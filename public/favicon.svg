@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" rx="8" fill="#4F46E5"/>
+  
+  <!-- Code brackets -->
+  <path d="M12 10L8 16L12 22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M20 10L24 16L20 22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Vibing wave -->
+  <path d="M16 8C16 8 14 12 16 16C18 20 16 24 16 24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
