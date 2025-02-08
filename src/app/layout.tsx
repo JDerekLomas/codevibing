@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ['latin'] });
  * Configures SEO and social sharing metadata for the application
  */
 export const metadata: Metadata = {
-  metadataBase: new URL('https://codevibing-q7u0m4yg4-derek-lomas-projects.vercel.app'),
   title: {
     default: 'CodeVibing - Share Your AI-Generated React Projects',
     template: '%s | CodeVibing'
