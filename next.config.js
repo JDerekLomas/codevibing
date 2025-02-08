@@ -1,27 +1,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure image optimization and domains
+  // Image optimization configuration
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.vercel.app',
-      },
-    ],
-    loader: 'default',
-    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    domains: ['localhost', 'vercel.app'],
   },
 
   // Enable strict mode for better development practices
   reactStrictMode: true,
 
-  // Customize webpack config
-  webpack: (config) => {
-    return config;
+  // Static file serving configuration
+  experimental: {
+    // Enable static serving
+    isrMemoryCacheSize: 0,
+    // Ensure correct static paths
+    appDir: true,
+    serverActions: true,
   },
 
-  // Disable image optimization in development
-  env: {
-    optimizeImages: process.env.NODE_ENV === 'production',
+  // Source maps for better debugging
+  productionBrowserSourceMaps: true,
+
+  // Customize compiler options
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === 'production',
   },
+  
+  // Static optimization
+  poweredByHeader: false,
+  compress: true,
 }

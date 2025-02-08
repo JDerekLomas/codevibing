@@ -28,18 +28,18 @@ export default function ProjectCard({
   return (
     <div className="project-card group bg-white rounded-lg overflow-hidden shadow-md">
       {/* Screenshot with fallback */}
-      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+      <div className="relative w-full aspect-video bg-gray-100">
         <Image
           src={screenshot}
           alt={`Screenshot of ${title}`}
-          width={400}
-          height={225}
-          className={`object-cover w-full h-full transition-opacity duration-300 ${
+          width={600}
+          height={338}
+          className={`object-cover w-full transition-opacity duration-300 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           onLoadingComplete={() => setImageLoaded(true)}
           priority={false}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized={screenshot.endsWith('.svg')}
         />
         {!imageLoaded && (
           <div className="absolute inset-0 loading-skeleton" />
