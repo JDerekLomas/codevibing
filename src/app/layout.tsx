@@ -2,13 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-// Initialize Inter font with Latin subset
 const inter = Inter({ subsets: ['latin'] });
 
-/**
- * Metadata Configuration
- * Configures SEO and social sharing metadata for the application
- */
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
   title: {
@@ -37,14 +32,11 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Root Layout Component
- */
-export default function RootLayout({
-  children,
-}: {
+type RootLayoutProps = {
   children: React.ReactNode;
-}) {
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="h-full scroll-smooth">
       <body className={`${inter.className} h-full bg-gray-50 antialiased`}>
