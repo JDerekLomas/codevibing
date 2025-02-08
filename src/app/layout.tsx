@@ -8,10 +8,9 @@ const inter = Inter({ subsets: ['latin'] });
 /**
  * Metadata Configuration
  * Configures SEO and social sharing metadata for the application
- * Uses the metadataBase to ensure consistent URL generation
  */
 export const metadata: Metadata = {
-  metadataBase: new URL('https://codevibing-etjtwbhaq-derek-lomas-projects.vercel.app'),
+  metadataBase: new URL('https://codevibing-q7u0m4yg4-derek-lomas-projects.vercel.app'),
   title: {
     default: 'CodeVibing - Share Your AI-Generated React Projects',
     template: '%s | CodeVibing'
@@ -26,20 +25,11 @@ export const metadata: Metadata = {
     siteName: 'CodeVibing',
     locale: 'en_US',
     type: 'website',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'CodeVibing - AI-Generated React Components'
-      }
-    ]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CodeVibing - Share Your AI-Generated React Projects',
     description: 'A visual gallery of AI-generated React components and experiments',
-    images: ['/og-image.png'],
   },
   robots: {
     index: true,
