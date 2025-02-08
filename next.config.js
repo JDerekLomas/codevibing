@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Output as a standalone application
-  output: 'standalone',
-  
   // Configure image optimization and domains
   images: {
     remotePatterns: [
@@ -24,12 +21,7 @@ const nextConfig = {
   },
 
   // Disable image optimization in development
-  // for faster build times
   env: {
     optimizeImages: process.env.NODE_ENV === 'production',
   },
-
-  // Configure base path and asset prefix if needed
-  basePath: '',
-  assetPrefix: '',
 }
