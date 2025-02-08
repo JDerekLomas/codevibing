@@ -27,62 +27,75 @@ const exampleProjects = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl tracking-tight">
-              Code Vibing
+      <div className="bg-white">
+        <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+          <div className="max-w-3xl">
+            <h1 className="heading-1 mb-6 text-gray-900">
+              Create. Share.
+              <br />
+              <span className="text-gray-500">With AI assistance.</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-xl sm:text-2xl md:mt-5 md:max-w-3xl">
-              Share and explore AI-generated React components. Join the creative coding revolution.
+            <p className="text-xl md:text-2xl text-gray-600 font-light mb-12 leading-relaxed">
+              A minimalist platform for sharing and exploring AI-generated React components.
+              Build beautiful interfaces faster than ever.
             </p>
-            <div className="mt-10">
-              <Link
-                href="/playground"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
+            <div className="flex gap-4">
+              <Link href="/playground" className="btn-primary">
+                Start Creating
+              </Link>
+              <Link 
+                href="#gallery" 
+                className="px-8 py-3 rounded-full text-gray-600 hover:text-gray-900 transition-colors"
               >
-                Create New Project
+                View Gallery
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Gallery Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Latest Projects</h2>
-          <select className="bg-white border border-gray-300 rounded-md px-3 py-1.5 text-sm">
-            <option value="latest">Latest</option>
-            <option value="popular">Popular</option>
-            <option value="trending">Trending</option>
-          </select>
-        </div>
+      {/* Featured Section */}
+      <div className="border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <div className="flex justify-between items-center mb-16">
+            <h2 className="heading-2">Featured Projects</h2>
+            <select className="px-4 py-2 border border-gray-200 rounded-full text-sm text-gray-600 bg-white hover:border-gray-300 transition-colors">
+              <option value="latest">Latest</option>
+              <option value="popular">Popular</option>
+              <option value="trending">Trending</option>
+            </select>
+          </div>
 
-        {/* Project Grid */}
-        <div className="masonry-grid">
-          {exampleProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              title={project.title}
-              description={project.description}
-              screenshot={project.screenshot}
-              demoUrl={project.demoUrl}
-              tags={project.tags}
-              authorName={project.authorName}
-              createdAt={project.createdAt}
-            />
-          ))}
+          {/* Project Grid */}
+          <div className="masonry-grid">
+            {exampleProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                title={project.title}
+                description={project.description}
+                screenshot={project.screenshot}
+                demoUrl={project.demoUrl}
+                tags={project.tags}
+                authorName={project.authorName}
+                createdAt={project.createdAt}
+              />
+            ))}
+          </div>
         </div>
-      </main>
+      </div>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} CodeVibing. All rights reserved.
+      <footer className="border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="flex justify-between items-center text-sm text-gray-500">
+            <div>© {new Date().getFullYear()} CodeVibing</div>
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-gray-900 transition-colors">About</a>
+              <a href="#" className="hover:text-gray-900 transition-colors">Terms</a>
+              <a href="#" className="hover:text-gray-900 transition-colors">Privacy</a>
+            </div>
           </div>
         </div>
       </footer>
