@@ -27,27 +27,30 @@ export default function ProjectCard({
 
   return (
     <div className="project-card group bg-white rounded-lg overflow-hidden shadow-md">
-      {/* Screenshot */}
+      {/* Screenshot with fallback */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
         <Image
           src={screenshot}
-          alt={title}
-          fill
-          className={`object-cover transition-opacity duration-300 ${
+          alt={`Screenshot of ${title}`}
+          width={400}
+          height={225}
+          className={`object-cover w-full h-full transition-opacity duration-300 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           onLoadingComplete={() => setImageLoaded(true)}
+          priority={false}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {!imageLoaded && (
           <div className="absolute inset-0 loading-skeleton" />
         )}
         
-        {/* Overlay with actions */}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        {/* Hover overlay with actions */}
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           {demoUrl && (
             <Link
               href={demoUrl}
-              className="bg-white text-gray-900 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors"
+              className="bg-white text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors"
             >
               Try it live
             </Link>
@@ -56,32 +59,35 @@ export default function ProjectCard({
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-gray-900 mb-1">
+      <div className="p-6">
+        <h3 className="font-medium text-lg text-gray-900 mb-2">
           {title}
         </h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
           {description}
         </p>
         
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-2 mb-4">
           {tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full"
+              className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full"
             >
               {tag}
             </span>
           ))}
         </div>
 
-        {/* Meta */}
+        {/* Meta information */}
         <div className="flex justify-between items-center text-sm text-gray-500">
           {authorName && (
-            <span>by {authorName}</span>
+            <span className="font-light">by {authorName}</span>
           )}
-          <time dateTime={createdAt.toISOString()}>
+          <time 
+            dateTime={createdAt.toISOString()}
+            className="font-light"
+          >
             {new Intl.DateTimeFormat('en-US', {
               month: 'short',
               day: 'numeric',
