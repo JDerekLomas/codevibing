@@ -1,23 +1,31 @@
+/* Tailwind CSS imports */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Base styles and CSS variables
+   Defines core design system values and default styles */
 @layer base {
   :root {
     --header-height: 4rem;
+    /* System font stack with fallbacks for optimal rendering */
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
+  /* Base HTML element styles */
   html {
-    @apply antialiased;
+    @apply antialiased; /* Enable font smoothing */
     font-family: var(--font-sans);
   }
 
+  /* Set neutral background and text colors */
   body {
     @apply bg-gray-50 text-gray-900;
   }
 }
 
+/* Layout reset
+   Ensures consistent full-height layouts */
 html,
 body {
   height: 100%;
@@ -25,6 +33,7 @@ body {
   margin: 0;
 }
 
+/* Next.js specific layout adjustments */
 #__next {
   height: 100%;
 }
@@ -33,7 +42,8 @@ body {
   height: 100%;
 }
 
-/* Animations */
+/* Animation Keyframes
+   Defines reusable animations for micro-interactions */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -54,7 +64,8 @@ body {
   }
 }
 
-/* Project card animations */
+/* Project Card Styles
+   Applies subtle hover animations and transitions */
 .project-card {
   @apply transition-all duration-500 ease-out;
 }
@@ -63,7 +74,9 @@ body {
   @apply transform -translate-y-1 shadow-md;
 }
 
-/* Masonry grid */
+/* Masonry Grid Layout
+   Creates a responsive grid system for project cards
+   Adjusts columns based on viewport width */
 .masonry-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -71,6 +84,7 @@ body {
   grid-auto-flow: dense;
 }
 
+/* Responsive breakpoints for grid layout */
 @media (min-width: 768px) {
   .masonry-grid {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -83,12 +97,14 @@ body {
   }
 }
 
-/* Loading animations */
+/* Loading States
+   Provides visual feedback during content loading */
 .loading-skeleton {
   @apply animate-pulse bg-gray-100 rounded;
 }
 
-/* Custom button styles */
+/* Button Styles
+   Consistent button styling with hover and focus states */
 .btn-primary {
   @apply bg-gray-900 text-white px-8 py-3 rounded-full font-medium 
          hover:bg-gray-800 transition-colors duration-300 ease-in-out 
@@ -96,7 +112,8 @@ body {
          focus:ring-offset-2;
 }
 
-/* Typography */
+/* Typography Scale
+   Defines consistent heading styles across the application */
 .heading-1 {
   @apply text-4xl sm:text-5xl md:text-6xl font-light tracking-tight;
 }
