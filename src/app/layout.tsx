@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
  * Configures SEO and social sharing metadata for the application
  */
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
   title: {
     default: 'CodeVibing - Share Your AI-Generated React Projects',
     template: '%s | CodeVibing'
@@ -38,13 +39,6 @@ export const metadata: Metadata = {
 
 /**
  * Root Layout Component
- * 
- * Provides the base HTML structure and applies global styles
- * Features:
- * - Implements Inter font for clean typography
- * - Sets HTML language for accessibility
- * - Maintains full height layout
- * - Applies consistent background color
  */
 export default function RootLayout({
   children,
