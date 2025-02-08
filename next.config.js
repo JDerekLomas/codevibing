@@ -1,8 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable React strict mode
+  reactStrictMode: true,
+
+  // Image optimization settings
   images: {
-    unoptimized: true,
-    domains: ['vercel.app']
+    domains: ['vercel.app'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
-  reactStrictMode: true
+
+  // Static file serving configuration
+  swcMinify: true,
+  poweredByHeader: false,
 }
