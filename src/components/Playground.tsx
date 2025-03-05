@@ -176,7 +176,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-[90vh] flex flex-col border border-gray-300 rounded-lg overflow-hidden">
       <header className="bg-gray-900 text-white p-4">
         <div className="flex justify-between items-center">
           <div>
@@ -188,7 +188,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
               className="bg-gray-800 text-white px-3 py-1 rounded"
               onChange={(e) => setCode(examples[e.target.value as ExampleType])}
             >
-              <option value="" disabled>Select Example</option>
+              <option value="" disabled selected>Select Example</option>
               <option value="basic">Basic</option>
               <option value="counter">Counter</option>
               <option value="todo">Todo List</option>
@@ -211,7 +211,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 disabled:opacity-50 font-medium"
               >
                 {isSaving ? 'Saving...' : 'Save Project'}
               </button>
@@ -220,8 +220,8 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
         </div>
       </header>
       
-      <main className="flex-1 flex">
-        <div className="w-1/2 border-r border-gray-200 flex flex-col">
+      <main className="flex-1 flex min-h-[400px]">
+        <div className="w-1/2 border-r border-gray-200 flex flex-col relative">
           <Editor
             height="100%"
             defaultLanguage="javascript"
@@ -237,6 +237,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
               wordWrap: 'on',
               tabSize: 2,
             }}
+            className="absolute inset-0" // Ensure editor fills the container
           />
           {error && (
             <div className="bg-red-50 text-red-500 p-2 text-sm border-t border-red-100">

@@ -79,10 +79,10 @@ export default function PublishForm({ initialCode }: PublishFormProps) {
   };
   
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col p-4 md:p-6 max-w-[1600px] mx-auto">
       <div className="mb-4 bg-white p-4 shadow-sm border border-gray-200 rounded-lg">
         <h2 className="text-xl font-semibold mb-2">Paste React code from Claude or ChatGPT</h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600">
           After editing your code, click "Save Project" to generate a screenshot and continue to publishing.
         </p>
       </div>
