@@ -257,7 +257,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
             }}
           >
             <SandpackLayout>
-              <div className="sandbox-preview flex-1">
+              <div className={`sandbox-preview ${consoleVisible ? 'h-2/3' : 'flex-1'}`}>
                 <SandpackPreview 
                   showOpenInCodeSandbox={false}
                   showRefreshButton={true}
@@ -266,7 +266,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
               </div>
               {consoleVisible && (
                 <div className="h-1/3 border-t border-gray-200">
-                  <SandpackConsole />
+                  <SandpackConsole resetOnPreviewReload={true} />
                 </div>
               )}
             </SandpackLayout>
