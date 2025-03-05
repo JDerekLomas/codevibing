@@ -1,35 +1,10 @@
 import Link from 'next/link';
-import ProjectCard from '@/components/ProjectCard';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
-/**
- * Example project data
- * These projects demonstrate the platform's capabilities with encoded playground states
- * Base64 encoded strings contain the initial playground code for each example
- */
-const exampleProjects = [
-  {
-    id: '1',
-    title: 'Animated Navigation Menu',
-    description: 'A smooth animated navigation menu created with AI assistance. Features hover effects and mobile responsiveness.',
-    screenshot: '/examples/placeholder.svg',
-    // Base64 encoded React component code for the navigation menu example
-    demoUrl: '/playground#Y29uc3QgW2lzT3Blbiwgc2V0SXNPcGVuXSA9IHVzZVN0YXRlKGZhbHNlKTsKCnJldHVybiAoCiAgPG5hdiBjbGFzc05hbWU9InAtNCI+CiAgICA8ZGl2IGNsYXNzTmFtZT0iZmxleCBqdXN0aWZ5LWJldHdlZW4gaXRlbXMtY2VudGVyIj4KICAgICAgPGgxIGNsYXNzTmFtZT0idGV4dC14bCI+TG9nbzwvaDE+CiAgICAgIDxidXR0b24KICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRJc09wZW4oIWlzT3Blbil9CiAgICAgICAgY2xhc3NOYW1lPSJtZDpoaWRkZW4gcC0yIgogICAgICA+CiAgICAgICAgPHN2ZyB2aWV3Qm94PSIwIDAgMjAgMjAiIGNsYXNzTmFtZT0idy02IGgtNiI+CiAgICAgICAgICA8bGluZQogICAgICAgICAgICB4MT0iMyIgeTE9IjEwIiB4Mj0iMTciIHkyPSIxMCIKICAgICAgICAgICAgc3Ryb2tlPSJjdXJyZW50Q29sb3IiCiAgICAgICAgICAgIHN0cm9rZVdpZHRoPSIyIgogICAgICAgICAgLz4KICAgICAgICA8L3N2Zz4KICAgICAgPC9idXR0b24+CiAgICA8L2Rpdj4KICAgIDx1bAogICAgICBjbGFzc05hbWU9e2BiZy13aGl0ZSBtZDpmbGV4IG1kOnNwYWNlLXgtNCBtZDpzdGF0aWMgYWJzb2x1dGUgbGVmdC0wIHJpZ2h0LTAgcC00IG10LTIgbWQ6bXQtMCB0cmFuc2l0aW9uLWFsbCAke2lzT3BlbiA/ICd2aXNpYmxlJyA6ICdoaWRkZW4gbWQ6dmlzaWJsZSd9YH0KICAgID4KICAgICAgPGxpPjxhIGhyZWY9IiMiPkhvbWU8L2E+PC9saT4KICAgICAgPGxpPjxhIGhyZWY9IiMiPkFib3V0PC9hPjwvbGk+CiAgICAgIDxsaT48YSBocmVmPSIjIj5TZXJ2aWNlczwvYT48L2xpPgogICAgICA8bGk+PGEgaHJlZj0iIyI+Q29udGFjdDwvYT48L2xpPgogICAgPC91bD4KICA8L25hdj4KKTs=',
-    tags: ['React', 'Animation', 'Navigation', 'Claude'],
-    authorName: 'Derek Lomas',
-    createdAt: new Date('2025-02-07'),
-  },
-  {
-    id: '2',
-    title: 'Dynamic Form Builder',
-    description: 'AI-generated form builder with validation, dynamic fields, and real-time preview.',
-    screenshot: '/examples/placeholder.svg',
-    // Base64 encoded React component code for the form builder example
-    demoUrl: '/playground#Y29uc3QgW2ZpZWxkcywgc2V0RmllbGRzXSA9IHVzZVN0YXRlKFtdKTsKY29uc3QgW2Zvcm1EYXRhLCBzZXRGb3JtRGF0YV0gPSB1c2VTdGF0ZSh7fSk7Cgpjb25zdCBhZGRGaWVsZCA9ICh0eXBlKSA9PiB7CiAgc2V0RmllbGRzKFsuLi5maWVsZHMsIHsKICAgIGlkOiBEYXRlLm5vdygpLnRvU3RyaW5nKCksCiAgICB0eXBlLAogICAgbGFiZWw6IGBOZXcgJHt0eXBlfWAsCiAgfV0pOwp9OwoKcmV0dXJuICgKICA8ZGl2IGNsYXNzTmFtZT0icC00Ij4KICAgIDxkaXYgY2xhc3NOYW1lPSJtYi00Ij4KICAgICAgPGJ1dHRvbgogICAgICAgIG9uQ2xpY2s9eygpID0+IGFkZEZpZWxkKCd0ZXh0Jyl9CiAgICAgICAgY2xhc3NOYW1lPSJiZy1ibHVlLTUwMCB0ZXh0LXdoaXRlIHB4LTQgcHktMiByb3VuZGVkIG1yLTIiCiAgICAgID4KICAgICAgICBBZGQgVGV4dCBGaWVsZAogICAgICA8L2J1dHRvbj4KICAgICAgPGJ1dHRvbgogICAgICAgIG9uQ2xpY2s9eygpID0+IGFkZEZpZWxkKCdzZWxlY3QnKX0KICAgICAgICBjbGFzc05hbWU9ImJnLWdyZWVuLTUwMCB0ZXh0LXdoaXRlIHB4LTQgcHktMiByb3VuZGVkIgogICAgICA+CiAgICAgICAgQWRkIFNlbGVjdCBGaWVsZAogICAgICA8L2J1dHRvbj4KICAgIDwvZGl2PgoKICAgIDxmb3JtIGNsYXNzTmFtZT0ic3BhY2UteS00Ij4KICAgICAge2ZpZWxkcy5tYXAoKGZpZWxkKSA9PiAoCiAgICAgICAgPGRpdiBrZXk9e2ZpZWxkLmlkfSBjbGFzc05hbWU9ImZsZXggZmxleC1jb2wiPgogICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT0ibWItMSI+e2ZpZWxkLmxhYmVsfTwvbGFiZWw+CiAgICAgICAgICB7ZmllbGQudHlwZSA9PT0gJ3RleHQnID8gKAogICAgICAgICAgICA8aW5wdXQKICAgICAgICAgICAgICB0eXBlPSJ0ZXh0IgogICAgICAgICAgICAgIGNsYXNzTmFtZT0iYm9yZGVyIHAtMiByb3VuZGVkIgogICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4KICAgICAgICAgICAgICAgIHNldEZvcm1EYXRhKHsuLi5mb3JtRGF0YSwgW2ZpZWxkLmlkXTogZS50YXJnZXQudmFsdWV9KQogICAgICAgICAgICAgIH0KICAgICAgICAgICAgLz4KICAgICAgICAgICkgOiAoCiAgICAgICAgICAgIDxzZWxlY3QKICAgICAgICAgICAgICBjbGFzc05hbWU9ImJvcmRlciBwLTIgcm91bmRlZCIKICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+CiAgICAgICAgICAgICAgICBzZXRGb3JtRGF0YSh7Li4uZm9ybURhdGEsIFtmaWVsZC5pZF06IGUudGFyZ2V0LnZhbHVlfSkKICAgICAgICAgICAgICB9CiAgICAgICAgICAgID4KICAgICAgICAgICAgICA8b3B0aW9uPk9wdGlvbiAxPC9vcHRpb24+CiAgICAgICAgICAgICAgPG9wdGlvbj5PcHRpb24gMjwvb3B0aW9uPgogICAgICAgICAgICA8L3NlbGVjdD4KICAgICAgICAgICl9CiAgICAgICAgPC9kaXY+CiAgICAgICkpfQogICAgPC9mb3JtPgogIDwvZGl2Pgop',
-    tags: ['React', 'Forms', 'Dynamic UI', 'GitHub Copilot'],
-    authorName: 'Derek Lomas',
-    createdAt: new Date('2025-02-07'),
-  },
-];
+const GalleryGrid = dynamic(() => import('@/components/GalleryGrid'), {
+  ssr: false
+});
 
 /**
  * Home Page Component
@@ -50,7 +25,7 @@ export default function Home() {
       <div className="bg-white">
         <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl">
-            <h1 className="heading-1 mb-6 text-gray-900">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
               Create. Share.
               <br />
               <span className="text-gray-500">With AI assistance.</span>
@@ -60,7 +35,10 @@ export default function Home() {
               Build beautiful interfaces faster than ever.
             </p>
             <div className="flex gap-4">
-              <Link href="/playground" className="btn-primary">
+              <Link 
+                href="/playground" 
+                className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-colors"
+              >
                 Start Creating
               </Link>
               <Link 
@@ -74,43 +52,79 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Featured Section 
-          Displays a curated selection of projects in a responsive grid layout
-          with consistent spacing and subtle animations */}
-      <div className="border-t border-gray-100">
+      {/* Gallery Section 
+          Displays projects in a responsive grid layout with live data */}
+      <div id="gallery" className="border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-24">
-          <div className="flex justify-between items-center mb-16">
-            <h2 className="heading-2">Featured Projects</h2>
-            {/* Filter dropdown using system font and minimal styling */}
-            <select className="px-4 py-2 border border-gray-200 rounded-full text-sm text-gray-600 bg-white hover:border-gray-300 transition-colors">
-              <option value="latest">Latest</option>
-              <option value="popular">Popular</option>
-              <option value="trending">Trending</option>
-            </select>
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Component Gallery</h2>
+            <p className="text-gray-600 max-w-3xl">
+              Browse AI-generated React components shared by the community. Find inspiration,
+              learn new techniques, and remix components for your own projects.
+            </p>
           </div>
 
-          {/* Project Grid 
-              Uses CSS Grid for a responsive masonry-style layout
-              Each ProjectCard maintains consistent spacing and styling */}
-          <div className="masonry-grid">
-            {exampleProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                title={project.title}
-                description={project.description}
-                screenshot={project.screenshot}
-                demoUrl={project.demoUrl}
-                tags={project.tags}
-                authorName={project.authorName}
-                createdAt={project.createdAt}
-              />
-            ))}
+          {/* Gallery Grid */}
+          <Suspense fallback={
+            <div className="py-12 text-center text-gray-500">
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p>Loading gallery...</p>
+            </div>
+          }>
+            <GalleryGrid limit={6} />
+          </Suspense>
+          
+          <div className="mt-12 text-center">
+            <Link 
+              href="/gallery" 
+              className="bg-gray-100 text-gray-800 px-8 py-3 rounded-full hover:bg-gray-200 transition-colors"
+            >
+              View All Components
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Footer 
-          Simple, minimal footer with subtle borders and consistent spacing */}
+      {/* How It Works Section */}
+      <div className="bg-white border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl">1</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Paste AI-Generated Code</h3>
+              <p className="text-gray-600">
+                Paste your React component code from Claude, ChatGPT, or Copilot into our playground.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl">2</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Edit & Preview</h3>
+              <p className="text-gray-600">
+                Preview your component in real-time, make edits, and generate metadata automatically.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl">3</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Share with Community</h3>
+              <p className="text-gray-600">
+                Publish your component to the gallery where others can view, like, and remix it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
       <footer className="border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex justify-between items-center text-sm text-gray-500">
