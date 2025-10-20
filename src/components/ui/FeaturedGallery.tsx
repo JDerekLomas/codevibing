@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { projectService } from '@/lib/projectService';
+import type { ProjectSummary } from '@/lib/types';
 
 interface FeaturedGalleryProps {
   limit?: number;
 }
 
 export default function FeaturedGallery({ limit = 6 }: FeaturedGalleryProps) {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

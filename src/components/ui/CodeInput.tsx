@@ -37,17 +37,17 @@ export default function Component() {
   );
 }`;
 
-export default function CodeInput({ onSubmit }) {
+export default function CodeInput({ onSubmit }: { onSubmit: (code: string, screenshot: string) => void }) {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [isCapturing, setIsCapturing] = useState(false);
-  const previewRef = useRef(null);
+  const previewRef = useRef<HTMLElement | null>(null);
   
   // Update the DOM ref when the preview is rendered
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
       for(let mutation of mutations) {
         if (mutation.type === 'childList') {
-          const previewElement = document.querySelector('.sp-preview-container');
+          const previewElement = document.querySelector('.sp-preview-container') as HTMLElement;
           if (previewElement && !previewRef.current) {
             previewRef.current = previewElement;
           }
@@ -60,7 +60,7 @@ export default function CodeInput({ onSubmit }) {
     return () => observer.disconnect();
   }, []);
 
-  const handleEditorChange = (value) => {
+  const handleEditorChange = (value: string | undefined) => {
     setCode(value || DEFAULT_CODE);
   };
   

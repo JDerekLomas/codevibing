@@ -1,30 +1,27 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
   title: {
-    default: 'CodeVibing - Share Your AI-Generated React Projects',
+    default: 'CodeVibing - Instant React Playground',
     template: '%s | CodeVibing'
   },
-  description: 'A visual gallery of AI-generated React components and experiments. Share and explore creative coding with AI assistance.',
+  description: 'An instant React playground for running and sharing code. Paste your React components and see them run live in your browser.',
   icons: {
     icon: '/favicon.svg',
   },
   openGraph: {
-    title: 'CodeVibing - Share Your AI-Generated React Projects',
-    description: 'A visual gallery of AI-generated React components and experiments',
+    title: 'CodeVibing - Instant React Playground',
+    description: 'An instant React playground for running and sharing code',
     siteName: 'CodeVibing',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CodeVibing - Share Your AI-Generated React Projects',
-    description: 'A visual gallery of AI-generated React components and experiments',
+    title: 'CodeVibing - Instant React Playground',
+    description: 'An instant React playground for running and sharing code',
   },
   robots: {
     index: true,
@@ -39,7 +36,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="h-full scroll-smooth">
-      <body className={`${inter.className} h-full bg-gray-50 antialiased`}>
+      <body className="h-full bg-gray-50 antialiased font-sans">
         {children}
       </body>
     </html>
