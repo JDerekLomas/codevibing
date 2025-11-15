@@ -35,6 +35,35 @@ A visual gallery of AI-generated React components and experiments. Share and exp
 
 Visit [http://localhost:3000](http://localhost:3000) to see the app running.
 
+## Publishing your own copy to GitHub
+
+If you started from a local folder and want to push it to a brand-new GitHub repository so that you (or collaborators) can clone it later, follow these exact steps:
+
+1. **Create a repository on GitHub**
+   * Visit <https://github.com/new> and make a repository (no need to initialize it with a README—this project already has one).
+   * Copy the HTTPS URL GitHub shows you, e.g. `https://github.com/<your-username>/codevibing.git`.
+
+2. **Wire up your local project to that remote** (run these in your project folder):
+   ```bash
+   git init               # only if the folder is not already a git repo
+   git remote add origin https://github.com/<your-username>/codevibing.git
+   git branch -M main     # optional, makes sure your default branch is "main"
+   git push -u origin main
+   ```
+   The `git push` command uploads everything to GitHub. If you already had commits locally, this publishes them; if not, run `git add .` and `git commit -m "Initial commit"` before pushing.
+
+3. **Verify the connection**
+   ```bash
+   git remote -v
+   ```
+   You should see your GitHub URL listed twice (for `fetch` and `push`).
+
+4. **Clone it elsewhere**
+   ```bash
+   git clone https://github.com/<your-username>/codevibing.git
+   ```
+   Replace `<your-username>` with your GitHub handle. You can now run the Getting Started steps on any machine.
+
 ## Project Structure
 
 ```
