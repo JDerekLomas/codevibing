@@ -37,10 +37,14 @@ export default function Component() {
   );
 }`;
 
-export default function CodeInput({ onSubmit }) {
+interface CodeInputProps {
+  onSubmit: (code: string, previewImage: string) => void;
+}
+
+export default function CodeInput({ onSubmit }: CodeInputProps) {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [isCapturing, setIsCapturing] = useState(false);
-  const previewRef = useRef(null);
+  const previewRef = useRef<Element | null>(null);
   
   // Update the DOM ref when the preview is rendered
   useEffect(() => {
@@ -60,7 +64,7 @@ export default function CodeInput({ onSubmit }) {
     return () => observer.disconnect();
   }, []);
 
-  const handleEditorChange = (value) => {
+  const handleEditorChange = (value: string | undefined): void => {
     setCode(value || DEFAULT_CODE);
   };
   
@@ -71,7 +75,7 @@ export default function CodeInput({ onSubmit }) {
     }
     
     try {
-      return await toPng(previewRef.current, {
+      return await toPng(previewRef.current as HTMLElement, {
         quality: 0.95,
         backgroundColor: '#fff',
       });

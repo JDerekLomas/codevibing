@@ -3,11 +3,18 @@
 import { useState, useEffect } from 'react';
 import { generateMetadata } from '@/lib/generateMetadata';
 
-export default function MetadataForm({ code, screenshot, onBack, onSubmit }) {
+interface MetadataFormProps {
+  code: string;
+  screenshot: string;
+  onBack: () => void;
+  onSubmit: (metadata: any) => void;
+}
+
+export default function MetadataForm({ code, screenshot, onBack, onSubmit }: MetadataFormProps) {
   const [metadata, setMetadata] = useState({
     title: '',
     description: '',
-    tags: [],
+    tags: [] as string[],
     authorName: '',
     aiTool: ''
   });
@@ -39,7 +46,7 @@ export default function MetadataForm({ code, screenshot, onBack, onSubmit }) {
     }
   };
   
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
     setMetadata({
       ...metadata,
@@ -63,14 +70,14 @@ export default function MetadataForm({ code, screenshot, onBack, onSubmit }) {
     setTagInput('');
   };
   
-  const removeTag = (tagToRemove) => {
+  const removeTag = (tagToRemove: string): void => {
     setMetadata({
       ...metadata,
       tags: metadata.tags.filter(tag => tag !== tagToRemove)
     });
   };
-  
-  const handleSubmit = (e) => {
+
+  const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     setIsSubmitting(true);
     

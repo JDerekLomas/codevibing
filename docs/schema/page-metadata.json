@@ -1,0 +1,664 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://codevibing.internal/schemas/page-metadata.json",
+  "title": "Page Metadata Record",
+  "description": "Structured metadata emitted for each textbook page by the Claude-powered labeling system.",
+  "type": "object",
+  "required": [
+    "book_id",
+    "page_number",
+    "source_checksum",
+    "summary",
+    "overview",
+    "topics",
+    "instructional",
+    "instructional_objectives",
+    "standards",
+    "assessment_profile",
+    "instructional_strategy",
+    "differentiation_supports",
+    "supplementary_resources",
+    "vocabulary_terms",
+    "equity_accessibility_flags",
+    "assets",
+    "qa_status",
+    "confidence_profile",
+    "generated_at"
+  ],
+  "properties": {
+    "book_id": {
+      "type": "string",
+      "description": "Stable identifier for the textbook (slug or UUID)."
+    },
+    "page_number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1-based page index inside the book."
+    },
+    "source_checksum": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "description": "SHA-256 checksum of the source PDF to ensure traceability."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Two- to three-sentence overview of the instructional focus."
+    },
+    "overview": {
+      "type": "object",
+      "required": ["key_points", "learning_focus", "teacher_guidance"],
+      "properties": {
+        "key_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Bullet highlights summarizing the page."
+        },
+        "learning_focus": {
+          "type": "string",
+          "description": "Primary learning focus articulated in reviewer-friendly language."
+        },
+        "teacher_guidance": {
+          "type": "string",
+          "description": "Notes for teachers (setup, facilitation tips, misconceptions)."
+        },
+        "student_prerequisites": {
+          "type": "string",
+          "description": "Optional prior knowledge students should have before this page."
+        }
+      },
+      "additionalProperties": false
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["label", "confidence"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Canonical taxonomy slug."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable label for UI display."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Model confidence for the label."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Quoted snippet or rationale supporting the label."
+          },
+          "taxonomy_path": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Hierarchy from root to label."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "instructional": {
+      "type": "object",
+      "required": ["grade_band", "age_range", "pedagogy_type", "bloom_level", "primary_skill"],
+      "properties": {
+        "grade_band": {
+          "type": "string",
+          "enum": ["K-2", "3-5", "6-8", "9-12", "higher-ed", "unspecified"],
+          "description": "Primary grade band for the page content."
+        },
+        "age_range": {
+          "type": "object",
+          "required": ["min", "max", "confidence"],
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 3
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 3
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "pedagogy_type": {
+          "type": "object",
+          "required": ["value", "confidence"],
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": [
+                "lecture",
+                "worked_example",
+                "guided_practice",
+                "independent_practice",
+                "assessment",
+                "lab_activity",
+                "project",
+                "reference",
+                "discussion",
+                "other"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "bloom_level": {
+          "type": "object",
+          "required": ["value", "confidence"],
+          "properties": {
+            "value": {
+              "type": "string",
+              "enum": ["remember", "understand", "apply", "analyze", "evaluate", "create", "unspecified"]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "primary_skill": {
+          "type": "object",
+          "required": ["label", "confidence"],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "instructional_objectives": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["description", "confidence"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Action-oriented objective text (SWBAT…)."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "related_standards": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "standards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["standard_id", "name", "alignment_confidence"],
+        "properties": {
+          "topic_label": {
+            "type": "string",
+            "description": "Topic that motivated the alignment."
+          },
+          "standard_id": {
+            "type": "string",
+            "description": "Canonical identifier from the standards corpus."
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "grade_band": {
+            "type": "string"
+          },
+          "alignment_type": {
+            "type": "string",
+            "enum": ["primary", "supporting", "extension", "review"]
+          },
+          "alignment_confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Supporting rationale or snippet reference."
+          },
+          "review_action": {
+            "type": "string",
+            "description": "Recommendation for human reviewers (e.g., confirm alignment)."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assessment_profile": {
+      "type": "object",
+      "required": ["purpose", "question_summary", "confidence"],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "enum": ["none", "informal", "formative", "summative", "diagnostic"],
+          "description": "Primary intent of assessments on this page."
+        },
+        "question_summary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["question_type", "count"],
+            "properties": {
+              "question_type": {
+                "type": "string",
+                "enum": [
+                  "multiple_choice",
+                  "short_answer",
+                  "open_response",
+                  "matching",
+                  "true_false",
+                  "other"
+                ]
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "differentiation_notes": {
+          "type": "string",
+          "description": "How assessment supports varied learners."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "instructional_strategy": {
+      "type": "object",
+      "required": ["primary", "supporting", "confidence"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "enum": [
+            "direct_instruction",
+            "guided_practice",
+            "independent_practice",
+            "collaborative_learning",
+            "project_based",
+            "exploratory",
+            "reference",
+            "discussion",
+            "other"
+          ]
+        },
+        "supporting": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "differentiation_supports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "description", "confidence"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["ELL", "intervention", "enrichment", "scaffolding", "extension", "other"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "supplementary_resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "description", "availability"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["worksheet", "digital_tool", "manipulative", "video", "assessment", "other"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "availability": {
+            "type": "string",
+            "enum": ["included", "external", "optional"]
+          },
+          "link": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "vocabulary_terms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "complexity", "confidence"],
+        "properties": {
+          "term": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "complexity": {
+            "type": "string",
+            "enum": ["introductory", "grade_level", "advanced", "requires_support"]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "equity_accessibility_flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "description", "severity", "confidence"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "reading_level",
+              "cultural_relevance",
+              "accessibility",
+              "language_support",
+              "technology_requirement",
+              "other"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "action": {
+            "type": "string",
+            "description": "Suggested follow-up or remediation."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assets": {
+      "type": "object",
+      "required": ["items", "assessment"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "description"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "diagram",
+                  "image",
+                  "table",
+                  "graph",
+                  "example",
+                  "activity",
+                  "experiment",
+                  "multimedia_callout",
+                  "other"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "bounding_box": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "minItems": 4,
+                "maxItems": 4,
+                "description": "[x1, y1, x2, y2] in pixels on rendered page image."
+              },
+              "notes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "assessment": {
+          "type": "object",
+          "required": ["has_assessment", "items"],
+          "properties": {
+            "has_assessment": {
+              "type": "boolean"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["question_type", "count"],
+                "properties": {
+                  "question_type": {
+                    "type": "string",
+                    "enum": [
+                      "multiple_choice",
+                      "short_answer",
+                      "open_response",
+                      "matching",
+                      "true_false",
+                      "other"
+                    ]
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidence_profile": {
+      "type": "object",
+      "description": "Aggregated confidences across subagents.",
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "topics_mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "standards_mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "instructional_mean": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "qa_status": {
+      "type": "object",
+      "required": ["status", "violations"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["approved", "retry", "manual_review"]
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["field", "issue", "severity"],
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "issue": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warning", "error"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "agent_versions": {
+      "type": "object",
+      "description": "Version metadata for each contributing agent.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "processing_log": {
+      "type": "array",
+      "description": "Ordered log of agent actions relevant to this page.",
+      "items": {
+        "type": "object",
+        "required": ["agent", "message", "timestamp"],
+        "properties": {
+          "agent": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

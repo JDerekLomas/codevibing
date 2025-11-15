@@ -334,7 +334,7 @@ export default function Playground({ initialCode, onSave }: PlaygroundProps) {
                     </svg>
                     Console Output
                   </div>
-                  <SandpackConsole resetOnPreviewReload={true} />
+                  <SandpackConsole resetOnPreviewRestart={true} />
                 </div>
               )}
             </SandpackLayout>

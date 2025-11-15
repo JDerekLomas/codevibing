@@ -47,6 +47,20 @@ codevibing/
 └── public/          # Static assets
 ```
 
+## Deployment
+
+Ready to deploy to production? See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions on deploying to Vercel.
+
+Quick deploy:
+```bash
+npm install -g vercel
+vercel
+```
+
+Make sure to set your environment variables in Vercel:
+- `ANTHROPIC_API_KEY` - Required for Claude integration
+- `CLAUDE_MODEL` - Model name (optional)
+
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.

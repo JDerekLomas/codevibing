@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import CodeInput from '@/components/ui/CodeInput';
-import Preview from '@/components/ui/Preview';
 import MetadataForm from '@/components/ui/MetadataForm';
 
 export default function CreatePage() {
@@ -19,13 +17,13 @@ export default function CreatePage() {
     aiTool: ''
   });
 
-  const handleCodeSubmit = (newCode, previewImage) => {
+  const handleCodeSubmit = (newCode: string, previewImage: string): void => {
     setCode(newCode);
     setScreenshot(previewImage);
     setActiveStep(2);
   };
 
-  const handleMetadataSubmit = (newMetadata) => {
+  const handleMetadataSubmit = (newMetadata: any): void => {
     setMetadata(newMetadata);
     // Would publish to backend here
     setActiveStep(3);

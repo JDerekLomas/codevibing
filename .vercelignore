@@ -1,0 +1,25 @@
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Development files
+.env.example
+.env.local.example
+
+# IDE
+.vscode/
+.idea/
+
+# Scripts
+scripts/
+
+# Misc
+.DS_Store
