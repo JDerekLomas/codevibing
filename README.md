@@ -1,85 +1,114 @@
 # CodeVibing
 
-A visual gallery of AI-generated React components and experiments. Share and explore creative coding with AI assistance.
+CodeVibing is a hybrid workspace that pairs a visual gallery of AI-generated React components with a research-grade Latin bibliography toolkit. The project combines a shareable Next.js playground for creative coding with a Python pipeline for constructing a master catalogue of Latin works (1450–1900).
 
-## Features
+```mermaid
+flowchart TD
+    subgraph Frontend Gallery
+        A[Next.js App Router]
+        B[Shared UI Components]
+        C[Data Seeds]
+        A --> B
+        A --> C
+    end
 
-- 🎨 Visual gallery of AI-generated projects
-- 💻 Live React playground
-- 🌟 Easy project sharing
-- 📱 Responsive design
-- 🎥 Auto-generated previews
+    subgraph Latin Corpus Toolkit
+        R[Raw Catalogue CSVs]
+        N[Normalization Utilities]
+        M[Master Bibliography Builder]
+        T[Translation Matcher]
+        P[Priority Scorer]
+        O[latin_master_1450_1900.csv]
+        R --> N --> M --> T --> P --> O
+    end
 
-## Getting Started
+    B -->|Showcase| Gallery[Live Gallery Experience]
+    O -->|Insights| Gallery
+```
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/JDerekLomas/codevibing.git
-   cd codevibing
-   ```
+## Repository Structure
 
-2. Install dependencies:
+```
+codevibing/
+├── src/                  # Next.js application source
+├── public/               # Static assets for the gallery
+├── latin_corpus/         # Python toolkit for the Latin master bibliography
+├── notebooks/            # Prototyping notebooks for dataset exploration
+├── package.json          # Frontend dependencies
+└── requirements.txt      # Python dependencies for the toolkit
+```
+
+## Frontend Quick Start
+
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Copy .env.example to .env.local and add your credentials:
+2. **Configure environment variables**
    ```bash
    cp .env.example .env.local
+   # Edit .env.local and add any required API keys
    ```
 
-4. Start the development server:
+3. **Run the development server**
    ```bash
    npm run dev
    ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the app running.
+   Visit <http://localhost:3000> to explore the gallery.
 
-## Publishing your own copy to GitHub
+## Latin Corpus Toolkit Overview
 
-If you started from a local folder and want to push it to a brand-new GitHub repository so that you (or collaborators) can clone it later, follow these exact steps:
+The toolkit in `latin_corpus/` assembles catalogue exports, flags digitization and translation coverage, and scores works for follow-up research.
 
-1. **Create a repository on GitHub**
-   * Visit <https://github.com/new> and make a repository (no need to initialize it with a README—this project already has one).
-   * Copy the HTTPS URL GitHub shows you, e.g. `https://github.com/<your-username>/codevibing.git`.
+### Prerequisites
 
-2. **Wire up your local project to that remote** (run these in your project folder):
+```bash
+cd latin_corpus
+python -m venv .venv
+source .venv/bin/activate   # On Windows: .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### Workflow
+
+1. Place catalogue exports (USTC, VD16/17/18, ESTC, etc.) and translation series CSVs in `latin_corpus/data/raw/`.
+2. Run the end-to-end builder:
    ```bash
-   git init               # only if the folder is not already a git repo
+   python -m latin_corpus.main
+   ```
+3. Inspect the generated master table at `latin_corpus/data/processed/latin_master_1450_1900.csv`.
+
+See [latin_corpus/README.md](latin_corpus/README.md) for detailed customization options, column mappings, and troubleshooting tips.
+
+## Publishing Your Own Copy to GitHub
+
+If you started from a local folder and want to push it to a new GitHub repository, follow these steps:
+
+1. Create an empty repository at <https://github.com/new>.
+2. Run the following commands from your project directory (replace the URL with your repo):
+   ```bash
+   git init
    git remote add origin https://github.com/<your-username>/codevibing.git
-   git branch -M main     # optional, makes sure your default branch is "main"
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
    git push -u origin main
    ```
-   The `git push` command uploads everything to GitHub. If you already had commits locally, this publishes them; if not, run `git add .` and `git commit -m "Initial commit"` before pushing.
-
-3. **Verify the connection**
+3. Verify the remote:
    ```bash
    git remote -v
    ```
-   You should see your GitHub URL listed twice (for `fetch` and `push`).
-
-4. **Clone it elsewhere**
+4. Clone elsewhere when needed:
    ```bash
    git clone https://github.com/<your-username>/codevibing.git
    ```
-   Replace `<your-username>` with your GitHub handle. You can now run the Getting Started steps on any machine.
-
-## Project Structure
-
-```
-codevibing/
-├── src/
-│   ├── app/          # Next.js app directory
-│   ├── components/   # Shared components
-│   ├── lib/         # Utilities and shared code
-│   └── data/        # Initial seed data
-└── public/          # Static assets
-```
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome improvements! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
