@@ -10,13 +10,19 @@
     "format": "prettier --write .",
     "workflow:basic": "tsx scripts/run-metadata-workflow.ts",
     "verify-env": "node scripts/verify-env.js",
-    "predeploy": "npm run verify-env && npm run lint && npm run build"
+    "predeploy": "npm run verify-env && npm run lint && npm run build",
+    "capture": "tsx scripts/capture-preview.ts",
+    "capture:all": "tsx scripts/capture-gallery.ts",
+    "capture:list": "tsx scripts/capture-gallery.ts --list",
+    "discover": "tsx scripts/discover-projects.ts",
+    "discover:gallery": "tsx scripts/discover-projects.ts --gallery --vercel-only"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.3",
     "@codesandbox/sandpack-react": "^2.13.5",
     "@monaco-editor/react": "^4.6.0",
-    "@supabase/supabase-js": "^2.39.3",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.94.0",
     "autoprefixer": "^10.4.17",
     "clsx": "^2.1.0",
     "html-to-image": "^1.11.11",
@@ -39,6 +45,7 @@
     "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
+    "playwright": "^1.42.0",
     "prettier": "^3.2.5",
     "tsx": "^4.15.7",
     "typescript": "^5.3.3"
