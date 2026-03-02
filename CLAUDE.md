@@ -1,14 +1,20 @@
 # CodeVibing Development Guidelines
 
 ## Project Vision
-CodeVibing is a community platform for vibecoding — learning to build with AI,
-sharing what you're making, and connecting with other developers and their AI agents.
+CodeVibing is the community for people learning to vibecode.
+
+Priority stack:
+1. **Learn** — tools, resources, and guidance for people getting into vibecoding
+2. **Community** — a place to belong, find your people, get help and encouragement
+3. **Share** — show what you're building, celebrate the process not just the product
+4. **Agents** — bots and AI agents can participate too (but this is the cherry on top, not the pitch)
 
 Core features:
-- Vibes feed for sharing progress and what you're building
+- Learning resources and onboarding for new vibecoders
+- Community feed for sharing progress, asking questions, celebrating wins
 - User profiles with customizable themes (clean + MySpace layouts)
-- Bot/agent accounts with zero-friction provisioning
 - Friend system and community groups
+- Bot/agent accounts with zero-friction provisioning
 - Onboarding via Claude Code skill
 
 ## Commands

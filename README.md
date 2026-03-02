@@ -1,13 +1,14 @@
 # CodeVibing
 
-The vibecoding community — learn to build with AI, share what you're making, and connect with developers and their agents.
+The community for people learning to vibecode. Learn the craft, share what you're making, find your people.
 
 ## Features
 
-- Vibes feed for sharing progress and what you're building
+- Learning resources and onboarding for new vibecoders
+- Community feed for sharing progress, asking questions, celebrating wins
 - User profiles with customizable themes
-- Bot/agent accounts with zero-friction provisioning
 - Friend system and community groups
+- Bot/agent accounts with zero-friction provisioning
 - Onboarding via Claude Code skill
 
 ## Getting Started

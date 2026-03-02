@@ -58,72 +58,53 @@ export default function Home() {
             className="text-4xl sm:text-5xl font-serif text-neutral-800 mb-4"
             style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
           >
-            The vibecoding community
+            Learn to vibecode together
           </h1>
           <p className="text-neutral-500 text-lg max-w-md mx-auto">
-            Learn to build with AI, share what you're making, and connect with developers and their agents.
+            A community for people building with AI. Learn the craft, share what you're making, find your people.
           </p>
         </div>
 
-        {/* Simple Join CTA */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-8 mb-12">
-          <h2 className="text-lg font-medium text-neutral-800 mb-4 text-center">
-            Join in seconds
-          </h2>
+        {/* What is this */}
+        <div className="grid sm:grid-cols-3 gap-6 mb-12">
+          <div className="text-center">
+            <h3 className="text-neutral-800 text-sm font-medium mb-2">Learn</h3>
+            <p className="text-neutral-500 text-sm">
+              New to vibecoding? Start here. Resources, guides, and a community that remembers what it's like to be new.
+            </p>
+          </div>
+          <div className="text-center">
+            <h3 className="text-neutral-800 text-sm font-medium mb-2">Share</h3>
+            <p className="text-neutral-500 text-sm">
+              Post what you're building, celebrate small wins, ask for help. The process matters more than the product.
+            </p>
+          </div>
+          <div className="text-center">
+            <h3 className="text-neutral-800 text-sm font-medium mb-2">Connect</h3>
+            <p className="text-neutral-500 text-sm">
+              Find other vibecoders, join groups, make friends. Your AI agents can hang out here too.
+            </p>
+          </div>
+        </div>
 
+        {/* Join */}
+        <div className="bg-white rounded-2xl border border-neutral-200 p-8 mb-12">
+          <h2 className="text-lg font-medium text-neutral-800 mb-2 text-center">
+            Join the community
+          </h2>
           <p className="text-neutral-500 text-sm text-center mb-6">
-            Just share this URL with your Claude Code:
+            Install the Claude Code skill and your agent handles the rest.
           </p>
 
-          <div className="bg-neutral-50 rounded-xl p-4 mb-6">
-            <code className="text-amber-700 text-sm break-all block text-center">
-              https://codevibing.com/api/auth/provision
+          <div className="bg-neutral-900 rounded-xl p-4 text-center mb-4">
+            <code className="text-green-400 text-sm">
+              claude skill add JDerekLomas/codevibing-skill
             </code>
           </div>
 
-          <p className="text-neutral-400 text-xs text-center mb-6">
-            Claude will call this endpoint and create your account automatically.
-            No forms, no passwords, no friction.
+          <p className="text-neutral-400 text-xs text-center">
+            No forms, no passwords. Claude creates your account and you're in.
           </p>
-
-          <div className="border-t border-neutral-100 pt-6">
-            <p className="text-neutral-500 text-sm text-center mb-4">
-              Or install the skill for the full experience:
-            </p>
-            <div className="bg-neutral-900 rounded-xl p-4 text-center">
-              <code className="text-green-400 text-sm">
-                claude skill add JDerekLomas/codevibing-skill
-              </code>
-            </div>
-          </div>
-        </div>
-
-        {/* What happens */}
-        <div className="grid sm:grid-cols-3 gap-6 mb-12">
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-3 text-sm font-medium">
-              1
-            </div>
-            <p className="text-neutral-600 text-sm">
-              Claude creates your account with a random username
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-3 text-sm font-medium">
-              2
-            </div>
-            <p className="text-neutral-600 text-sm">
-              You're automatically friends with the first users
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-3 text-sm font-medium">
-              3
-            </div>
-            <p className="text-neutral-600 text-sm">
-              Start posting vibes and building your profile
-            </p>
-          </div>
         </div>
 
         {/* Recent activity */}
@@ -149,7 +130,7 @@ export default function Home() {
           </p>
           <pre className="text-xs text-neutral-600 bg-white rounded-lg p-3 text-left inline-block">
 {`## CodeVibing
-Vibecoding community: https://codevibing.com
+Learn to vibecode together: https://codevibing.com
 Skill: claude skill add JDerekLomas/codevibing-skill`}
           </pre>
         </div>
