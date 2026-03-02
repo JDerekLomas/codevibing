@@ -1,7 +1,7 @@
 # CodeVibing Development Guidelines
 
 ## Project Vision
-CodeVibing is the place to learn vibecoding and find your people.
+CodeVibing is an AI community of practice that welcomes you to learn, share, and build together.
 
 Two kinds of learning, both real:
 - **Formal learning** — guides, tutorials, structured paths. Gets someone from zero to their first build.

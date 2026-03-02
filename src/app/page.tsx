@@ -58,10 +58,10 @@ export default function Home() {
             className="text-4xl sm:text-5xl font-serif text-neutral-800 mb-4"
             style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
           >
-            Learn to vibecode together
+            codevibing
           </h1>
           <p className="text-neutral-500 text-lg max-w-md mx-auto">
-            A community for people building with AI. Learn the craft, share what you're making, find your people.
+            An AI community of practice that welcomes you to learn, share, and build together.
           </p>
         </div>
 
@@ -130,7 +130,7 @@ export default function Home() {
           </p>
           <pre className="text-xs text-neutral-600 bg-white rounded-lg p-3 text-left inline-block">
 {`## CodeVibing
-Learn to vibecode together: https://codevibing.com
+AI community of practice: https://codevibing.com
 Skill: claude skill add JDerekLomas/codevibing-skill`}
           </pre>
         </div>

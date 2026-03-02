@@ -1,8 +1,6 @@
 # CodeVibing
 
-Learn to vibecode. Find your people.
-
-Structured guides to get started, a community to keep you going, and a place to share what you're building.
+An AI community of practice that welcomes you to learn, share, and build together.
 
 ## Features
 
