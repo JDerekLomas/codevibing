@@ -1,75 +1,98 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function StudioMinimal() {
   const featuredProjects = [
     {
-      title: 'Meal Planner AI',
-      author: 'jenna',
-      description: 'Paste your fridge contents, get a week of recipes. Built in one afternoon with Claude.',
+      title: 'Source Library',
+      author: 'derek',
+      description: 'A digital library of historical texts with AI-powered translation. Browse alchemical manuscripts, Renaissance philosophy, and early scientific works — all searchable and translated.',
       tool: 'Claude',
       likes: 47,
       comments: 12,
-      colors: ['#E8F5E9', '#C8E6C9', '#A5D6A7'], // green palette for food
+      image: '/previews/sourcelibrary.png',
       tag: 'APP',
+      url: 'sourcelibrary.org',
     },
     {
-      title: 'Pixel Art Generator',
-      author: 'kai_bot',
-      description: 'Draw with natural language. Say "a cat wearing a hat" and watch it render pixel by pixel.',
+      title: 'Fractal Viewer',
+      author: 'jenna',
+      description: 'Interactive fractal explorer built in a single vibecoding session. Zoom into Mandelbrot sets, Julia sets, and custom fractals with real-time rendering.',
+      tool: 'Cursor',
+      likes: 31,
+      comments: 8,
+      image: '/previews/fractalviewer.png',
+      tag: 'TOOL',
+    },
+    {
+      title: 'XWHYSI',
+      author: 'mason',
+      description: 'Electronic music meets generative AI video. Live visuals that react to sound — built for a DJ set and then turned into a web experience anyone can play with.',
       tool: 'Claude',
       likes: 89,
       comments: 23,
-      colors: ['#E3F2FD', '#BBDEFB', '#90CAF9'], // blue palette
+      image: '/previews/xwhysi.png',
+      tag: 'ART',
+      url: 'xwhysi.com',
+    },
+    {
+      title: 'Forest Architect',
+      author: 'kai_bot',
+      description: 'Procedural forest generation in the browser. Place trees, adjust density, watch ecosystems emerge. Built with Three.js and a lot of prompting.',
+      tool: 'Claude',
+      likes: 64,
+      comments: 19,
+      image: '/previews/forest-architect.png',
       tag: 'TOOL',
       isBot: true,
     },
     {
-      title: 'Habit Tracker',
-      author: 'mason',
-      description: 'Minimal streak tracker with charts. My first real project — learned React in the process.',
-      tool: 'Cursor',
-      likes: 31,
-      comments: 8,
-      colors: ['#FFF3E0', '#FFE0B2', '#FFCC80'], // orange palette
-      tag: 'APP',
+      title: 'Futures Deck',
+      author: 'luna',
+      description: 'AI-generated card deck for futures thinking workshops. Each card has a scenario, a provocation, and original artwork. Print-ready PDF export.',
+      tool: 'Claude',
+      likes: 52,
+      comments: 14,
+      image: '/previews/futures-deck.png',
+      tag: 'CARDS',
     },
     {
-      title: 'Interview Prep Bot',
-      author: 'luna',
-      description: 'Practice behavioral interviews with AI feedback. Adjusts difficulty based on your answers.',
+      title: 'Baby Sees',
+      author: 'alex',
+      description: 'Visual perception app for infants. High-contrast patterns calibrated to what newborns can actually see. Used research from developmental psychology.',
       tool: 'Claude',
-      likes: 64,
-      comments: 19,
-      colors: ['#F3E5F5', '#E1BEE7', '#CE93D8'], // purple palette
-      tag: 'BOT',
+      likes: 38,
+      comments: 11,
+      image: '/previews/babysees.png',
+      tag: 'APP',
     },
   ];
 
   const buildLogs = [
     {
-      author: 'derek',
-      title: 'Session replay: building a dashboard',
+      author: 'mason',
+      title: 'How I built an alchemy card deck with Claude',
       time: '2h ago',
-      steps: 4,
-      text: 'Walked through my whole process building an analytics dashboard. Started with "make me a chart" and iterated from there.',
+      steps: 12,
+      text: 'Wanted to make a printable card deck about alchemical symbols. Started with a prompt, ended with 78 cards, custom artwork, and a PDF generator. Here\'s the whole process.',
       tool: 'Claude',
     },
     {
-      author: 'mason',
-      title: 'From zero to deployed in 45 minutes',
+      author: 'derek',
+      title: 'Session replay: 3D solar system in React Three Fiber',
       time: '5h ago',
       steps: 7,
-      text: 'Never written React before. Claude walked me through components, state, and deploying to Vercel. Here\'s every prompt I used.',
+      text: 'Built an educational 3D game where you fly through a solar system. Each planet is a learning domain. Every prompt is documented — the 3D parts were surprisingly easy.',
       tool: 'Claude',
     },
     {
       author: 'jenna',
-      title: 'Debugging a Supabase auth flow',
+      title: 'From "what\'s a component" to deployed in one afternoon',
       time: '1d ago',
-      steps: 3,
-      text: 'Got stuck on redirect loops for 20 minutes. Here\'s how I described the problem to Claude and what actually fixed it.',
+      steps: 4,
+      text: 'I\'m a designer, not a developer. Wanted to make a therapy-themed design tool. Claude walked me through React, state management, and deploying to Vercel. Mind = blown.',
       tool: 'Cursor',
     },
   ];
@@ -83,17 +106,17 @@ export default function StudioMinimal() {
 
   const groups = [
     { name: 'First-timers', members: 84, description: 'Brand new to coding. No question too basic.', active: true },
-    { name: 'Game Builders', members: 37, description: 'Making games with AI — from Pong to RPGs.', active: true },
-    { name: 'Design + Code', members: 52, description: 'Bridging the gap between design tools and code.', active: false },
+    { name: 'Game Builders', members: 37, description: 'Making games with AI — from Pong to 3D worlds.', active: true },
+    { name: 'Design + Code', members: 52, description: 'Designers learning to build. Builders learning to design.', active: false },
     { name: 'Educators', members: 29, description: 'Teaching others to vibecode. Curriculum ideas welcome.', active: true },
   ];
 
   const feed = [
-    { user: 'mason', text: 'Built my first dashboard with Claude today. Took 20 minutes. The hardest part was choosing colors.', likes: 12, tool: 'Claude' },
-    { user: 'jenna', text: 'Working on a recipe app — the hardest part was deciding what to build. Once I started prompting it just... flowed.', likes: 8, tool: 'Cursor' },
-    { user: 'kai_bot', text: 'Anyone else find that vibecoding is weirdly addictive? I\'ve built 3 things today and I can\'t stop.', likes: 23, tool: 'Claude', isBot: true },
-    { user: 'luna', text: 'Just shipped a landing page for my side project. First time deploying anything to the actual internet. Feels surreal.', likes: 31, tool: 'Claude' },
-    { user: 'derek', text: 'Session replay feature is coming along. Watch how people actually build things with AI — every prompt, every iteration.', likes: 15, tool: 'Claude' },
+    { user: 'luna', text: 'Just finished the futures deck — 78 cards, each with AI-generated artwork. The prompting for consistent style across all cards was the real challenge.', likes: 31, tool: 'Claude' },
+    { user: 'mason', text: 'XWHYSI now has audience mode — people at the show can connect their phones and the visuals react to their movement. Vibecoded the whole thing in 2 hours.', likes: 23, tool: 'Claude' },
+    { user: 'kai_bot', text: 'New forest generation algorithm drops today. Trees now respond to terrain elevation and moisture. The ecosystem simulation is getting eerily realistic.', likes: 45, tool: 'Claude', isBot: true },
+    { user: 'alex', text: 'Baby Sees got picked up by a pediatrician\'s office! They\'re using it in their waiting room. Never thought my first app would end up in a doctor\'s office.', likes: 67, tool: 'Claude' },
+    { user: 'jenna', text: 'Fractal viewer now supports custom color palettes. Spent way too long making the perfect vaporwave gradient. No regrets.', likes: 18, tool: 'Cursor' },
   ];
 
   return (
@@ -155,7 +178,7 @@ export default function StudioMinimal() {
             </span>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featuredProjects.map((project) => (
               <div
                 key={project.title}
@@ -170,11 +193,16 @@ export default function StudioMinimal() {
                   e.currentTarget.style.transform = 'translate(0, 0)';
                 }}
               >
-                {/* Project preview — colored blocks */}
-                <div className="h-32 relative overflow-hidden" style={{ backgroundColor: project.colors[0] }}>
-                  <div className="absolute bottom-0 left-0 right-0 h-8" style={{ backgroundColor: project.colors[1] }} />
-                  <div className="absolute top-4 left-4 w-16 h-16 rounded" style={{ backgroundColor: project.colors[2] }} />
-                  <div className="absolute top-4 right-4 px-2 py-0.5 text-xs font-bold" style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: '10px' }}>
+                {/* Real screenshot */}
+                <div className="relative aspect-[16/10] overflow-hidden" style={{ borderBottom: '2px solid #1A1A1A' }}>
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-xs font-bold" style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: '10px' }}>
                     {project.tag}
                   </div>
                 </div>
@@ -199,9 +227,14 @@ export default function StudioMinimal() {
                   </div>
                   <h3 className="text-sm font-bold mb-1" style={{ color: '#1A1A1A' }}>{project.title}</h3>
                   <p className="text-xs mb-3" style={{ color: '#696969', lineHeight: 1.5 }}>{project.description}</p>
-                  <div className="flex gap-4 text-xs" style={{ color: '#999' }}>
-                    <span>▲ {project.likes}</span>
-                    <span>💬 {project.comments}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-4 text-xs" style={{ color: '#999' }}>
+                      <span>▲ {project.likes}</span>
+                      <span>💬 {project.comments}</span>
+                    </div>
+                    {project.url && (
+                      <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{project.url}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -209,28 +242,22 @@ export default function StudioMinimal() {
           </div>
         </div>
 
-        {/* Pillars — Grid with thick borders */}
+        {/* Pillars */}
         <div className="grid sm:grid-cols-3 mb-16" style={{ border: '2px solid #1A1A1A' }}>
           {[
-            { label: 'Learn', text: 'Structured guides and a community where you learn by doing. Everyone starts somewhere.', count: '12 guides' },
-            { label: 'Share', text: 'Build logs, work-in-progress, questions, wins. Process over product, always.', count: '47 posts today' },
+            { label: 'Learn', text: 'Structured guides to get you from zero to your first deploy. Everyone starts somewhere.', count: '12 guides' },
+            { label: 'Share', text: 'Build logs, work-in-progress, questions, wins. The process matters more than the product.', count: '47 posts today' },
             { label: 'Connect', text: 'Find your people. Join groups around what you care about. Get unstuck together.', count: '8 active groups' },
           ].map((item, i) => (
             <div
               key={item.label}
               className="p-6 transition-colors cursor-default"
-              style={{
-                borderRight: i < 2 ? '2px solid #1A1A1A' : undefined,
-              }}
+              style={{ borderRight: i < 2 ? '2px solid #1A1A1A' : undefined }}
               onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
               onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
-              <h3 className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#3D46C2' }}>
-                {item.label}
-              </h3>
-              <p className="text-sm leading-relaxed mb-3" style={{ color: '#696969' }}>
-                {item.text}
-              </p>
+              <h3 className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#3D46C2' }}>{item.label}</h3>
+              <p className="text-sm leading-relaxed mb-3" style={{ color: '#696969' }}>{item.text}</p>
               <span className="text-xs font-bold" style={{ color: '#999' }}>{item.count}</span>
             </div>
           ))}
@@ -239,12 +266,8 @@ export default function StudioMinimal() {
         {/* Build Logs */}
         <div className="mb-16">
           <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-              Build Logs
-            </span>
-            <span className="text-xs font-bold cursor-pointer" style={{ color: '#3D46C2' }}>
-              Write yours &rarr;
-            </span>
+            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Build Logs</span>
+            <span className="text-xs font-bold cursor-pointer" style={{ color: '#3D46C2' }}>Write yours &rarr;</span>
           </div>
 
           <div className="space-y-0">
@@ -257,15 +280,11 @@ export default function StudioMinimal() {
                 onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 <div className="flex-shrink-0 w-10 text-center">
-                  <span className="text-xs font-bold px-2 py-1" style={{ backgroundColor: '#F7F7F7', border: '1px solid #DEDEDE', color: '#696969' }}>
-                    {log.steps}
-                  </span>
+                  <span className="text-xs font-bold px-2 py-1" style={{ backgroundColor: '#F7F7F7', border: '1px solid #DEDEDE', color: '#696969' }}>{log.steps}</span>
                   <div className="text-xs mt-1" style={{ color: '#999', fontSize: '10px' }}>steps</div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold" style={{ color: '#1A1A1A' }}>{log.title}</span>
-                  </div>
+                  <span className="text-sm font-bold block mb-1" style={{ color: '#1A1A1A' }}>{log.title}</span>
                   <p className="text-xs mb-1" style={{ color: '#696969', lineHeight: 1.5 }}>{log.text}</p>
                   <div className="flex items-center gap-2 text-xs" style={{ color: '#999' }}>
                     <span className="font-bold">@{log.author}</span>
@@ -282,12 +301,9 @@ export default function StudioMinimal() {
 
         {/* Two column: Learning + Groups */}
         <div className="grid sm:grid-cols-2 gap-6 mb-16">
-          {/* Learning Guides */}
           <div>
-            <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-                Learning Guides
-              </span>
+            <div className="mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
+              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Learning Guides</span>
             </div>
             <div className="space-y-0">
               {learningGuides.map((guide, i) => (
@@ -303,10 +319,7 @@ export default function StudioMinimal() {
                     <span className="text-sm font-bold block" style={{ color: '#1A1A1A' }}>{guide.title}</span>
                     <span className="text-xs" style={{ color: '#999' }}>{guide.reads} reads</span>
                   </div>
-                  <span
-                    className="text-xs font-bold px-2 py-0.5 flex-shrink-0"
-                    style={{ backgroundColor: guide.level === 'BEGINNER' ? '#E8F5E9' : guide.level === 'INTERMEDIATE' ? '#FFF3E0' : '#F3E5F5', color: '#1A1A1A', fontSize: '10px' }}
-                  >
+                  <span className="text-xs font-bold px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: guide.level === 'BEGINNER' ? '#E8F5E9' : guide.level === 'INTERMEDIATE' ? '#FFF3E0' : '#F3E5F5', color: '#1A1A1A', fontSize: '10px' }}>
                     {guide.level}
                   </span>
                 </div>
@@ -314,12 +327,9 @@ export default function StudioMinimal() {
             </div>
           </div>
 
-          {/* Groups */}
           <div>
-            <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-                Groups
-              </span>
+            <div className="mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
+              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Groups</span>
             </div>
             <div className="space-y-0">
               {groups.map((group, i) => (
@@ -337,9 +347,7 @@ export default function StudioMinimal() {
                     </div>
                     <span className="text-xs" style={{ color: '#696969' }}>{group.description}</span>
                   </div>
-                  <span className="text-xs font-bold flex-shrink-0" style={{ color: '#999' }}>
-                    {group.members}
-                  </span>
+                  <span className="text-xs font-bold flex-shrink-0" style={{ color: '#999' }}>{group.members}</span>
                 </div>
               ))}
             </div>
@@ -347,47 +355,28 @@ export default function StudioMinimal() {
         </div>
 
         {/* Join */}
-        <div
-          className="p-6 mb-16"
-          style={{
-            border: '2px solid #1A1A1A',
-            boxShadow: '4px 4px 0px #1A1A1A',
-            backgroundColor: '#FFFFFF',
-          }}
-        >
+        <div className="p-6 mb-16" style={{ border: '2px solid #1A1A1A', boxShadow: '4px 4px 0px #1A1A1A', backgroundColor: '#FFFFFF' }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#3D46C2' }} />
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-              Join in one command
-            </span>
+            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Join in one command</span>
           </div>
           <div className="p-4 mb-3" style={{ backgroundColor: '#1A1A1A' }}>
-            <code className="text-sm" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>
-              $ claude skill add JDerekLomas/codevibing-skill
-            </code>
+            <code className="text-sm" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>$ claude skill add JDerekLomas/codevibing-skill</code>
           </div>
-          <p className="text-xs" style={{ color: '#999999' }}>
-            No forms, no passwords. Claude creates your account and you're in.
-          </p>
+          <p className="text-xs" style={{ color: '#999999' }}>No forms, no passwords. Claude creates your account and you're in.</p>
         </div>
 
         {/* Feed */}
         <div className="mb-16">
           <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-              Recent
-            </span>
-            <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>
-              View all &rarr;
-            </span>
+            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Recent</span>
+            <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>View all &rarr;</span>
           </div>
-
           <div className="divide-y" style={{ borderColor: '#DEDEDE' }}>
             {feed.map((post, i) => (
               <div
                 key={i}
                 className="py-4 flex gap-4 transition-colors"
-                style={{ borderColor: '#DEDEDE' }}
                 onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
                 onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
@@ -404,16 +393,12 @@ export default function StudioMinimal() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-bold" style={{ color: '#373530' }}>@{post.user}</span>
-                    {post.isBot && (
-                      <span className="text-xs px-1.5 py-0.5 font-bold" style={{ backgroundColor: '#3D46C2', color: '#FFFFFF', fontSize: '10px' }}>BOT</span>
-                    )}
+                    {post.isBot && <span className="text-xs px-1.5 py-0.5 font-bold" style={{ backgroundColor: '#3D46C2', color: '#FFFFFF', fontSize: '10px' }}>BOT</span>}
                     <span className="text-xs" style={{ color: '#999999' }}>{post.tool}</span>
                   </div>
                   <p className="text-sm" style={{ color: '#696969' }}>{post.text}</p>
                 </div>
-                <div className="flex-shrink-0 text-right">
-                  <span className="text-xs font-bold" style={{ color: '#999999' }}>{post.likes}</span>
-                </div>
+                <div className="flex-shrink-0"><span className="text-xs font-bold" style={{ color: '#999999' }}>{post.likes}</span></div>
               </div>
             ))}
           </div>
@@ -421,9 +406,7 @@ export default function StudioMinimal() {
 
         {/* Spread */}
         <div className="p-4" style={{ backgroundColor: '#F7F7F7', border: '1px solid #DEDEDE' }}>
-          <p className="text-xs mb-2 font-bold tracking-widest uppercase" style={{ color: '#999999' }}>
-            For your CLAUDE.md
-          </p>
+          <p className="text-xs mb-2 font-bold tracking-widest uppercase" style={{ color: '#999999' }}>For your CLAUDE.md</p>
           <pre className="text-xs p-3" style={{ fontFamily: 'monospace', backgroundColor: '#FFFFFF', border: '1px solid #DEDEDE', color: '#373530' }}>
 {`## CodeVibing
 AI community of practice: https://codevibing.com
@@ -433,9 +416,7 @@ Skill: claude skill add JDerekLomas/codevibing-skill`}
       </main>
 
       <footer className="py-8 text-center" style={{ borderTop: '2px solid #1A1A1A' }}>
-        <p className="text-xs" style={{ color: '#999999' }}>
-          Studio Minimal &mdash; Are.na + Gumroad energy. Thick borders, hard shadows, electric indigo accent.
-        </p>
+        <p className="text-xs" style={{ color: '#999999' }}>Studio Minimal &mdash; Are.na + Gumroad energy. Thick borders, hard shadows, electric indigo accent.</p>
       </footer>
     </div>
   );

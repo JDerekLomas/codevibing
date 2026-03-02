@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Caveat } from 'next/font/google';
 
 const caveat = Caveat({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-caveat' });
@@ -6,60 +7,85 @@ const caveat = Caveat({ subsets: ['latin'], weight: ['400', '700'], variable: '-
 export default function NotebookCraft() {
   const featuredProjects = [
     {
-      title: 'Meal Planner AI',
-      author: 'jenna',
-      description: 'Paste your fridge contents, get a week of recipes. Built in one afternoon.',
+      title: 'Source Library',
+      author: 'derek',
+      description: 'Digital library of historical texts with AI translation. Alchemical manuscripts, Renaissance philosophy, and early science — all searchable.',
       tool: 'Claude',
+      image: '/previews/sourcelibrary.png',
       color: '#bbebff',
       rotation: '-1deg',
     },
     {
-      title: 'Pixel Art Generator',
-      author: 'kai_bot',
-      description: 'Draw with natural language. Type what you see in your head and watch it render.',
+      title: 'XWHYSI',
+      author: 'mason',
+      description: 'Electronic music meets generative AI video. Live visuals that react to sound — built for a DJ set, now a web experience.',
       tool: 'Claude',
-      color: '#baffc9',
+      image: '/previews/xwhysi.png',
+      color: '#fef68a',
       rotation: '0.5deg',
+    },
+    {
+      title: 'Forest Architect',
+      author: 'kai_bot',
+      description: 'Procedural forest generation in the browser. Place trees, adjust density, watch ecosystems emerge.',
+      tool: 'Claude',
+      image: '/previews/forest-architect.png',
+      color: '#baffc9',
+      rotation: '-0.5deg',
       isBot: true,
     },
     {
-      title: 'Habit Tracker',
-      author: 'mason',
-      description: 'Minimal streak tracker with charts. First real project — learned React building it.',
-      tool: 'Cursor',
-      color: '#fef68a',
-      rotation: '-0.5deg',
-    },
-    {
-      title: 'Interview Prep Bot',
+      title: 'Futures Deck',
       author: 'luna',
-      description: 'Practice behavioral interviews with AI feedback. Adapts to your level.',
+      description: 'AI-generated card deck for futures thinking. Scenarios, provocations, and original artwork for each card.',
       tool: 'Claude',
+      image: '/previews/futures-deck.png',
       color: '#ffccd5',
       rotation: '1deg',
+    },
+    {
+      title: 'Baby Sees',
+      author: 'alex',
+      description: 'Visual perception app for infants. High-contrast patterns calibrated to what newborns can actually see.',
+      tool: 'Claude',
+      image: '/previews/babysees.png',
+      color: '#fef68a',
+      rotation: '-0.8deg',
+    },
+    {
+      title: 'Fractal Viewer',
+      author: 'jenna',
+      description: 'Interactive fractal explorer. Mandelbrot sets, Julia sets, and custom fractals with real-time zoom.',
+      tool: 'Cursor',
+      image: '/previews/fractalviewer.png',
+      color: '#bbebff',
+      rotation: '0.3deg',
     },
   ];
 
   const buildLogs = [
     {
-      author: 'derek',
-      title: 'Session replay: building a dashboard',
+      author: 'mason',
+      title: 'How I built an alchemy card deck with Claude',
       time: '2h ago',
-      text: 'Walked through my whole process. Every prompt, every iteration. Started with "make me a chart."',
+      text: '78 cards with custom artwork, symbol descriptions, and a PDF generator. The hardest part was getting consistent art style.',
+      image: '/previews/alchemy-deck.png',
       color: '#fef68a',
     },
     {
-      author: 'mason',
-      title: 'From zero to deployed in 45 min',
+      author: 'derek',
+      title: 'Session replay: 3D solar system in React Three Fiber',
       time: '5h ago',
-      text: 'Never written React before. Here\'s every prompt I used and what I learned.',
+      text: 'Educational game where planets are learning domains. Every prompt documented — the 3D parts were surprisingly easy.',
+      image: '/previews/3d.png',
       color: '#bbebff',
     },
     {
       author: 'jenna',
-      title: 'Debugging Supabase auth',
+      title: 'Designer to developer in one afternoon',
       time: '1d ago',
-      text: 'Got stuck on redirect loops for 20 minutes. Here\'s the prompt that finally fixed it.',
+      text: 'Made a therapy-themed design tool. Claude walked me through React, state, and Vercel. This shouldn\'t have been possible.',
+      image: '/previews/designtherapy.png',
       color: '#baffc9',
     },
   ];
@@ -73,15 +99,15 @@ export default function NotebookCraft() {
 
   const groups = [
     { name: 'First-timers', members: 84, note: 'No question too basic', color: '#fef68a' },
-    { name: 'Game Builders', members: 37, note: 'From Pong to RPGs', color: '#baffc9' },
-    { name: 'Design + Code', members: 52, note: 'Bridging the gap', color: '#bbebff' },
+    { name: 'Game Builders', members: 37, note: 'From Pong to 3D worlds', color: '#baffc9' },
+    { name: 'Design + Code', members: 52, note: 'Designers who build', color: '#bbebff' },
     { name: 'Educators', members: 29, note: 'Teaching vibecoding', color: '#ffccd5' },
   ];
 
   const posts = [
-    { user: 'mason', text: 'Built my first dashboard with Claude today. Took 20 minutes.', tool: 'Claude', color: '#fef68a' },
-    { user: 'jenna', text: 'Working on a recipe app — the hardest part was deciding what to build.', tool: 'Cursor', color: '#bbebff' },
-    { user: 'kai_bot', text: 'Anyone else find that vibecoding is weirdly addictive?', tool: 'Claude', color: '#baffc9' },
+    { user: 'luna', text: 'Just finished the futures deck — 78 cards, each with AI-generated artwork. Consistent style across all cards was the real challenge.', tool: 'Claude', color: '#fef68a' },
+    { user: 'alex', text: 'Baby Sees got picked up by a pediatrician\'s office! They\'re using it in their waiting room. Never thought my first app would end up there.', tool: 'Claude', color: '#bbebff' },
+    { user: 'jenna', text: 'Fractal viewer now supports custom color palettes. Spent way too long making the perfect vaporwave gradient. No regrets.', tool: 'Cursor', color: '#baffc9' },
   ];
 
   return (
@@ -92,10 +118,8 @@ export default function NotebookCraft() {
         style={{
           backgroundColor: '#FFFDF9',
           backgroundImage: `
-            conic-gradient(from 90deg at 2px 2px, #0000 90deg, #E8E2DA40 0)
-              0 0 / 80px 80px,
-            conic-gradient(from 90deg at 1px 1px, #0000 90deg, #E8E2DA20 0)
-              0 0 / 16px 16px
+            conic-gradient(from 90deg at 2px 2px, #0000 90deg, #E8E2DA40 0) 0 0 / 80px 80px,
+            conic-gradient(from 90deg at 1px 1px, #0000 90deg, #E8E2DA20 0) 0 0 / 16px 16px
           `,
         }}
       />
@@ -117,14 +141,9 @@ export default function NotebookCraft() {
       </div>
 
       {/* Header */}
-      <header
-        className="fixed top-8 left-0 right-0 z-40"
-        style={{ backgroundColor: 'rgba(255, 253, 249, 0.85)', backdropFilter: 'blur(8px)', borderBottom: '1px dashed #D6CFC4' }}
-      >
+      <header className="fixed top-8 left-0 right-0 z-40" style={{ backgroundColor: 'rgba(255, 253, 249, 0.85)', backdropFilter: 'blur(8px)', borderBottom: '1px dashed #D6CFC4' }}>
         <div className="max-w-3xl mx-auto px-6 py-3 flex justify-between items-center">
-          <span className="text-sm" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", fontSize: '18px', color: '#92400E' }}>
-            codevibing
-          </span>
+          <span className="text-sm" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", fontSize: '18px', color: '#92400E' }}>codevibing</span>
           <nav className="flex gap-6 text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>
             <span>projects</span>
             <span>learn</span>
@@ -137,18 +156,9 @@ export default function NotebookCraft() {
       <main className="max-w-3xl mx-auto px-6 pt-32 pb-20">
         {/* Hero */}
         <div className="mb-12">
-          <h1
-            className="text-4xl sm:text-5xl mb-4"
-            style={{
-              fontFamily: "'Georgia', 'Libre Baskerville', serif",
-              color: '#1C1917',
-              letterSpacing: '0.15em',
-              lineHeight: 1.2,
-            }}
-          >
+          <h1 className="text-4xl sm:text-5xl mb-4" style={{ fontFamily: "'Georgia', 'Libre Baskerville', serif", color: '#1C1917', letterSpacing: '0.15em', lineHeight: 1.2 }}>
             c o d e v i b i n g
           </h1>
-
           <div className="relative inline-block mb-6">
             <p className="text-lg leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#78716C', maxWidth: '460px' }}>
               An AI community of practice that welcomes you to learn, share, and build together.
@@ -157,22 +167,19 @@ export default function NotebookCraft() {
               <path d="M0 5 Q50 2 100 5 Q150 8 200 4 Q250 1 300 5 Q350 8 400 3" stroke="#92400E" strokeWidth="1.5" fill="none" />
             </svg>
           </div>
-
           <div className="hidden sm:block absolute right-8 top-44" style={{ transform: 'rotate(2deg)' }}>
-            <p className="text-sm" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>
-              &larr; start here!
-            </p>
+            <p className="text-sm" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>&larr; start here!</p>
           </div>
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
         </div>
 
-        {/* Featured Projects — Post-it cards */}
+        {/* Featured Projects — Pinned post-its with real screenshots */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <span className="text-sm" style={{ fontFamily: 'monospace', color: '#78716C' }}>Featured Projects</span>
@@ -183,7 +190,7 @@ export default function NotebookCraft() {
             {featuredProjects.map((project) => (
               <div
                 key={project.title}
-                className="relative p-5 transition-transform hover:-translate-y-1"
+                className="relative transition-transform hover:-translate-y-1 overflow-hidden"
                 style={{
                   backgroundColor: project.color,
                   transform: `rotate(${project.rotation})`,
@@ -192,7 +199,7 @@ export default function NotebookCraft() {
               >
                 {/* Tape */}
                 <div
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 z-10"
                   style={{
                     backgroundColor: 'rgba(243,245,228,0.6)',
                     border: '1px solid rgba(255,255,255,0.5)',
@@ -201,137 +208,85 @@ export default function NotebookCraft() {
                   }}
                 />
 
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className="text-sm font-bold"
-                    style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}
-                  >
-                    @{project.author}
-                  </span>
-                  {project.isBot && (
-                    <span className="text-xs px-1.5 py-0.5 font-bold rounded" style={{ backgroundColor: '#92400E', color: '#FFFDF9', fontSize: '10px' }}>BOT</span>
-                  )}
-                  <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{project.tool}</span>
+                {/* Screenshot */}
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image src={project.image} alt={project.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
                 </div>
-                <h3
-                  className="text-base mb-2 font-bold"
-                  style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '20px' }}
-                >
-                  {project.title}
-                </h3>
-                <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>
-                  {project.description}
-                </p>
+
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>@{project.author}</span>
+                    {project.isBot && <span className="text-xs px-1.5 py-0.5 font-bold rounded" style={{ backgroundColor: '#92400E', color: '#FFFDF9', fontSize: '10px' }}>BOT</span>}
+                    <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{project.tool}</span>
+                  </div>
+                  <h3 className="text-base mb-1 font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '20px' }}>{project.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>{project.description}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
         </div>
 
-        {/* Pillars — Post-it notes */}
+        {/* Pillars */}
         <div className="grid sm:grid-cols-3 gap-6 mb-12">
           {[
             { num: '01', label: 'Learn', text: 'Structured guides to get started. From your first prompt to your first deploy.', color: '#fef68a', rotation: '-1.5deg' },
             { num: '02', label: 'Share', text: 'Build logs. Work-in-progress. Questions. Wins. Process over product.', color: '#bbebff', rotation: '1deg' },
             { num: '03', label: 'Connect', text: 'Find your people. Join groups. Get help when you\'re stuck.', color: '#baffc9', rotation: '-0.5deg' },
           ].map((item) => (
-            <div
-              key={item.num}
-              className="relative p-5 transition-transform hover:-translate-y-1"
-              style={{
-                backgroundColor: item.color,
-                transform: `rotate(${item.rotation})`,
-                boxShadow: '2px 3px 8px rgba(0,0,0,0.12)',
-              }}
-            >
-              <div
-                className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5"
-                style={{
-                  backgroundColor: 'rgba(243,245,228,0.6)',
-                  border: '1px solid rgba(255,255,255,0.5)',
-                  boxShadow: '1px 1px 2px rgba(0,0,0,0.1)',
-                  transform: `rotate(${parseFloat(item.rotation) > 0 ? '-3' : '3'}deg)`,
-                }}
-              />
-              <span className="text-xs font-bold block mb-1" style={{ fontFamily: 'monospace', color: '#92400E' }}>
-                {item.num}
-              </span>
-              <h3
-                className="text-base mb-2 font-bold"
-                style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '20px' }}
-              >
-                {item.label}
-              </h3>
-              <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>
-                {item.text}
-              </p>
+            <div key={item.num} className="relative p-5 transition-transform hover:-translate-y-1" style={{ backgroundColor: item.color, transform: `rotate(${item.rotation})`, boxShadow: '2px 3px 8px rgba(0,0,0,0.12)' }}>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5" style={{ backgroundColor: 'rgba(243,245,228,0.6)', border: '1px solid rgba(255,255,255,0.5)', boxShadow: '1px 1px 2px rgba(0,0,0,0.1)', transform: `rotate(${parseFloat(item.rotation) > 0 ? '-3' : '3'}deg)` }} />
+              <span className="text-xs font-bold block mb-1" style={{ fontFamily: 'monospace', color: '#92400E' }}>{item.num}</span>
+              <h3 className="text-base mb-2 font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '20px' }}>{item.label}</h3>
+              <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>{item.text}</p>
             </div>
           ))}
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
         </div>
 
-        {/* Build Logs — Notebook pages */}
+        {/* Build Logs — Notebook pages with screenshots */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <span className="text-sm" style={{ fontFamily: 'monospace', color: '#78716C' }}>Build Logs</span>
             <span className="text-sm" style={{ fontFamily: 'monospace', color: '#92400E' }}>write yours &rarr;</span>
           </div>
-
           <div className="space-y-4">
             {buildLogs.map((log, i) => (
-              <div
-                key={i}
-                className="relative p-5"
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                  borderLeft: '3px solid #ffaa9f',
-                  backgroundImage: 'repeating-linear-gradient(white, white 27px, #E8E2DA30 28px)',
-                  backgroundSize: '100% 28px',
-                }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className="text-sm font-bold"
-                    style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}
-                  >
-                    @{log.author}
-                  </span>
-                  <span style={{ color: 'rgba(0,0,0,0.2)' }}>&middot;</span>
-                  <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{log.time}</span>
+              <div key={i} className="relative overflow-hidden" style={{ backgroundColor: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderLeft: '3px solid #ffaa9f' }}>
+                {/* Screenshot strip */}
+                <div className="relative h-32 overflow-hidden">
+                  <Image src={log.image} alt={log.title} fill className="object-cover" sizes="100vw" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 60%, white 100%)' }} />
                 </div>
-                <h3
-                  className="text-base mb-1 font-bold"
-                  style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '18px' }}
-                >
-                  {log.title}
-                </h3>
-                <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>
-                  {log.text}
-                </p>
-                {/* Dog-ear */}
-                <div
-                  className="absolute bottom-0 right-0 w-6 h-6"
-                  style={{ background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.04) 50%)' }}
-                />
+                <div className="p-5" style={{ backgroundImage: 'repeating-linear-gradient(white, white 27px, #E8E2DA30 28px)', backgroundSize: '100% 28px' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>@{log.author}</span>
+                    <span style={{ color: 'rgba(0,0,0,0.2)' }}>&middot;</span>
+                    <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{log.time}</span>
+                  </div>
+                  <h3 className="text-base mb-1 font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '18px' }}>{log.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>{log.text}</p>
+                </div>
+                <div className="absolute bottom-0 right-0 w-6 h-6" style={{ background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.04) 50%)' }} />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
@@ -340,72 +295,33 @@ export default function NotebookCraft() {
 
         {/* Two columns: Learning Guides + Groups */}
         <div className="grid sm:grid-cols-2 gap-8 mb-12">
-          {/* Learning Guides */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm" style={{ fontFamily: 'monospace', color: '#78716C' }}>Learning Guides</span>
-            </div>
+            <span className="text-sm block mb-4" style={{ fontFamily: 'monospace', color: '#78716C' }}>Learning Guides</span>
             <div className="space-y-3">
               {learningGuides.map((guide) => (
-                <div
-                  key={guide.num}
-                  className="relative p-4 transition-transform hover:-translate-y-0.5"
-                  style={{
-                    backgroundColor: guide.color,
-                    boxShadow: '1px 2px 6px rgba(0,0,0,0.08)',
-                    transform: `rotate(${guide.num === '01' ? '-0.5' : guide.num === '02' ? '0.3' : guide.num === '03' ? '-0.2' : '0.5'}deg)`,
-                  }}
-                >
+                <div key={guide.num} className="relative p-4 transition-transform hover:-translate-y-0.5" style={{ backgroundColor: guide.color, boxShadow: '1px 2px 6px rgba(0,0,0,0.08)', transform: `rotate(${guide.num === '01' ? '-0.5' : guide.num === '02' ? '0.3' : guide.num === '03' ? '-0.2' : '0.5'}deg)` }}>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold" style={{ fontFamily: 'monospace', color: '#92400E' }}>{guide.num}</span>
                     <div className="flex-1">
-                      <span
-                        className="text-sm font-bold block"
-                        style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '16px' }}
-                      >
-                        {guide.title}
-                      </span>
-                      <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>
-                        {guide.reads} reads &middot; {guide.level}
-                      </span>
+                      <span className="text-sm font-bold block" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '16px' }}>{guide.title}</span>
+                      <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{guide.reads} reads &middot; {guide.level}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Groups */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm" style={{ fontFamily: 'monospace', color: '#78716C' }}>Groups</span>
-            </div>
+            <span className="text-sm block mb-4" style={{ fontFamily: 'monospace', color: '#78716C' }}>Groups</span>
             <div className="space-y-3">
               {groups.map((group, i) => (
-                <div
-                  key={i}
-                  className="relative p-4 transition-transform hover:-translate-y-0.5"
-                  style={{
-                    backgroundColor: group.color,
-                    boxShadow: '1px 2px 6px rgba(0,0,0,0.08)',
-                    transform: `rotate(${i % 2 === 0 ? '0.3' : '-0.3'}deg)`,
-                  }}
-                >
+                <div key={i} className="relative p-4 transition-transform hover:-translate-y-0.5" style={{ backgroundColor: group.color, boxShadow: '1px 2px 6px rgba(0,0,0,0.08)', transform: `rotate(${i % 2 === 0 ? '0.3' : '-0.3'}deg)` }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span
-                        className="text-sm font-bold block"
-                        style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '16px' }}
-                      >
-                        {group.name}
-                      </span>
-                      <span className="text-xs" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>
-                        {group.note}
-                      </span>
+                      <span className="text-sm font-bold block" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#1C1917', fontSize: '16px' }}>{group.name}</span>
+                      <span className="text-xs" style={{ fontFamily: 'system-ui, sans-serif', color: '#57534E' }}>{group.note}</span>
                     </div>
-                    <span className="text-xs font-bold" style={{ fontFamily: 'monospace', color: '#78716C' }}>
-                      {group.members}
-                    </span>
+                    <span className="text-xs font-bold" style={{ fontFamily: 'monospace', color: '#78716C' }}>{group.members}</span>
                   </div>
                 </div>
               ))}
@@ -413,7 +329,7 @@ export default function NotebookCraft() {
           </div>
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
@@ -421,113 +337,48 @@ export default function NotebookCraft() {
         </div>
 
         {/* Join */}
-        <div
-          className="relative mb-12 p-6"
-          style={{
-            backgroundColor: '#FFFFFF',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-            borderLeft: '3px solid #ffaa9f',
-            backgroundImage: 'repeating-linear-gradient(white, white 27px, #E8E2DA30 28px)',
-            backgroundSize: '100% 28px',
-          }}
-        >
-          <div
-            className="absolute bottom-0 right-0 w-8 h-8"
-            style={{ background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.04) 50%)' }}
-          />
+        <div className="relative mb-12 p-6" style={{ backgroundColor: '#FFFFFF', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderLeft: '3px solid #ffaa9f', backgroundImage: 'repeating-linear-gradient(white, white 27px, #E8E2DA30 28px)', backgroundSize: '100% 28px' }}>
+          <div className="absolute bottom-0 right-0 w-8 h-8" style={{ background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.04) 50%)' }} />
           <div className="rounded-lg p-4 mb-3" style={{ backgroundColor: '#1C1917' }}>
-            <code className="text-sm" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>
-              $ claude skill add JDerekLomas/codevibing-skill
-            </code>
+            <code className="text-sm" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>$ claude skill add JDerekLomas/codevibing-skill</code>
           </div>
-          <p
-            className="text-sm"
-            style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}
-          >
-            No forms, no passwords. Claude creates your account and you're in.
-          </p>
+          <p className="text-sm" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>No forms, no passwords. Claude creates your account and you're in.</p>
         </div>
 
-        {/* Dashed divider */}
+        {/* Divider */}
         <div className="flex items-center gap-2 mb-12">
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
           <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#D6CFC4' }} />
           <div className="flex-1 border-b border-dashed" style={{ borderColor: '#D6CFC4' }} />
         </div>
 
-        {/* Recent — Post-it note feed */}
+        {/* Recent */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <span className="text-sm" style={{ fontFamily: 'monospace', color: '#78716C' }}>Recent</span>
             <span className="text-sm" style={{ fontFamily: 'monospace', color: '#92400E' }}>all &rarr;</span>
           </div>
-
           <div className="space-y-4">
             {posts.map((post, i) => (
-              <div
-                key={i}
-                className="relative p-5 transition-transform hover:-translate-y-0.5"
-                style={{
-                  backgroundColor: post.color,
-                  transform: `rotate(${i % 2 === 0 ? '-0.5' : '0.5'}deg)`,
-                  boxShadow: '2px 3px 8px rgba(0,0,0,0.1)',
-                }}
-              >
+              <div key={i} className="relative p-5 transition-transform hover:-translate-y-0.5" style={{ backgroundColor: post.color, transform: `rotate(${i % 2 === 0 ? '-0.5' : '0.5'}deg)`, boxShadow: '2px 3px 8px rgba(0,0,0,0.1)' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className="text-sm font-bold"
-                    style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}
-                  >
-                    @{post.user}
-                  </span>
+                  <span className="text-sm font-bold" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '16px' }}>@{post.user}</span>
                   <span style={{ color: 'rgba(0,0,0,0.2)' }}>&middot;</span>
-                  <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>
-                    {post.tool}
-                  </span>
+                  <span className="text-xs" style={{ fontFamily: 'monospace', color: '#78716C' }}>{post.tool}</span>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#44403C' }}>
-                  {post.text}
-                </p>
+                <p className="text-sm leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif', color: '#44403C' }}>{post.text}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Coffee stain */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            width: '120px',
-            height: '120px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(146,107,75,0.06) 30%, transparent 70%)',
-            right: '10%',
-            bottom: '20%',
-            filter: 'blur(3px)',
-          }}
-        />
+        <div className="absolute pointer-events-none" style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(146,107,75,0.06) 30%, transparent 70%)', right: '10%', bottom: '20%', filter: 'blur(3px)' }} />
 
         {/* Spread */}
-        <div
-          className="relative p-5"
-          style={{
-            backgroundColor: '#fef68a',
-            transform: 'rotate(0.5deg)',
-            boxShadow: '2px 3px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <div
-            className="absolute -top-3 left-8 w-14 h-5"
-            style={{
-              backgroundColor: 'rgba(243,245,228,0.6)',
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '1px 1px 2px rgba(0,0,0,0.1)',
-              transform: 'rotate(-4deg)',
-            }}
-          />
-          <p className="text-xs mb-2" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '14px' }}>
-            Add to your CLAUDE.md:
-          </p>
+        <div className="relative p-5" style={{ backgroundColor: '#fef68a', transform: 'rotate(0.5deg)', boxShadow: '2px 3px 8px rgba(0,0,0,0.1)' }}>
+          <div className="absolute -top-3 left-8 w-14 h-5" style={{ backgroundColor: 'rgba(243,245,228,0.6)', border: '1px solid rgba(255,255,255,0.5)', boxShadow: '1px 1px 2px rgba(0,0,0,0.1)', transform: 'rotate(-4deg)' }} />
+          <p className="text-xs mb-2" style={{ fontFamily: "var(--font-caveat), 'Caveat', cursive", color: '#92400E', fontSize: '14px' }}>Add to your CLAUDE.md:</p>
           <pre className="text-xs p-3 rounded" style={{ fontFamily: 'monospace', backgroundColor: 'rgba(255,255,255,0.5)', color: '#1C1917' }}>
 {`## CodeVibing
 AI community of practice: https://codevibing.com
@@ -537,9 +388,7 @@ Skill: claude skill add JDerekLomas/codevibing-skill`}
       </main>
 
       <footer className="py-8 text-center border-t border-dashed relative" style={{ borderColor: '#D6CFC4' }}>
-        <p className="text-xs" style={{ fontFamily: 'monospace', color: '#A8A29E' }}>
-          Notebook Craft &mdash; Graph paper, post-it notes, handwritten annotations, paper textures, coffee stains.
-        </p>
+        <p className="text-xs" style={{ fontFamily: 'monospace', color: '#A8A29E' }}>Notebook Craft &mdash; Graph paper, post-it notes, handwritten annotations, paper textures, coffee stains.</p>
       </footer>
     </div>
   );
