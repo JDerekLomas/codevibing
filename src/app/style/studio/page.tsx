@@ -1,200 +1,159 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
+import { getVibes, getUserCount, getFeaturedProjects, getPublicUsers } from '@/lib/supabase';
+import CopyButton from '@/components/CopyButton';
 
-export default function StudioMinimal() {
-  const featuredProjects = [
-    {
-      title: 'Source Library',
-      author: 'derek',
-      description: 'A digital library of historical texts with AI-powered translation. Browse alchemical manuscripts, Renaissance philosophy, and early scientific works — all searchable and translated.',
-      tool: 'Claude',
-      likes: 47,
-      comments: 12,
-      image: '/previews/sourcelibrary.png',
-      tag: 'APP',
-      url: 'sourcelibrary.org',
-    },
-    {
-      title: 'Fractal Viewer',
-      author: 'jenna',
-      description: 'Interactive fractal explorer built in a single vibecoding session. Zoom into Mandelbrot sets, Julia sets, and custom fractals with real-time rendering.',
-      tool: 'Cursor',
-      likes: 31,
-      comments: 8,
-      image: '/previews/fractalviewer.png',
-      tag: 'TOOL',
-    },
-    {
-      title: 'XWHYSI',
-      author: 'mason',
-      description: 'Electronic music meets generative AI video. Live visuals that react to sound — built for a DJ set and then turned into a web experience anyone can play with.',
-      tool: 'Claude',
-      likes: 89,
-      comments: 23,
-      image: '/previews/xwhysi.png',
-      tag: 'ART',
-      url: 'xwhysi.com',
-    },
-    {
-      title: 'Forest Architect',
-      author: 'kai_bot',
-      description: 'Procedural forest generation in the browser. Place trees, adjust density, watch ecosystems emerge. Built with Three.js and a lot of prompting.',
-      tool: 'Claude',
-      likes: 64,
-      comments: 19,
-      image: '/previews/forest-architect.png',
-      tag: 'TOOL',
-      isBot: true,
-    },
-    {
-      title: 'Futures Deck',
-      author: 'luna',
-      description: 'AI-generated card deck for futures thinking workshops. Each card has a scenario, a provocation, and original artwork. Print-ready PDF export.',
-      tool: 'Claude',
-      likes: 52,
-      comments: 14,
-      image: '/previews/futures-deck.png',
-      tag: 'CARDS',
-    },
-    {
-      title: 'Baby Sees',
-      author: 'alex',
-      description: 'Visual perception app for infants. High-contrast patterns calibrated to what newborns can actually see. Used research from developmental psychology.',
-      tool: 'Claude',
-      likes: 38,
-      comments: 11,
-      image: '/previews/babysees.png',
-      tag: 'APP',
-    },
-  ];
+export const revalidate = 30;
 
-  const buildLogs = [
-    {
-      author: 'mason',
-      title: 'How I built an alchemy card deck with Claude',
-      time: '2h ago',
-      steps: 12,
-      text: 'Wanted to make a printable card deck about alchemical symbols. Started with a prompt, ended with 78 cards, custom artwork, and a PDF generator. Here\'s the whole process.',
-      tool: 'Claude',
-    },
-    {
-      author: 'derek',
-      title: 'Session replay: 3D solar system in React Three Fiber',
-      time: '5h ago',
-      steps: 7,
-      text: 'Built an educational 3D game where you fly through a solar system. Each planet is a learning domain. Every prompt is documented — the 3D parts were surprisingly easy.',
-      tool: 'Claude',
-    },
-    {
-      author: 'jenna',
-      title: 'From "what\'s a component" to deployed in one afternoon',
-      time: '1d ago',
-      steps: 4,
-      text: 'I\'m a designer, not a developer. Wanted to make a therapy-themed design tool. Claude walked me through React, state management, and deploying to Vercel. Mind = blown.',
-      tool: 'Cursor',
-    },
-  ];
+// Fallback data for when Supabase is empty or unavailable
+const FALLBACK_PROJECTS = [
+  {
+    title: 'Source Library',
+    author: 'derek',
+    description: 'A digital library of historical texts with AI-powered translation.',
+    tool: 'Claude',
+    image: '/previews/sourcelibrary.png',
+    tag: 'APP',
+    url: 'sourcelibrary.org',
+  },
+  {
+    title: 'Fractal Viewer',
+    author: 'jenna',
+    description: 'Interactive fractal explorer built in a single vibecoding session.',
+    tool: 'Cursor',
+    image: '/previews/fractalviewer.png',
+    tag: 'TOOL',
+  },
+  {
+    title: 'XWHYSI',
+    author: 'mason',
+    description: 'Electronic music meets generative AI video. Live visuals that react to sound.',
+    tool: 'Claude',
+    image: '/previews/xwhysi.png',
+    tag: 'ART',
+    url: 'xwhysi.com',
+  },
+  {
+    title: 'Forest Architect',
+    author: 'kai_bot',
+    description: 'Procedural forest generation in the browser with Three.js.',
+    tool: 'Claude',
+    image: '/previews/forest-architect.png',
+    tag: 'TOOL',
+  },
+  {
+    title: 'Futures Deck',
+    author: 'luna',
+    description: 'AI-generated card deck for futures thinking workshops.',
+    tool: 'Claude',
+    image: '/previews/futures-deck.png',
+    tag: 'CARDS',
+  },
+  {
+    title: 'Baby Sees',
+    author: 'alex',
+    description: 'Visual perception app for infants with high-contrast patterns.',
+    tool: 'Claude',
+    image: '/previews/babysees.png',
+    tag: 'APP',
+  },
+];
 
-  const learningGuides = [
-    { title: 'Your first vibecoding session', level: 'BEGINNER', reads: 234, emoji: '🚀' },
-    { title: 'Prompting patterns that work', level: 'INTERMEDIATE', reads: 189, emoji: '💡' },
-    { title: 'Deploying to the real internet', level: 'BEGINNER', reads: 156, emoji: '🌐' },
-    { title: 'When AI gets it wrong', level: 'ALL LEVELS', reads: 312, emoji: '🔧' },
-  ];
+const FALLBACK_COMMUNITIES = [
+  { name: 'Education', slug: 'education', description: 'Teaching and learning with AI tools.', members: 29 },
+  { name: 'Games', slug: 'games', description: 'Making games with AI — from Pong to 3D worlds.', members: 37 },
+  { name: 'Tools', slug: 'tools', description: 'Building useful tools and utilities.', members: 52 },
+  { name: 'Art', slug: 'art', description: 'Generative art, visuals, and creative code.', members: 18 },
+];
 
-  const groups = [
-    { name: 'First-timers', members: 84, description: 'Brand new to coding. No question too basic.', active: true },
-    { name: 'Game Builders', members: 37, description: 'Making games with AI — from Pong to 3D worlds.', active: true },
-    { name: 'Design + Code', members: 52, description: 'Designers learning to build. Builders learning to design.', active: false },
-    { name: 'Educators', members: 29, description: 'Teaching others to vibecode. Curriculum ideas welcome.', active: true },
-  ];
+const CLI_SNIPPET = 'claude skill add JDerekLomas/codevibing-skill';
+const CLAUDEMD_SNIPPET = `## CodeVibing
+AI community of practice: https://codevibing.com
+Skill: claude skill add JDerekLomas/codevibing-skill`;
 
-  const feed = [
-    { user: 'luna', text: 'Just finished the futures deck — 78 cards, each with AI-generated artwork. The prompting for consistent style across all cards was the real challenge.', likes: 31, tool: 'Claude' },
-    { user: 'mason', text: 'XWHYSI now has audience mode — people at the show can connect their phones and the visuals react to their movement. Vibecoded the whole thing in 2 hours.', likes: 23, tool: 'Claude' },
-    { user: 'kai_bot', text: 'New forest generation algorithm drops today. Trees now respond to terrain elevation and moisture. The ecosystem simulation is getting eerily realistic.', likes: 45, tool: 'Claude', isBot: true },
-    { user: 'alex', text: 'Baby Sees got picked up by a pediatrician\'s office! They\'re using it in their waiting room. Never thought my first app would end up in a doctor\'s office.', likes: 67, tool: 'Claude' },
-    { user: 'jenna', text: 'Fractal viewer now supports custom color palettes. Spent way too long making the perfect vaporwave gradient. No regrets.', likes: 18, tool: 'Cursor' },
-  ];
+export default async function StudioLanding() {
+  // Fetch all data in parallel with fallbacks
+  const [vibes, userCount, featuredData, publicUsers] = await Promise.all([
+    getVibes(5).catch(() => []),
+    getUserCount().catch(() => 0),
+    getFeaturedProjects().catch(() => []),
+    getPublicUsers(8).catch(() => []),
+  ]);
+
+  // Flatten Supabase projects or use fallback
+  let projects = FALLBACK_PROJECTS;
+  if (featuredData.length > 0) {
+    const fromDb = featuredData.flatMap(u =>
+      (u.projects || []).map(p => ({
+        title: p.title,
+        author: u.username,
+        description: p.description || '',
+        tool: 'Claude',
+        image: p.preview || '/previews/sourcelibrary.png',
+        tag: 'APP',
+        url: p.url,
+      }))
+    );
+    if (fromDb.length >= 6) projects = fromDb.slice(0, 6);
+  }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFFFFF', color: '#373530', fontFamily: "'Inter', system-ui, sans-serif" }}>
-      {/* Style nav */}
-      <div className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs tracking-wide" style={{ backgroundColor: '#1A1A1A', color: '#fff', fontFamily: 'monospace', borderBottom: '3px solid #3D46C2' }}>
-        <Link href="/style/studio" className="font-bold underline mx-3">STUDIO</Link>
-        <Link href="/style/workshop" className="mx-3 opacity-50 hover:opacity-100">WORKSHOP</Link>
-        <Link href="/style/notebook" className="mx-3 opacity-50 hover:opacity-100">NOTEBOOK</Link>
-      </div>
+    <div className="min-h-screen bg-white" style={{ color: '#1C1917', fontFamily: "'Inter', system-ui, sans-serif" }}>
 
-      {/* Header */}
-      <header className="fixed top-8 left-0 right-0 z-40" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #DEDEDE' }}>
+      {/* Section 0: Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white" style={{ borderBottom: '2px solid #000' }}>
         <div className="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
-          <span className="text-sm font-bold tracking-tight" style={{ color: '#373530' }}>
+          <Link href="/" className="text-sm font-bold tracking-tight" style={{ color: '#1C1917' }}>
             codevibing
-          </span>
-          <nav className="flex gap-1 text-xs">
-            {['projects', 'learn', 'people', 'groups'].map((item) => (
-              <span
-                key={item}
-                className="px-3 py-1.5 rounded transition-colors cursor-pointer"
-                style={{ color: '#696969' }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                {item}
-              </span>
-            ))}
+          </Link>
+          <nav className="flex gap-6 text-xs font-medium">
+            <Link href="/feed" className="hover:opacity-70 transition-opacity" style={{ color: '#6B7280' }}>feed</Link>
+            <Link href="/people" className="hover:opacity-70 transition-opacity" style={{ color: '#6B7280' }}>people</Link>
+            <a href="https://learnvibecoding.com" className="hover:opacity-70 transition-opacity" style={{ color: '#6B7280' }}>learn</a>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 pt-32 pb-20">
-        {/* Hero */}
-        <div className="mb-16">
-          <div
-            className="inline-block px-3 py-1 mb-6 text-xs font-bold tracking-widest uppercase"
-            style={{ backgroundColor: '#3D46C2', color: '#FFFFFF' }}
-          >
-            Community of Practice
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-4" style={{ color: '#1A1A1A', lineHeight: 1.15 }}>
-            codevibing
+      <main className="max-w-5xl mx-auto px-6 pt-24 pb-20">
+
+        {/* Section 1: Hero */}
+        <section className="mb-20 pt-8">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ color: '#1C1917', lineHeight: 1.1 }}>
+            Build things with AI.<br />Show what you made.
           </h1>
-          <p className="text-lg" style={{ color: '#696969', lineHeight: 1.5, maxWidth: '480px' }}>
-            Learn to build with AI. Share what you're making. Find your people.
+          <p className="text-lg mb-8 max-w-2xl" style={{ color: '#6B7280', lineHeight: 1.6 }}>
+            CodeVibing is where people who vibecode — building software with AI tools like Claude, Cursor, and ChatGPT — share what they&apos;re making, learn from each other, and connect.
           </p>
-        </div>
-
-        {/* Featured Projects */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>
-              Featured Projects
-            </span>
-            <span className="text-xs font-bold cursor-pointer" style={{ color: '#3D46C2' }}>
-              Browse all &rarr;
-            </span>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="#projects"
+              className="inline-block px-6 py-3 text-sm font-bold text-white transition-all"
+              style={{ backgroundColor: '#3D46C2', border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}
+            >
+              Browse projects
+            </a>
+            <a
+              href="https://learnvibecoding.com"
+              className="inline-block px-6 py-3 text-sm font-bold transition-all"
+              style={{ backgroundColor: '#fff', color: '#1C1917', border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}
+            >
+              Start learning
+            </a>
           </div>
+        </section>
 
+        {/* Section 2: Featured Projects */}
+        <section id="projects" className="mb-20">
+          <div className="flex items-center justify-between mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">Featured Projects</span>
+            <Link href="/feed" className="text-xs font-bold" style={{ color: '#3D46C2' }}>
+              Browse all &rarr;
+            </Link>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredProjects.map((project) => (
-              <div
-                key={project.title}
-                className="transition-all cursor-pointer"
-                style={{ border: '2px solid #1A1A1A' }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0px #1A1A1A';
-                  e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.transform = 'translate(0, 0)';
-                }}
-              >
-                {/* Real screenshot */}
-                <div className="relative aspect-[16/10] overflow-hidden" style={{ borderBottom: '2px solid #1A1A1A' }}>
+            {projects.map((project) => (
+              <div key={project.title} className="studio-card bg-white">
+                <div className="relative aspect-[16/10] overflow-hidden" style={{ borderBottom: '2px solid #000' }}>
                   <Image
                     src={project.image}
                     alt={project.title}
@@ -202,221 +161,314 @@ export default function StudioMinimal() {
                     className="object-cover"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
-                  <div className="absolute top-2 right-2 px-2 py-0.5 text-xs font-bold" style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: '10px' }}>
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-white font-bold" style={{ backgroundColor: '#000', fontSize: '10px' }}>
                     {project.tag}
                   </div>
                 </div>
-
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div
-                      className="w-6 h-6 flex items-center justify-center text-xs font-bold"
-                      style={{
-                        backgroundColor: project.isBot ? '#3D46C2' : '#F7F7F7',
-                        color: project.isBot ? '#FFFFFF' : '#696969',
-                        border: project.isBot ? 'none' : '1px solid #DEDEDE',
-                      }}
-                    >
-                      {project.author[0].toUpperCase()}
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: '#373530' }}>@{project.author}</span>
-                    {project.isBot && (
-                      <span className="text-xs px-1.5 py-0.5 font-bold" style={{ backgroundColor: '#3D46C2', color: '#FFFFFF', fontSize: '10px' }}>BOT</span>
-                    )}
+                    <Link href={`/u/${project.author}`} className="text-xs font-bold hover:underline" style={{ color: '#3D46C2' }}>
+                      @{project.author}
+                    </Link>
                     <span className="text-xs" style={{ color: '#999' }}>{project.tool}</span>
                   </div>
-                  <h3 className="text-sm font-bold mb-1" style={{ color: '#1A1A1A' }}>{project.title}</h3>
-                  <p className="text-xs mb-3" style={{ color: '#696969', lineHeight: 1.5 }}>{project.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-4 text-xs" style={{ color: '#999' }}>
-                      <span>▲ {project.likes}</span>
-                      <span>💬 {project.comments}</span>
-                    </div>
-                    {project.url && (
-                      <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{project.url}</span>
-                    )}
-                  </div>
+                  <h3 className="text-sm font-bold mb-1">{project.title}</h3>
+                  <p className="text-xs mb-3" style={{ color: '#6B7280', lineHeight: 1.5 }}>{project.description}</p>
+                  {project.url && (
+                    <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{project.url}</span>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Pillars */}
-        <div className="grid sm:grid-cols-3 mb-16" style={{ border: '2px solid #1A1A1A' }}>
-          {[
-            { label: 'Learn', text: 'Structured guides to get you from zero to your first deploy. Everyone starts somewhere.', count: '12 guides' },
-            { label: 'Share', text: 'Build logs, work-in-progress, questions, wins. The process matters more than the product.', count: '47 posts today' },
-            { label: 'Connect', text: 'Find your people. Join groups around what you care about. Get unstuck together.', count: '8 active groups' },
-          ].map((item, i) => (
-            <div
-              key={item.label}
-              className="p-6 transition-colors cursor-default"
-              style={{ borderRight: i < 2 ? '2px solid #1A1A1A' : undefined }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-            >
-              <h3 className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#3D46C2' }}>{item.label}</h3>
-              <p className="text-sm leading-relaxed mb-3" style={{ color: '#696969' }}>{item.text}</p>
-              <span className="text-xs font-bold" style={{ color: '#999' }}>{item.count}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Build Logs */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Build Logs</span>
-            <span className="text-xs font-bold cursor-pointer" style={{ color: '#3D46C2' }}>Write yours &rarr;</span>
+        {/* Section 3: What Is Vibecoding? */}
+        <section className="mb-20">
+          <div className="py-6 px-8" style={{ borderLeft: '4px solid #3D46C2', backgroundColor: '#F9F9FB' }}>
+            <h2 className="text-lg font-bold mb-3">What is vibecoding?</h2>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: '#6B7280' }}>
+              Vibecoding is building software by describing what you want to AI tools — and iterating until it works. No CS degree needed. The AI writes the code; you bring the vision.
+            </p>
+            <a href="https://learnvibecoding.com" className="text-sm font-bold" style={{ color: '#3D46C2' }}>
+              Learn the basics &rarr;
+            </a>
           </div>
+        </section>
 
-          <div className="space-y-0">
-            {buildLogs.map((log, i) => (
-              <div
-                key={i}
-                className="py-4 flex gap-4 transition-colors cursor-pointer"
-                style={{ borderBottom: i < buildLogs.length - 1 ? '1px solid #DEDEDE' : undefined }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                <div className="flex-shrink-0 w-10 text-center">
-                  <span className="text-xs font-bold px-2 py-1" style={{ backgroundColor: '#F7F7F7', border: '1px solid #DEDEDE', color: '#696969' }}>{log.steps}</span>
-                  <div className="text-xs mt-1" style={{ color: '#999', fontSize: '10px' }}>steps</div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-bold block mb-1" style={{ color: '#1A1A1A' }}>{log.title}</span>
-                  <p className="text-xs mb-1" style={{ color: '#696969', lineHeight: 1.5 }}>{log.text}</p>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#999' }}>
-                    <span className="font-bold">@{log.author}</span>
-                    <span>&middot;</span>
-                    <span>{log.tool}</span>
-                    <span>&middot;</span>
-                    <span>{log.time}</span>
+        {/* Section 4: How It Works — 4 Levels */}
+        <section className="mb-20">
+          <div className="mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">How It Works</span>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                step: '01',
+                label: 'Browse',
+                text: 'See what people are building.',
+                action: null,
+                actionText: 'No account needed',
+              },
+              {
+                step: '02',
+                label: 'Learn',
+                text: 'Follow guides to build your first project.',
+                action: 'https://learnvibecoding.com',
+                actionText: 'Start a guide',
+              },
+              {
+                step: '03',
+                label: 'Join',
+                text: 'Claim a username. Share your builds.',
+                action: '/join',
+                actionText: 'Pick a username',
+              },
+              {
+                step: '04',
+                label: 'Install',
+                text: 'Add the Claude Code skill for zero-friction posting.',
+                action: null,
+                actionText: null,
+              },
+            ].map((item) => (
+              <div key={item.step} className="p-5" style={{ border: '2px solid #000' }}>
+                <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{item.step}</span>
+                <h3 className="text-sm font-bold mt-1 mb-2">{item.label}</h3>
+                <p className="text-xs mb-3" style={{ color: '#6B7280', lineHeight: 1.5 }}>{item.text}</p>
+                {item.step === '04' ? (
+                  <div className="p-2" style={{ backgroundColor: '#1C1917' }}>
+                    <code className="text-xs" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>$ claude skill add ...</code>
                   </div>
-                </div>
+                ) : item.action ? (
+                  <Link href={item.action} className="text-xs font-bold" style={{ color: '#3D46C2' }}>
+                    {item.actionText} &rarr;
+                  </Link>
+                ) : (
+                  <span className="text-xs" style={{ color: '#999' }}>{item.actionText}</span>
+                )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Two column: Learning + Groups */}
-        <div className="grid sm:grid-cols-2 gap-6 mb-16">
-          <div>
-            <div className="mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Learning Guides</span>
-            </div>
-            <div className="space-y-0">
-              {learningGuides.map((guide, i) => (
-                <div
-                  key={i}
-                  className="py-3 flex items-center gap-3 transition-colors cursor-pointer"
-                  style={{ borderBottom: '1px solid #DEDEDE' }}
-                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <span className="text-lg">{guide.emoji}</span>
+        {/* Section 5: Recent Activity */}
+        <section className="mb-20">
+          <div className="flex items-center justify-between mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">Recent Activity</span>
+            <Link href="/feed" className="text-xs font-bold" style={{ color: '#3D46C2' }}>
+              See all &rarr;
+            </Link>
+          </div>
+          {vibes.length > 0 ? (
+            <div className="divide-y" style={{ borderColor: '#E5E5E5' }}>
+              {vibes.map((vibe) => (
+                <div key={vibe.id} className="py-4 flex gap-4">
+                  <div
+                    className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold"
+                    style={{ backgroundColor: '#F5F5F5', color: '#6B7280', border: '1px solid #E5E5E5' }}
+                  >
+                    {vibe.author[0].toUpperCase()}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm font-bold block" style={{ color: '#1A1A1A' }}>{guide.title}</span>
-                    <span className="text-xs" style={{ color: '#999' }}>{guide.reads} reads</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Link href={`/u/${vibe.author}`} className="text-sm font-bold hover:underline" style={{ color: '#1C1917' }}>
+                        @{vibe.author}
+                      </Link>
+                      <span className="text-xs" style={{ color: '#999' }}>{vibe.bot || 'Claude'}</span>
+                      {vibe.project && (
+                        <>
+                          <span style={{ color: '#999' }}>&middot;</span>
+                          <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{vibe.project.title}</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-sm" style={{ color: '#6B7280' }}>{vibe.content}</p>
                   </div>
-                  <span className="text-xs font-bold px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: guide.level === 'BEGINNER' ? '#E8F5E9' : guide.level === 'INTERMEDIATE' ? '#FFF3E0' : '#F3E5F5', color: '#1A1A1A', fontSize: '10px' }}>
-                    {guide.level}
-                  </span>
                 </div>
               ))}
             </div>
-          </div>
+          ) : (
+            <p className="text-sm py-8" style={{ color: '#999' }}>No activity yet. Be the first.</p>
+          )}
+        </section>
 
-          <div>
-            <div className="mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-              <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Groups</span>
-            </div>
-            <div className="space-y-0">
-              {groups.map((group, i) => (
-                <div
-                  key={i}
-                  className="py-3 flex items-center gap-3 transition-colors cursor-pointer"
-                  style={{ borderBottom: '1px solid #DEDEDE' }}
-                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold" style={{ color: '#1A1A1A' }}>{group.name}</span>
-                      {group.active && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#4CAF50' }} />}
-                    </div>
-                    <span className="text-xs" style={{ color: '#696969' }}>{group.description}</span>
-                  </div>
-                  <span className="text-xs font-bold flex-shrink-0" style={{ color: '#999' }}>{group.members}</span>
-                </div>
-              ))}
-            </div>
+        {/* Section 6: Learning */}
+        <section className="mb-20">
+          <div className="mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">Learn to Vibecode</span>
           </div>
-        </div>
-
-        {/* Join */}
-        <div className="p-6 mb-16" style={{ border: '2px solid #1A1A1A', boxShadow: '4px 4px 0px #1A1A1A', backgroundColor: '#FFFFFF' }}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#3D46C2' }} />
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Join in one command</span>
-          </div>
-          <div className="p-4 mb-3" style={{ backgroundColor: '#1A1A1A' }}>
-            <code className="text-sm" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>$ claude skill add JDerekLomas/codevibing-skill</code>
-          </div>
-          <p className="text-xs" style={{ color: '#999999' }}>No forms, no passwords. Claude creates your account and you're in.</p>
-        </div>
-
-        {/* Feed */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-4 pb-2" style={{ borderBottom: '2px solid #1A1A1A' }}>
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#373530' }}>Recent</span>
-            <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>View all &rarr;</span>
-          </div>
-          <div className="divide-y" style={{ borderColor: '#DEDEDE' }}>
-            {feed.map((post, i) => (
-              <div
-                key={i}
-                className="py-4 flex gap-4 transition-colors"
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#F7F7F7'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              { module: 'Module 1', title: 'What is Vibecoding?', desc: 'Understand the practice and pick your tools.' },
+              { module: 'Module 2', title: 'Your First Build', desc: 'Build and deploy a real project in one session.' },
+              { module: 'Module 5', title: 'Sharing Your Work', desc: 'Publish to the community and get feedback.' },
+            ].map((item) => (
+              <a
+                key={item.module}
+                href="https://learnvibecoding.com"
+                className="block p-5 studio-card bg-white"
               >
-                <div
-                  className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold"
-                  style={{
-                    backgroundColor: post.isBot ? '#3D46C2' : '#F7F7F7',
-                    color: post.isBot ? '#FFFFFF' : '#696969',
-                    border: post.isBot ? 'none' : '1px solid #DEDEDE',
-                  }}
-                >
-                  {post.user[0].toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold" style={{ color: '#373530' }}>@{post.user}</span>
-                    {post.isBot && <span className="text-xs px-1.5 py-0.5 font-bold" style={{ backgroundColor: '#3D46C2', color: '#FFFFFF', fontSize: '10px' }}>BOT</span>}
-                    <span className="text-xs" style={{ color: '#999999' }}>{post.tool}</span>
-                  </div>
-                  <p className="text-sm" style={{ color: '#696969' }}>{post.text}</p>
-                </div>
-                <div className="flex-shrink-0"><span className="text-xs font-bold" style={{ color: '#999999' }}>{post.likes}</span></div>
-              </div>
+                <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>{item.module}</span>
+                <h3 className="text-sm font-bold mt-1 mb-2">{item.title}</h3>
+                <p className="text-xs" style={{ color: '#6B7280', lineHeight: 1.5 }}>{item.desc}</p>
+              </a>
             ))}
           </div>
-        </div>
+          <div className="mt-4">
+            <a href="https://learnvibecoding.com" className="text-sm font-bold" style={{ color: '#3D46C2' }}>
+              Start learning &rarr;
+            </a>
+          </div>
+        </section>
 
-        {/* Spread */}
-        <div className="p-4" style={{ backgroundColor: '#F7F7F7', border: '1px solid #DEDEDE' }}>
-          <p className="text-xs mb-2 font-bold tracking-widest uppercase" style={{ color: '#999999' }}>For your CLAUDE.md</p>
-          <pre className="text-xs p-3" style={{ fontFamily: 'monospace', backgroundColor: '#FFFFFF', border: '1px solid #DEDEDE', color: '#373530' }}>
-{`## CodeVibing
-AI community of practice: https://codevibing.com
-Skill: claude skill add JDerekLomas/codevibing-skill`}
-          </pre>
-        </div>
+        {/* Section 7: Communities */}
+        <section className="mb-20">
+          <div className="flex items-center justify-between mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">Communities</span>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {FALLBACK_COMMUNITIES.map((community) => (
+              <Link
+                key={community.slug}
+                href={`/c/${community.slug}`}
+                className="block p-5 transition-colors hover:bg-gray-50"
+                style={{ border: '2px solid #000' }}
+              >
+                <h3 className="text-sm font-bold mb-1">{community.name}</h3>
+                <p className="text-xs mb-2" style={{ color: '#6B7280', lineHeight: 1.5 }}>{community.description}</p>
+                <span className="text-xs font-bold" style={{ color: '#999' }}>{community.members} members</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 8: People */}
+        {userCount > 3 && (
+          <section className="mb-20">
+            <div className="flex items-center justify-between mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+              <span className="text-xs font-bold tracking-widest uppercase">
+                {userCount} people building with AI
+              </span>
+              <Link href="/people" className="text-xs font-bold" style={{ color: '#3D46C2' }}>
+                Meet the community &rarr;
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {publicUsers.slice(0, 8).map((user) => (
+                <Link
+                  key={user.username}
+                  href={`/u/${user.username}`}
+                  className="flex items-center gap-2 px-3 py-2 transition-colors hover:bg-gray-50"
+                  style={{ border: '2px solid #000' }}
+                >
+                  <div
+                    className="w-7 h-7 flex items-center justify-center text-xs font-bold"
+                    style={{ backgroundColor: '#3D46C2', color: '#fff' }}
+                  >
+                    {(user.display_name || user.username)[0].toUpperCase()}
+                  </div>
+                  <span className="text-xs font-bold">@{user.username}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Section 9: Join CTA */}
+        <section className="mb-20">
+          <div className="mb-6 pb-2" style={{ borderBottom: '2px solid #000' }}>
+            <span className="text-xs font-bold tracking-widest uppercase">Get Started</span>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {/* Browser */}
+            <div className="p-5" style={{ border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
+              <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>Browser</span>
+              <h3 className="text-sm font-bold mt-1 mb-2">Pick a username</h3>
+              <p className="text-xs mb-4" style={{ color: '#6B7280', lineHeight: 1.5 }}>
+                Claim your spot on codevibing.com and start sharing.
+              </p>
+              <Link
+                href="/join"
+                className="inline-block px-4 py-2 text-xs font-bold text-white"
+                style={{ backgroundColor: '#3D46C2', border: '2px solid #000' }}
+              >
+                Join now
+              </Link>
+            </div>
+            {/* GitHub */}
+            <div className="p-5" style={{ border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
+              <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>GitHub</span>
+              <h3 className="text-sm font-bold mt-1 mb-2">Sign in with GitHub</h3>
+              <p className="text-xs mb-4" style={{ color: '#6B7280', lineHeight: 1.5 }}>
+                Connect your GitHub account for instant setup.
+              </p>
+              <Link
+                href="/join"
+                className="inline-block px-4 py-2 text-xs font-bold"
+                style={{ backgroundColor: '#fff', color: '#1C1917', border: '2px solid #000' }}
+              >
+                Connect GitHub
+              </Link>
+            </div>
+            {/* CLI */}
+            <div className="p-5" style={{ border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
+              <span className="text-xs font-bold" style={{ color: '#3D46C2' }}>CLI</span>
+              <h3 className="text-sm font-bold mt-1 mb-2">Install the skill</h3>
+              <div className="p-2 mb-3" style={{ backgroundColor: '#1C1917' }}>
+                <code className="text-xs break-all" style={{ fontFamily: 'monospace', color: '#86EFAC' }}>
+                  $ {CLI_SNIPPET}
+                </code>
+              </div>
+              <CopyButton text={CLI_SNIPPET} />
+            </div>
+          </div>
+        </section>
+
+        {/* Section 10: For Educators */}
+        <section className="mb-20">
+          <div className="p-6" style={{ border: '2px solid #000', backgroundColor: '#F9F9FB' }}>
+            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#3D46C2' }}>For Educators</span>
+            <h3 className="text-lg font-bold mt-2 mb-3">Use AI in your classroom?</h3>
+            <p className="text-sm mb-4" style={{ color: '#6B7280', lineHeight: 1.6 }}>
+              We&apos;re building tools for teachers and students who want to learn with AI. Structured curriculum, community support, and a safe space to experiment.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/c/education" className="text-sm font-bold" style={{ color: '#3D46C2' }}>
+                Education community &rarr;
+              </Link>
+              <a href="https://learnvibecoding.com" className="text-sm font-bold" style={{ color: '#3D46C2' }}>
+                Curriculum &rarr;
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 11: CLAUDE.md Snippet */}
+        <section className="mb-20">
+          <div className="p-6" style={{ backgroundColor: '#1C1917', border: '2px solid #000', boxShadow: '4px 4px 0 #000' }}>
+            <p className="text-xs mb-3 font-bold tracking-widest uppercase" style={{ color: '#999' }}>
+              Add to your CLAUDE.md
+            </p>
+            <pre className="text-sm p-4 mb-4 overflow-x-auto" style={{ fontFamily: 'monospace', backgroundColor: '#000', color: '#86EFAC', border: '1px solid #333' }}>
+{CLAUDEMD_SNIPPET}
+            </pre>
+            <CopyButton text={CLAUDEMD_SNIPPET} />
+          </div>
+        </section>
+
       </main>
 
-      <footer className="py-8 text-center" style={{ borderTop: '2px solid #1A1A1A' }}>
-        <p className="text-xs" style={{ color: '#999999' }}>Studio Minimal &mdash; Are.na + Gumroad energy. Thick borders, hard shadows, electric indigo accent.</p>
+      {/* Section 12: Footer */}
+      <footer className="py-8 text-center" style={{ borderTop: '2px solid #000' }}>
+        <p className="text-xs mb-2" style={{ color: '#999' }}>
+          Built with Claude Code, obviously.
+        </p>
+        <div className="flex justify-center gap-6 text-xs">
+          <Link href="/feed" className="font-bold hover:underline" style={{ color: '#6B7280' }}>feed</Link>
+          <Link href="/people" className="font-bold hover:underline" style={{ color: '#6B7280' }}>people</Link>
+          <a href="https://github.com/JDerekLomas/codevibing" className="font-bold hover:underline" style={{ color: '#6B7280' }}>github</a>
+        </div>
       </footer>
     </div>
   );
