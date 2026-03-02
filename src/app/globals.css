@@ -1,4 +1,4 @@
-/* Tailwind CSS imports */
+/* Tailwind CSS imports - force rebuild */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,19 +8,20 @@
 @layer base {
   :root {
     --header-height: 4rem;
-    /* System font stack with fallbacks for optimal rendering */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --color-cream: #FFFDF9;
+    --color-warm-border: #E8E2DA;
+    --color-accent: #92400E;
+    --color-text: #1C1917;
+    --color-text-muted: #78716C;
   }
 
-  /* Base HTML element styles */
   html {
-    @apply antialiased; /* Enable font smoothing */
-    font-family: var(--font-sans);
+    @apply antialiased;
   }
 
-  /* Set neutral background and text colors */
   body {
-    @apply bg-gray-50 text-gray-900;
+    color: var(--color-text);
+    background-color: var(--color-cream);
   }
 }
 
@@ -120,4 +121,41 @@ body {
 
 .heading-2 {
   @apply text-3xl font-light tracking-tight text-gray-900;
+}
+
+/* Gallery page styles */
+@keyframes gallery-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(10px, -15px) scale(1.02); }
+  50% { transform: translate(-5px, 10px) scale(0.98); }
+  75% { transform: translate(-15px, -5px) scale(1.01); }
+}
+
+@keyframes gallery-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.gallery-drift { animation: gallery-drift 20s ease-in-out infinite; }
+.gallery-marquee { animation: gallery-marquee 30s linear infinite; }
+
+.gallery-scanlines {
+  position: relative;
+}
+.gallery-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.gallery-scanlines:hover::after {
+  opacity: 1;
 }
