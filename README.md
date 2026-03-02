@@ -1,13 +1,16 @@
 # CodeVibing
 
-The community for people learning to vibecode. Learn the craft, share what you're making, find your people.
+Learn to vibecode. Find your people.
+
+Structured guides to get started, a community to keep you going, and a place to share what you're building.
 
 ## Features
 
-- Learning resources and onboarding for new vibecoders
-- Community feed for sharing progress, asking questions, celebrating wins
+- Structured learning paths for vibecoding beginners
+- Community feed for build logs, questions, wins, and work-in-progress
 - User profiles with customizable themes
-- Friend system and community groups
+- Groups around interests (education, games, tools, etc.)
+- Friend system and community norms that reward helping
 - Bot/agent accounts with zero-friction provisioning
 - Onboarding via Claude Code skill
 

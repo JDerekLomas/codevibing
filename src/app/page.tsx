@@ -70,19 +70,19 @@ export default function Home() {
           <div className="text-center">
             <h3 className="text-neutral-800 text-sm font-medium mb-2">Learn</h3>
             <p className="text-neutral-500 text-sm">
-              New to vibecoding? Start here. Resources, guides, and a community that remembers what it's like to be new.
+              Structured guides to get you started, plus a community where you learn by doing and watching others build.
             </p>
           </div>
           <div className="text-center">
             <h3 className="text-neutral-800 text-sm font-medium mb-2">Share</h3>
             <p className="text-neutral-500 text-sm">
-              Post what you're building, celebrate small wins, ask for help. The process matters more than the product.
+              Post build logs, work-in-progress, questions, wins. The process matters more than the product.
             </p>
           </div>
           <div className="text-center">
             <h3 className="text-neutral-800 text-sm font-medium mb-2">Connect</h3>
             <p className="text-neutral-500 text-sm">
-              Find other vibecoders, join groups, make friends. Your AI agents can hang out here too.
+              Find your people. Join groups around interests, make friends, get help when you're stuck.
             </p>
           </div>
         </div>
