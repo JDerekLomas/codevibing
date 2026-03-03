@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabasePublic } from '@/lib/supabase';
 import { ComposeForm } from '@/components/ComposeForm';
+import { ThreadedPost } from '@/components/ThreadedPost';
 
 export const revalidate = 30;
 
@@ -26,7 +27,8 @@ interface Vibe {
   content: string;
   author: string;
   bot: string;
-  community: string;
+  community: string | null;
+  reply_to: string | null;
   created_at: string;
 }
 
@@ -45,22 +47,8 @@ async function getCommunityPosts(slug: string): Promise<Vibe[]> {
     .select('*')
     .eq('community', slug)
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(100);
   return data || [];
-}
-
-function formatTime(iso: string): string {
-  const date = new Date(iso);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString();
 }
 
 export default async function CommunityPage({ params }: PageProps) {
@@ -146,62 +134,48 @@ export default async function CommunityPage({ params }: PageProps) {
         {/* Compose */}
         <ComposeForm community={slug} />
 
-        {/* Posts */}
-        <div className="space-y-0">
-          {posts.length === 0 ? (
-            <div
-              className="text-center py-12 border border-dashed rounded-xl"
-              style={{ borderColor: 'var(--color-warm-border)' }}
-            >
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                No posts yet. Be the first to share something.
-              </p>
-            </div>
-          ) : (
-            posts.map((vibe, i) => (
-              <div key={vibe.id}>
-                {i > 0 && (
-                  <div className="border-b" style={{ borderColor: 'var(--color-warm-border)' }} />
-                )}
-                <div className="py-4">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-medium mt-0.5"
-                      style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
-                    >
-                      {(vibe.bot?.charAt(0) || vibe.author.charAt(0)).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Link
-                          href={`/u/${vibe.author}`}
-                          className="hover:underline text-sm font-medium"
-                          style={{ color: 'var(--color-text)' }}
-                        >
-                          @{vibe.author}
-                        </Link>
-                        {vibe.bot && (
-                          <span
-                            className="text-[10px] px-1.5 py-0.5 rounded-full"
-                            style={{ backgroundColor: '#F5F0EB', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}
-                          >
-                            {vibe.bot}
-                          </span>
-                        )}
-                        <span className="text-xs" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                          {formatTime(vibe.created_at)}
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text-muted)' }}>
-                        {vibe.content}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        {/* Threaded Posts */}
+        {(() => {
+          const topLevel = posts.filter(p => !p.reply_to);
+          const repliesByParent = new Map<string, Vibe[]>();
+          for (const p of posts) {
+            if (p.reply_to) {
+              const existing = repliesByParent.get(p.reply_to) || [];
+              existing.push(p);
+              repliesByParent.set(p.reply_to, existing);
+            }
+          }
+          // Sort replies chronologically (oldest first)
+          repliesByParent.forEach((replies) => {
+            replies.sort((a: Vibe, b: Vibe) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          });
+
+          if (topLevel.length === 0) {
+            return (
+              <div
+                className="text-center py-12 border border-dashed rounded-xl"
+                style={{ borderColor: 'var(--color-warm-border)' }}
+              >
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  No posts yet. Be the first to share something.
+                </p>
               </div>
-            ))
-          )}
-        </div>
+            );
+          }
+
+          return (
+            <div className="space-y-4">
+              {topLevel.map(post => (
+                <ThreadedPost
+                  key={post.id}
+                  post={post}
+                  replies={repliesByParent.get(post.id) || []}
+                  community={slug}
+                />
+              ))}
+            </div>
+          );
+        })()}
       </main>
     </div>
   );
