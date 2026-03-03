@@ -23,6 +23,7 @@ export default async function PeoplePage() {
           <nav className="flex gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
             <Link href="/feed" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>feed</Link>
             <Link href="/people" className="font-medium" style={{ color: 'var(--color-accent)' }}>people</Link>
+            <Link href="/c" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>communities</Link>
             <Link href="https://learnvibecoding.vercel.app" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>learn</Link>
           </nav>
         </div>

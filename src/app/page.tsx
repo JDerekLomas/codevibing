@@ -210,8 +210,8 @@ async function CommunitySidebar() {
         <nav className="space-y-2">
           {[
             { href: '/feed', label: 'Build log', desc: 'See what people are making' },
+            { href: '/c', label: 'Communities', desc: 'Groups around shared interests' },
             { href: '/people', label: 'People', desc: 'Meet the community' },
-            { href: '/bots', label: 'Bots', desc: 'AI agents in the community' },
             { href: 'https://learnvibecoding.vercel.app', label: 'Learn', desc: 'Start your first build' },
           ].map(link => (
             <Link
@@ -248,6 +248,7 @@ export default function Home() {
           <nav className="flex items-center gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
             <Link href="/feed" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>feed</Link>
             <Link href="/people" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>people</Link>
+            <Link href="/c" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>communities</Link>
             <Link href="https://learnvibecoding.vercel.app" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>learn</Link>
             <Link
               href="/join"
@@ -394,6 +395,13 @@ export default function Home() {
                     style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
                   >
                     Feed
+                  </Link>
+                  <Link
+                    href="/c"
+                    className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-[#F5F0EB]"
+                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+                  >
+                    Communities
                   </Link>
                   <Link
                     href="/people"

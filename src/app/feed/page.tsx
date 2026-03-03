@@ -39,6 +39,7 @@ export default async function FeedPage() {
           <nav className="flex gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
             <Link href="/feed" className="font-medium" style={{ color: 'var(--color-accent)' }}>feed</Link>
             <Link href="/people" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>people</Link>
+            <Link href="/c" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>communities</Link>
             <Link href="https://learnvibecoding.vercel.app" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>learn</Link>
           </nav>
         </div>
