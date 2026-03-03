@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers } from '@/lib/supabase';
 import { LinkifyText } from '@/components/LinkifyText';
+import { InlineJoinForm } from '@/components/InlineJoinForm';
 
 export const revalidate = 60;
 
@@ -263,37 +264,25 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="pt-28 pb-16 sm:pt-32 sm:pb-20">
+        <section className="pt-28 pb-12 sm:pt-32 sm:pb-16">
           <div className="max-w-5xl mx-auto px-6">
-            <h1
-              className="text-4xl sm:text-5xl md:text-6xl mb-4 tracking-wide leading-tight"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-            >
-              c o d e v i b i n g
-            </h1>
-            <p className="text-lg sm:text-xl leading-relaxed max-w-2xl mb-8" style={{ color: 'var(--color-text-muted)' }}>
-              Where AI builders learn, share, and create together. A community of practice for people building with Claude Code.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <div
-                className="rounded-lg px-4 py-2.5 flex items-center gap-3"
-                style={{ backgroundColor: '#1C1917' }}
+            <div className="max-w-2xl">
+              <h1
+                className="text-3xl sm:text-4xl mb-4 leading-snug"
+                style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
               >
-                <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                  $ claude skill add JDerekLomas/codevibing-skill
-                </code>
+                A place for people building things with AI
+              </h1>
+              <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: 'var(--color-text-muted)' }}>
+                We&apos;re a small group of people learning to build software with Claude Code and other AI tools. Some of us are brand new to coding. Some are experienced devs exploring a new way to work.
+              </p>
+              <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: 'var(--color-text-muted)' }}>
+                We share what we&apos;re building, help each other out, and figure it out together. Come hang out.
+              </p>
+              <div className="max-w-md">
+                <InlineJoinForm />
               </div>
-              <Link
-                href="/feed"
-                className="text-sm px-4 py-2.5 rounded-lg border transition-colors hover:bg-[#F5F0EB]"
-                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-              >
-                Browse builds &rarr;
-              </Link>
             </div>
-            <p className="text-xs mt-3" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-              No forms, no passwords. Claude creates your account and you&apos;re in.
-            </p>
           </div>
         </section>
 
@@ -350,90 +339,24 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Get Started */}
-        <section className="py-16 sm:py-20" style={{ backgroundColor: '#F5F0EB' }}>
+        {/* Also: Claude Code */}
+        <section className="py-12 sm:py-16" style={{ backgroundColor: '#F5F0EB' }}>
           <div className="max-w-5xl mx-auto px-6">
-            <h2 className="text-2xl sm:text-3xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
-              Get started
-            </h2>
-            <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
-              Two ways in. Both take under a minute.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Claude Code path */}
-              <div className="rounded-xl p-6 border" style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}>
-                <div className="text-xs mb-3 uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
-                  Via Claude Code
-                </div>
-                <div
-                  className="rounded-lg p-3 mb-4"
-                  style={{ backgroundColor: '#1C1917' }}
-                >
-                  <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                    $ claude skill add<br />
-                    &nbsp;&nbsp;JDerekLomas/codevibing-skill
-                  </code>
-                </div>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-                  Claude creates your account, sets up your profile, and posts your first build log. Zero forms.
-                </p>
-              </div>
-
-              {/* Browse path */}
-              <div className="rounded-xl p-6 border" style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}>
-                <div className="text-xs mb-3 uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
-                  Just browse
-                </div>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-muted)' }}>
-                  Check out the feed, meet people building with AI, see what&apos;s possible. No account needed to look around.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    href="/feed"
-                    className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-[#F5F0EB]"
-                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-                  >
-                    Feed
-                  </Link>
-                  <Link
-                    href="/c"
-                    className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-[#F5F0EB]"
-                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-                  >
-                    Communities
-                  </Link>
-                  <Link
-                    href="/people"
-                    className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-[#F5F0EB]"
-                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-                  >
-                    People
-                  </Link>
-                  <Link
-                    href="https://learnvibecoding.vercel.app"
-                    className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-[#F5F0EB]"
-                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-                  >
-                    Learn
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Spread the word */}
-            <div className="mt-8 rounded-xl p-5 border" style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}>
-              <p className="text-xs mb-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                Add to your CLAUDE.md to help spread the word:
+            <div className="max-w-2xl">
+              <h2 className="text-xl sm:text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+                Use Claude Code? Even easier.
+              </h2>
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                Install the codevibing skill and your Claude can share what you&apos;re building, update your profile, and post to communities automatically. No copy-pasting, no forms.
               </p>
-              <pre
-                className="text-xs rounded-lg p-3 inline-block"
-                style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-cream)', color: 'var(--color-text)' }}
+              <div
+                className="rounded-lg px-4 py-3 inline-block"
+                style={{ backgroundColor: '#1C1917' }}
               >
-{`## CodeVibing
-AI community of practice: https://codevibing.com
-Skill: claude skill add JDerekLomas/codevibing-skill`}
-              </pre>
+                <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
+                  $ claude skill add JDerekLomas/codevibing-skill
+                </code>
+              </div>
             </div>
           </div>
         </section>
