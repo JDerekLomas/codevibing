@@ -94,16 +94,6 @@ export default function JoinPage() {
   if (loggedInUser && !result?.success) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-sans)' }}>
-        <header
-          className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
-          style={{ backgroundColor: 'rgba(255, 253, 249, 0.9)', borderColor: 'var(--color-warm-border)' }}
-        >
-          <div className="max-w-2xl mx-auto px-6 py-3 flex justify-between items-center">
-            <Link href="/" className="text-sm hover:opacity-70 transition-opacity" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-              codevibing
-            </Link>
-          </div>
-        </header>
         <main className="max-w-md mx-auto px-6 pt-28 pb-12 text-center">
           <div className="text-4xl mb-4">&#10003;</div>
           <h1 className="text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
@@ -135,21 +125,6 @@ export default function JoinPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-sans)' }}>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
-        style={{ backgroundColor: 'rgba(255, 253, 249, 0.9)', borderColor: 'var(--color-warm-border)' }}
-      >
-        <div className="max-w-2xl mx-auto px-6 py-3 flex justify-between items-center">
-          <Link href="/" className="text-sm hover:opacity-70 transition-opacity" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-            codevibing
-          </Link>
-          <nav className="flex gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
-            <Link href="/feed" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>feed</Link>
-            <Link href="/c" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>communities</Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="max-w-md mx-auto px-6 pt-28 pb-12">
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
