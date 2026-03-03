@@ -1,0 +1,51 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.8.2
+2 info using node@v20.18.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/dereklomas/CodeVibing/efm/.npmrc
+5 silly config load:file:/Users/dereklomas/codevibing/efm/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm install supabase
+8 verbose argv "install" "--save-dev" "supabase"
+9 verbose logfile logs-max:10 dir:/Users/dereklomas/codevibing/efm/.npm/_logs/2025-10-17T18_52_16_708Z-
+10 verbose logfile /Users/dereklomas/codevibing/efm/.npm/_logs/2025-10-17T18_52_16_708Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly fetch manifest supabase@*
+15 silly packumentCache full:https://registry.npmjs.org/supabase cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/supabase 8656ms (cache miss)
+17 silly packumentCache full:https://registry.npmjs.org/supabase set size:undefined disposed:false
+18 silly placeDep ROOT supabase@2.51.0 REPLACE for: efm@1.0.0 want: *
+19 silly reify mark retired [
+19 silly reify   '/Users/dereklomas/CodeVibing/efm/node_modules/supabase',
+19 silly reify   '/Users/dereklomas/CodeVibing/efm/node_modules/.bin/supabase'
+19 silly reify ]
+20 silly reify moves {
+20 silly reify   '/Users/dereklomas/CodeVibing/efm/node_modules/supabase': '/Users/dereklomas/CodeVibing/efm/node_modules/.supabase-uiQcvwLY',
+20 silly reify   '/Users/dereklomas/CodeVibing/efm/node_modules/.bin/supabase': '/Users/dereklomas/CodeVibing/efm/node_modules/.bin/.supabase-mSXYQ4oC'
+20 silly reify }
+21 verbose stack Error: ENOTEMPTY: directory not empty, rename '/Users/dereklomas/CodeVibing/efm/node_modules/supabase' -> '/Users/dereklomas/CodeVibing/efm/node_modules/.supabase-uiQcvwLY'
+21 verbose stack     at async Object.rename (node:internal/fs/promises:782:10)
+21 verbose stack     at async moveFile (/usr/local/lib/node_modules/npm/node_modules/@npmcli/fs/lib/move-file.js:30:5)
+21 verbose stack     at async Promise.allSettled (index 0)
+21 verbose stack     at async [reifyPackages] (/usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:325:11)
+21 verbose stack     at async Arborist.reify (/usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:142:5)
+21 verbose stack     at async Install.exec (/usr/local/lib/node_modules/npm/lib/commands/install.js:150:5)
+21 verbose stack     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:207:9)
+21 verbose stack     at async module.exports (/usr/local/lib/node_modules/npm/lib/cli/entry.js:74:5)
+22 error code ENOTEMPTY
+23 error syscall rename
+24 error path /Users/dereklomas/CodeVibing/efm/node_modules/supabase
+25 error dest /Users/dereklomas/CodeVibing/efm/node_modules/.supabase-uiQcvwLY
+26 error errno -66
+27 error ENOTEMPTY: directory not empty, rename '/Users/dereklomas/CodeVibing/efm/node_modules/supabase' -> '/Users/dereklomas/CodeVibing/efm/node_modules/.supabase-uiQcvwLY'
+28 silly unfinished npm timer reify 1760727136883
+29 silly unfinished npm timer reify:retireShallow 1760727145573
+30 verbose cwd /Users/dereklomas/CodeVibing/efm
+31 verbose os Darwin 23.4.0
+32 verbose node v20.18.0
+33 verbose npm  v10.8.2
+34 verbose exit -66
+35 verbose code -66
+36 error A complete log of this run can be found in: /Users/dereklomas/codevibing/efm/.npm/_logs/2025-10-17T18_52_16_708Z-debug-0.log

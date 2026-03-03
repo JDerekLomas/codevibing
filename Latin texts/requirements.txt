@@ -1,0 +1,12 @@
+# Core dependencies
+# Add specific dependencies as needed for catalogue data access
+# Examples (uncomment and configure as needed):
+# requests>=2.31.0  # For API access
+# pandas>=2.0.0     # For data manipulation (optional)
+# openpyxl>=3.1.0   # For Excel file reading (if catalogues provide Excel)
+# lxml>=4.9.0       # For XML parsing (if catalogues provide XML)
+
+# For now, using only standard library
+# Add catalogue-specific dependencies as you integrate data sources
+
+

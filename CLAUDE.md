@@ -50,3 +50,9 @@ Core features:
 - `src/lib` - Utilities and shared code
 - `src/data` - Data models and initial seed data
 
+## Component Publishing Flow
+1. User pastes AI-generated React code into playground
+2. System auto-generates metadata (title, description, tags)
+3. User can edit metadata and upload/generate screenshots
+4. Project is published to gallery with proper attribution
+5. Community can view, like, and fork components

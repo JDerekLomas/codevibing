@@ -1,0 +1,8 @@
+{
+  "name": "curriculum-review",
+  "version": "0.1.0",
+  "description": "Curriculum QA: standards coverage, EdReports-style evidence, reviewer exports",
+  "author": {
+    "name": "Your Org"
+  }
+}

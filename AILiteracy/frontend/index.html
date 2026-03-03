@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Literacy Prompts</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="prompt-panel">
+        <header class="panel-header">
+          <h1>AI Literacy Modules</h1>
+          <p class="panel-subtitle">Choose a prompt to start a guided conversation.</p>
+        </header>
+        <div id="promptList" class="prompt-list" aria-live="polite"></div>
+      </aside>
+      <main class="chat-panel">
+        <section class="prompt-details" id="promptDetails">
+          <h2 id="promptTitle">Select a module to begin</h2>
+          <pre id="promptContent" class="prompt-content"></pre>
+        </section>
+        <section class="chat-window" id="chatWindow" aria-live="polite"></section>
+        <section class="composer" aria-label="Chat composer">
+          <div class="composer-status" id="statusMessage" role="status"></div>
+          <textarea
+            id="messageInput"
+            rows="3"
+            placeholder="Type your message..."
+            aria-label="Type your message"
+          ></textarea>
+          <div class="composer-actions">
+            <button id="editCancel" type="button" class="secondary" hidden>Cancel edit</button>
+            <div class="action-spacer"></div>
+            <button id="sendButton" type="button">Send</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

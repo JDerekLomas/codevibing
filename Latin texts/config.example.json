@@ -1,0 +1,36 @@
+{
+  "catalogues": [
+    {
+      "name": "USTC",
+      "data_source": "data/raw/ustc_latin.csv",
+      "description": "Universal Short Title Catalogue"
+    },
+    {
+      "name": "VD16",
+      "data_source": "data/raw/vd16_latin.csv",
+      "description": "Verzeichnis der im deutschen Sprachbereich erschienenen Drucke des 16. Jahrhunderts"
+    },
+    {
+      "name": "VD17",
+      "data_source": "data/raw/vd17_latin.csv",
+      "description": "Verzeichnis der im deutschen Sprachbereich erschienenen Drucke des 17. Jahrhunderts"
+    },
+    {
+      "name": "VD18",
+      "data_source": "data/raw/vd18_latin.csv",
+      "description": "Verzeichnis der im deutschen Sprachbereich erschienenen Drucke des 18. Jahrhunderts"
+    },
+    {
+      "name": "ESTC",
+      "data_source": "data/raw/estc_latin.csv",
+      "description": "English Short Title Catalogue"
+    }
+  ],
+  "matching": {
+    "title_similarity_threshold": 0.85,
+    "author_similarity_threshold": 0.80,
+    "year_tolerance": 2
+  }
+}
+
+

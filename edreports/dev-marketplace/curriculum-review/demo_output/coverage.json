@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "subject": "math",
+    "grades": "3-5",
+    "books": [
+      "demo_math_grade3"
+    ],
+    "total_standards": 5
+  },
+  "standards": [
+    {
+      "id": "3.NF.A.1",
+      "grade": 3,
+      "taught": true,
+      "practiced": true,
+      "assessed": true,
+      "intensity": "high",
+      "off_grade_percent": 0,
+      "redundancy_count": 3,
+      "evidence_found": true,
+      "top_pages": [
+        1,
+        2,
+        3
+      ],
+      "rationale": "Clear instruction with multiple practice activities"
+    },
+    {
+      "id": "3.NF.A.2",
+      "grade": 3,
+      "taught": true,
+      "practiced": true,
+      "assessed": false,
+      "intensity": "medium",
+      "off_grade_percent": 0,
+      "redundancy_count": 2,
+      "evidence_found": true,
+      "top_pages": [
+        5,
+        6
+      ],
+      "rationale": "Taught with practice on number lines"
+    },
+    {
+      "id": "3.NF.A.3a",
+      "grade": 3,
+      "taught": true,
+      "practiced": false,
+      "assessed": false,
+      "intensity": "low",
+      "off_grade_percent": 0,
+      "redundancy_count": 1,
+      "evidence_found": true,
+      "top_pages": [
+        7
+      ],
+      "rationale": "Introduced with visual models"
+    },
+    {
+      "id": "3.OA.A.1",
+      "grade": 3,
+      "taught": true,
+      "practiced": true,
+      "assessed": false,
+      "intensity": "high",
+      "off_grade_percent": 0,
+      "redundancy_count": 2,
+      "evidence_found": true,
+      "top_pages": [
+        8,
+        9
+      ],
+      "rationale": "Multiplication as equal groups with arrays"
+    },
+    {
+      "id": "4.OA.A.3",
+      "grade": 4,
+      "taught": false,
+      "practiced": false,
+      "assessed": false,
+      "intensity": "none",
+      "off_grade_percent": 0,
+      "redundancy_count": 0,
+      "evidence_found": false,
+      "top_pages": [],
+      "unrated": "evidence not found"
+    }
+  ],
+  "summary": {
+    "total_covered": 4,
+    "total_uncovered": 1,
+    "coverage_percent": 80
+  }
+}

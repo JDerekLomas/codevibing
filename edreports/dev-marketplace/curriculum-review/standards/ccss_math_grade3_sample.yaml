@@ -1,0 +1,126 @@
+standards:
+  - id: "3.NF.A.1"
+    grade: 3
+    description: "Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts"
+    keywords:
+      - "fraction"
+      - "equal parts"
+      - "numerator"
+      - "denominator"
+      - "one half"
+      - "one third"
+      - "one fourth"
+      - "partition"
+    anti_keywords:
+      - "percent"
+      - "decimal"
+      - "ratio"
+    examples:
+      - "1/2 of a pizza"
+      - "dividing a rectangle into 4 equal parts"
+
+  - id: "3.NF.A.2"
+    grade: 3
+    description: "Understand a fraction as a number on the number line; represent fractions on a number line diagram"
+    keywords:
+      - "number line"
+      - "fraction"
+      - "locate"
+      - "mark"
+      - "interval"
+      - "endpoint"
+    anti_keywords:
+      - "negative"
+      - "improper"
+    examples:
+      - "plotting 1/2 on a number line"
+      - "marking equal intervals"
+
+  - id: "3.NF.A.3a"
+    grade: 3
+    description: "Understand two fractions as equivalent (equal) if they are the same size"
+    keywords:
+      - "equivalent"
+      - "equal fractions"
+      - "same size"
+      - "compare"
+      - "fraction model"
+    anti_keywords:
+      - "simplify"
+    examples:
+      - "2/4 equals 1/2"
+
+  - id: "3.NF.A.3b"
+    grade: 3
+    description: "Recognize and generate simple equivalent fractions"
+    keywords:
+      - "equivalent"
+      - "generate"
+      - "simple fraction"
+      - "2/4"
+      - "3/6"
+    anti_keywords:
+      - "complex"
+    examples:
+      - "1/2 = 2/4"
+      - "1/3 = 2/6"
+
+  - id: "3.OA.A.1"
+    grade: 3
+    description: "Interpret products of whole numbers"
+    keywords:
+      - "product"
+      - "multiply"
+      - "equal groups"
+      - "arrays"
+      - "multiplication"
+    anti_keywords: []
+    examples:
+      - "3 × 5 as 3 groups of 5"
+      - "arrays of objects"
+
+  - id: "3.OA.A.2"
+    grade: 3
+    description: "Interpret whole-number quotients of whole numbers"
+    keywords:
+      - "quotient"
+      - "divide"
+      - "division"
+      - "equal sharing"
+      - "groups"
+    anti_keywords: []
+    examples:
+      - "15 ÷ 3 means 15 objects shared equally into 3 groups"
+
+  - id: "4.NF.A.1"
+    grade: 4
+    description: "Explain why a fraction a/b is equivalent to a fraction (n × a)/(n × b)"
+    keywords:
+      - "equivalent"
+      - "multiply numerator"
+      - "multiply denominator"
+      - "fraction"
+      - "scaling"
+    anti_keywords: []
+    examples:
+      - "1/2 = 2/4 because 1 × 2 = 2 and 2 × 2 = 4"
+
+  - id: "4.OA.A.3"
+    grade: 4
+    description: "Solve multistep word problems with whole numbers and interpret remainders"
+    keywords:
+      - "multi-step"
+      - "word problem"
+      - "interpret"
+      - "remainders"
+      - "operations"
+    anti_keywords: []
+    examples:
+      - "Buying supplies and computing change"
+
+metadata:
+  pack_name: "CCSS Math Grade 3 Sample"
+  version: "0.1.0"
+  subject: "math"
+  grades: [3, 4]
+  last_updated: "2025-10-17"
