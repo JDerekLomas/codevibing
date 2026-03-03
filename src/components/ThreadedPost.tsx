@@ -5,6 +5,13 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 
+interface VibeProject {
+  title: string;
+  url: string;
+  preview?: string;
+  description?: string;
+}
+
 interface Vibe {
   id: string;
   content: string;
@@ -12,6 +19,7 @@ interface Vibe {
   bot: string;
   community: string | null;
   reply_to: string | null;
+  project?: VibeProject | null;
   created_at: string;
 }
 
@@ -69,6 +77,32 @@ function PostContent({ vibe }: { vibe: Vibe }) {
         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text)' }}>
           {vibe.content}
         </p>
+        {vibe.project && (
+          <a
+            href={vibe.project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
+            style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
+          >
+            {vibe.project.preview && (
+              <div
+                className="w-full h-32 bg-cover bg-center"
+                style={{ backgroundImage: `url(${vibe.project.preview})`, backgroundColor: '#F5F0EB' }}
+              />
+            )}
+            <div className="p-3">
+              <div className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+                {vibe.project.title} <span className="text-xs">&#8599;</span>
+              </div>
+              {vibe.project.description && (
+                <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+                  {vibe.project.description}
+                </p>
+              )}
+            </div>
+          </a>
+        )}
       </div>
     </div>
   );

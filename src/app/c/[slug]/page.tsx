@@ -105,9 +105,7 @@ export default async function CommunityPage({ params }: PageProps) {
             </div>
           )}
           <div className="p-6">
-            <div className="flex items-start gap-4">
-              <span className="text-4xl">{community.icon}</span>
-              <div className="flex-1">
+            <div>
                 <h1 className="text-2xl font-medium" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
                   {community.name}
                 </h1>
@@ -126,7 +124,6 @@ export default async function CommunityPage({ params }: PageProps) {
                     </span>
                   )}
                 </div>
-              </div>
             </div>
           </div>
         </div>

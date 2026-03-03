@@ -2,8 +2,28 @@ import Link from 'next/link';
 import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers } from '@/lib/supabase';
 import { LinkifyText } from '@/components/LinkifyText';
 import { InlineJoinForm } from '@/components/InlineJoinForm';
+import { PostItNote } from '@/components/PostItNote';
 
 export const revalidate = 60;
+
+const MEMES = [
+  { src: '/memes/01-rick-rubin-vibing.png', alt: 'Rick Rubin vibing' },
+  { src: '/memes/03-afraid-to-ask.png', alt: 'Too afraid to ask' },
+  { src: '/memes/05-what-do-you-want-to-build.png', alt: 'What do you want to build?' },
+  { src: '/memes/01-misinterpretation.png', alt: 'Vibe coding misinterpretation' },
+  { src: '/memes/04-karpathy-origin.jpg', alt: 'Karpathy origin' },
+  { src: '/memes/01-first-pancake.png', alt: 'First pancake' },
+  { src: '/memes/01-how-to-draw-owl.jpg', alt: 'How to draw an owl' },
+  { src: '/memes/01-solo-gamedev.jpeg', alt: 'This is fine - solo gamedev' },
+  { src: '/memes/02-vibe-coders-production.jpeg', alt: 'Vibe coders in production' },
+  { src: '/memes/01-speedrun.png', alt: 'Scope creep speedrun' },
+  { src: '/memes/02-one-more-feature.png', alt: 'One more feature' },
+  { src: '/memes/01-in-case-of-fire.png', alt: 'In case of fire: git commit' },
+  { src: '/memes/01-sharing-localhost.png', alt: 'Sharing localhost' },
+  { src: '/memes/01-classic.jpg', alt: 'Works on my machine' },
+  { src: '/memes/01-dog-driving.png', alt: 'Dog driving - dark flow' },
+  { src: '/memes/01-soulless-food.png', alt: 'The taste gap' },
+];
 
 function formatTime(iso: string): string {
   const date = new Date(iso);
@@ -22,7 +42,6 @@ function formatTime(iso: string): string {
 async function FeaturedBuilds() {
   const profiles = await getFeaturedProjects();
 
-  // Flatten all projects with their authors
   const projects = profiles.flatMap(p =>
     (p.projects || []).map(proj => ({ ...proj, author: p.username }))
   ).slice(0, 6);
@@ -86,7 +105,7 @@ async function FeaturedBuilds() {
 }
 
 async function RecentActivity() {
-  const vibes = await getVibes(6);
+  const vibes = await getVibes(10);
 
   if (vibes.length === 0) {
     return (
@@ -156,79 +175,87 @@ async function RecentActivity() {
   );
 }
 
-async function CommunitySidebar() {
+async function CommunityStats() {
   const [userCount, recentUsers] = await Promise.all([
     getUserCount(),
     getPublicUsers(8),
   ]);
 
   return (
-    <div className="space-y-6">
-      {/* Stats */}
-      <div className="rounded-xl p-5 border" style={{ borderColor: 'var(--color-warm-border)', backgroundColor: 'white' }}>
-        <div className="text-3xl font-medium mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+    <div
+      className="flex items-center gap-4 flex-wrap rounded-xl px-5 py-3 border"
+      style={{ borderColor: 'var(--color-warm-border)', backgroundColor: 'white' }}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-xl font-medium" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
           {userCount}
-        </div>
-        <div className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-          builders and counting
-        </div>
-
-        {/* Member avatars */}
-        {recentUsers.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {recentUsers.map(user => (
-              <Link
-                key={user.username}
-                href={`/u/${user.username}`}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-medium transition-transform hover:scale-110"
-                style={{
-                  backgroundColor: '#F5F0EB',
-                  color: 'var(--color-accent)',
-                  ...(user.avatar ? { backgroundImage: `url(${user.avatar})`, backgroundSize: 'cover', color: 'transparent' } : {}),
-                }}
-                title={user.display_name || user.username}
-              >
-                {!user.avatar && (user.display_name?.charAt(0) || user.username.charAt(0)).toUpperCase()}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <Link
-          href="/people"
-          className="text-xs hover:underline"
-          style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
-        >
-          See everyone &rarr;
-        </Link>
+        </span>
+        <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+          builders
+        </span>
       </div>
 
-      {/* Quick links */}
-      <div className="rounded-xl p-5 border" style={{ borderColor: 'var(--color-warm-border)', backgroundColor: 'white' }}>
-        <div className="text-xs mb-3 uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-          Explore
-        </div>
-        <nav className="space-y-2">
-          {[
-            { href: '/feed', label: 'Build log', desc: 'See what people are making' },
-            { href: '/c', label: 'Communities', desc: 'Groups around shared interests' },
-            { href: '/people', label: 'People', desc: 'Meet the community' },
-            { href: 'https://learnvibecoding.vercel.app', label: 'Learn', desc: 'Start your first build' },
-          ].map(link => (
+      {recentUsers.length > 0 && (
+        <div className="flex items-center gap-1">
+          {recentUsers.map(user => (
             <Link
-              key={link.href}
-              href={link.href}
-              className="block p-2 -mx-2 rounded-lg transition-colors hover:bg-[#F5F0EB]"
+              key={user.username}
+              href={`/u/${user.username}`}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-medium transition-transform hover:scale-110"
+              style={{
+                backgroundColor: '#F5F0EB',
+                color: 'var(--color-accent)',
+                ...(user.avatar ? { backgroundImage: `url(${user.avatar})`, backgroundSize: 'cover', color: 'transparent' } : {}),
+              }}
+              title={user.display_name || user.username}
             >
-              <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{link.label}</div>
-              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{link.desc}</div>
+              {!user.avatar && (user.display_name?.charAt(0) || user.username.charAt(0)).toUpperCase()}
             </Link>
           ))}
-        </nav>
-      </div>
+        </div>
+      )}
+
+      <Link
+        href="/people"
+        className="text-xs hover:underline ml-auto"
+        style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+      >
+        See everyone &rarr;
+      </Link>
     </div>
   );
 }
+
+function MemeGallery() {
+  // Show a random-ish selection of 4 memes
+  const selection = MEMES.filter((_, i) => [0, 5, 6, 13].includes(i));
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {selection.map((meme) => (
+        <div
+          key={meme.src}
+          className="rounded-lg overflow-hidden border"
+          style={{ borderColor: 'var(--color-warm-border)' }}
+        >
+          <img
+            src={meme.src}
+            alt={meme.alt}
+            className="w-full h-auto"
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const TOPICS = [
+  { slug: 'edtech', name: 'EdTech' },
+  { slug: 'fintech', name: 'FinTech' },
+  { slug: 'games', name: 'Games' },
+  { slug: 'tools', name: 'Tools & Utils' },
+];
 
 export default function Home() {
   return (
@@ -238,7 +265,7 @@ export default function Home() {
         className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
         style={{ backgroundColor: 'rgba(255, 253, 249, 0.9)', borderColor: 'var(--color-warm-border)' }}
       >
-        <div className="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
+        <div className="max-w-3xl mx-auto px-6 py-3 flex justify-between items-center">
           <Link
             href="/"
             className="text-sm hover:opacity-70 transition-opacity"
@@ -262,101 +289,147 @@ export default function Home() {
         </div>
       </header>
 
-      <main>
+      <main className="max-w-3xl mx-auto px-6">
         {/* Hero */}
-        <section className="pt-28 pb-12 sm:pt-32 sm:pb-16">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="max-w-2xl">
-              <h1
-                className="text-3xl sm:text-4xl mb-4 leading-snug"
-                style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-              >
-                A place for people building things with AI
-              </h1>
-              <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: 'var(--color-text-muted)' }}>
-                We&apos;re a small group of people learning to build software with Claude Code and other AI tools. Some of us are brand new to coding. Some are experienced devs exploring a new way to work.
-              </p>
-              <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: 'var(--color-text-muted)' }}>
-                We share what we&apos;re building, help each other out, and figure it out together. Come hang out.
-              </p>
-              <div className="max-w-md">
-                <InlineJoinForm />
-              </div>
+        <section className="pt-28 pb-10 sm:pt-32 sm:pb-12">
+          <div className="max-w-2xl">
+            <h1
+              className="text-3xl sm:text-4xl mb-4 leading-snug"
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+            >
+              A place for people building things with AI
+            </h1>
+            <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: 'var(--color-text-muted)' }}>
+              We&apos;re a small group of people learning to build software with Claude Code and other AI tools. Some of us are brand new to coding. Some are experienced devs exploring a new way to work.
+            </p>
+            <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: 'var(--color-text-muted)' }}>
+              We share what we&apos;re building, help each other out, and figure it out together. Come hang out.
+            </p>
+            <div className="max-w-md">
+              <InlineJoinForm />
             </div>
+          </div>
+        </section>
+
+        {/* Community stats bar */}
+        <section className="pb-8">
+          <CommunityStats />
+        </section>
+
+        {/* Topic tabs */}
+        <section className="pb-8">
+          <div className="flex items-center gap-3 flex-wrap">
+            {TOPICS.map((topic) => (
+              <Link
+                key={topic.slug}
+                href={`/c/${topic.slug}`}
+                className="px-4 py-2 rounded-full text-sm border transition-all hover:-translate-y-0.5 hover:shadow-sm"
+                style={{
+                  borderColor: 'var(--color-warm-border)',
+                  backgroundColor: 'white',
+                  color: 'var(--color-text)',
+                  fontFamily: 'var(--font-mono)',
+                }}
+              >
+                {topic.name}
+              </Link>
+            ))}
+            <Link
+              href="/c"
+              className="px-4 py-2 rounded-full text-sm border border-dashed transition-all hover:-translate-y-0.5"
+              style={{
+                borderColor: 'var(--color-warm-border)',
+                color: 'var(--color-text-muted)',
+                fontFamily: 'var(--font-mono)',
+              }}
+            >
+              all topics &rarr;
+            </Link>
           </div>
         </section>
 
         {/* Featured Builds */}
-        <section className="pb-16 sm:pb-20">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                What people are building
-              </h2>
-              <Link
-                href="/feed"
-                className="text-xs hover:underline"
-                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
-              >
-                See all &rarr;
-              </Link>
-            </div>
-            <FeaturedBuilds />
+        <section className="pb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+              What people are building
+            </h2>
+            <Link
+              href="/feed"
+              className="text-xs hover:underline"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            >
+              See all &rarr;
+            </Link>
+          </div>
+          <FeaturedBuilds />
+        </section>
+
+        {/* Post-it notes */}
+        <section className="pb-10">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <PostItNote
+              text="Join a conversation or get one going!"
+              href="/c"
+              color="yellow"
+              rotation={-2}
+            />
+            <PostItNote
+              text="Just getting started? Learn code vibing"
+              href="https://learnvibecoding.vercel.app"
+              color="pink"
+              rotation={1.5}
+            />
           </div>
         </section>
 
         {/* Divider */}
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
-        </div>
+        <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
 
-        {/* Activity + Sidebar */}
-        <section className="py-16 sm:py-20">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-              {/* Feed */}
-              <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                    Recent activity
-                  </h2>
-                  <Link
-                    href="/feed"
-                    className="text-xs hover:underline"
-                    style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
-                  >
-                    Full feed &rarr;
-                  </Link>
-                </div>
-                <RecentActivity />
-              </div>
-
-              {/* Sidebar */}
-              <div className="lg:col-span-1">
-                <CommunitySidebar />
-              </div>
-            </div>
+        {/* Recent Activity — full width, no sidebar */}
+        <section className="py-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+              Recent activity
+            </h2>
+            <Link
+              href="/feed"
+              className="text-xs hover:underline"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            >
+              Full feed &rarr;
+            </Link>
           </div>
+          <RecentActivity />
+        </section>
+
+        {/* Divider */}
+        <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
+
+        {/* Memes */}
+        <section className="py-10">
+          <h2 className="text-sm uppercase tracking-wider mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+            The vibe
+          </h2>
+          <MemeGallery />
         </section>
 
         {/* Also: Claude Code */}
-        <section className="py-12 sm:py-16" style={{ backgroundColor: '#F5F0EB' }}>
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="max-w-2xl">
-              <h2 className="text-xl sm:text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
-                Use Claude Code? Even easier.
-              </h2>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-                Install the codevibing skill and your Claude can share what you&apos;re building, update your profile, and post to communities automatically. No copy-pasting, no forms.
-              </p>
-              <div
-                className="rounded-lg px-4 py-3 inline-block"
-                style={{ backgroundColor: '#1C1917' }}
-              >
-                <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                  $ claude skill add JDerekLomas/codevibing-skill
-                </code>
-              </div>
+        <section className="py-10 sm:py-12 -mx-6 px-6" style={{ backgroundColor: '#F5F0EB' }}>
+          <div className="max-w-2xl">
+            <h2 className="text-xl sm:text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+              Use Claude Code? Even easier.
+            </h2>
+            <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+              Install the codevibing skill and your Claude can share what you&apos;re building, update your profile, and post to communities automatically. No copy-pasting, no forms.
+            </p>
+            <div
+              className="rounded-lg px-4 py-3 inline-block"
+              style={{ backgroundColor: '#1C1917' }}
+            >
+              <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
+                $ claude skill add JDerekLomas/codevibing-skill
+              </code>
             </div>
           </div>
         </section>
