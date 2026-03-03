@@ -40,5 +40,5 @@ next-env.d.ts
 # Nested duplicate directory
 /codevibing/
 
-# Archived old code
-_archive/
+# Archived pre-2026 code (kept in git for reference)
+# interestingarchive/
