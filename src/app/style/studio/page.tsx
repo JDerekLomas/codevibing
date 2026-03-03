@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getVibes, getUserCount, getFeaturedProjects, getPublicUsers } from '@/lib/supabase';
+import { getVibes, getUserCount, getPublicUsers } from '@/lib/supabase';
 import CopyButton from '@/components/CopyButton';
 
 export const revalidate = 30;
@@ -73,29 +73,14 @@ Skill: claude skill add JDerekLomas/codevibing-skill`;
 
 export default async function StudioLanding() {
   // Fetch all data in parallel with fallbacks
-  const [vibes, userCount, featuredData, publicUsers] = await Promise.all([
+  const [vibes, userCount, publicUsers] = await Promise.all([
     getVibes(5).catch(() => []),
     getUserCount().catch(() => 0),
-    getFeaturedProjects().catch(() => []),
     getPublicUsers(8).catch(() => []),
   ]);
 
-  // Flatten Supabase projects or use fallback
-  let projects = FALLBACK_PROJECTS;
-  if (featuredData.length > 0) {
-    const fromDb = featuredData.flatMap(u =>
-      (u.projects || []).map(p => ({
-        title: p.title,
-        author: u.username,
-        description: p.description || '',
-        tool: 'Claude',
-        image: p.preview || '/previews/sourcelibrary.png',
-        tag: 'APP',
-        url: p.url,
-      }))
-    );
-    if (fromDb.length >= 6) projects = fromDb.slice(0, 6);
-  }
+  // Always use curated fallback projects — they have real screenshots
+  const projects = FALLBACK_PROJECTS;
 
   return (
     <div className="min-h-screen bg-white" style={{ color: '#1C1917', fontFamily: "'Inter', system-ui, sans-serif" }}>
