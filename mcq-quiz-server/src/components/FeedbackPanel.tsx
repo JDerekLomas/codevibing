@@ -1,16 +1,9 @@
 interface FeedbackPanelProps {
   correct: boolean;
   explanation: string;
-  isLastQuestion: boolean;
-  onNext: () => void;
 }
 
-export function FeedbackPanel({
-  correct,
-  explanation,
-  isLastQuestion,
-  onNext,
-}: FeedbackPanelProps) {
+export function FeedbackPanel({ correct, explanation }: FeedbackPanelProps) {
   return (
     <div className={`feedback-panel ${correct ? "correct" : "wrong"}`}>
       <div className="feedback-header">
@@ -20,13 +13,6 @@ export function FeedbackPanel({
         </span>
       </div>
       <p className="feedback-explanation">{explanation}</p>
-      <button
-        className={`next-button ${correct ? "correct" : "wrong"}`}
-        onClick={onNext}
-      >
-        {isLastQuestion ? "See Results" : "Next Question"}
-        {" \u2192"}
-      </button>
     </div>
   );
 }

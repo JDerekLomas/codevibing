@@ -7,19 +7,17 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { pickQuizQuestions, topics } from "./src/quiz-data.js";
-import type { QuizSession } from "./src/types.js";
+import { quizItems, topics } from "./src/quiz-data.js";
 
 // Works both from source (server.ts) and compiled (dist/server.js)
 const DIST_DIR = import.meta.filename.endsWith(".ts")
   ? path.join(import.meta.dirname, "dist")
   : import.meta.dirname;
 
-// ── Session store ──────────────────────────────────────────────────
-const sessions = new Map<string, QuizSession>();
-const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
+// ── Lightweight session store (tracks shown question IDs) ───────────
+const sessions = new Map<string, { shownIds: Set<string>; startedAt: number }>();
+const SESSION_TTL_MS = 30 * 60 * 1000;
 
 function cleanExpiredSessions() {
   const now = Date.now();
@@ -30,86 +28,82 @@ function cleanExpiredSessions() {
   }
 }
 
-// Clean up every 5 minutes
 setInterval(cleanExpiredSessions, 5 * 60 * 1000).unref();
 
 // ── Server creation ────────────────────────────────────────────────
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "Vibecoding Quiz",
-    version: "0.1.0",
+    version: "0.2.0",
   });
 
-  const resourceUri = "ui://start-quiz/mcp-app.html";
+  const resourceUri = "ui://quiz-question/mcp-app.html";
 
-  // ── Tool: start-quiz (LLM-facing, opens the UI) ────────────────
+  // ── Tool: quiz-question (LLM-facing, opens the UI) ──────────────
   registerAppTool(
     server,
-    "start-quiz",
+    "quiz-question",
     {
-      title: "Start Vibecoding Quiz",
+      title: "Show Quiz Question",
       description:
-        "Start an interactive vibecoding quiz session. The user will see a visual quiz card with multiple-choice questions about vibecoding concepts. Available topics: " +
+        "Show an interactive vibecoding quiz question card. The user sees a visual card with 4 answer options and clicks their choice. After they answer, their result (correct/incorrect + what they selected) is sent back to you so you can react conversationally. Call this once per question. Available topics: " +
         topics.join(", ") +
         ".",
       inputSchema: {
         topic: z
           .enum(topics)
           .optional()
-          .describe("Quiz topic to focus on. Leave empty for mixed topics."),
-        count: z
-          .number()
-          .min(3)
-          .max(10)
+          .describe("Quiz topic. Leave empty for random."),
+        sessionId: z
+          .string()
           .optional()
-          .describe("Number of questions (default 7, max 10)."),
+          .describe(
+            "Session ID to continue (avoids repeat questions). Omit for first question."
+          ),
       },
       _meta: { ui: { resourceUri } },
     },
-    async ({ topic, count: requestedCount }) => {
-      const count = Math.min(requestedCount || 7, 10);
-      const questions = pickQuizQuestions(count, topic);
+    async ({ topic, sessionId }) => {
+      let session = sessionId ? sessions.get(sessionId) : null;
+      if (!session) {
+        sessionId = crypto.randomUUID();
+        session = { shownIds: new Set(), startedAt: Date.now() };
+        sessions.set(sessionId, session);
+      }
 
-      if (questions.length === 0) {
+      const available = quizItems.filter(
+        (q) => !session!.shownIds.has(q.id) && (!topic || q.topic === topic)
+      );
+
+      if (available.length === 0) {
         return {
           content: [
             {
               type: "text" as const,
-              text: `No questions found for topic "${topic}". Available topics: ${topics.join(", ")}`,
+              text: `All questions have been shown${topic ? ` for "${topic}"` : ""}. ${session.shownIds.size} questions completed in this session.`,
             },
           ],
         };
       }
 
-      const session: QuizSession = {
-        id: uuidv4(),
-        questions,
-        answers: new Array(questions.length).fill(null),
-        currentIndex: 0,
-        startedAt: Date.now(),
-      };
-
-      sessions.set(session.id, session);
-
-      const firstQuestion = questions[0];
+      const question =
+        available[Math.floor(Math.random() * available.length)];
+      session.shownIds.add(question.id);
 
       return {
         content: [
           {
             type: "text" as const,
-            text: `Started a ${questions.length}-question quiz${topic ? ` on "${topic}"` : ""}. The interactive quiz card is now displayed — the user can answer directly in the UI.`,
+            text: `Showing question ${session.shownIds.size}: "${question.question}" (Topic: ${question.topic}). The user will answer in the interactive card — wait for their response.`,
           },
         ],
         structuredContent: {
-          sessionId: session.id,
-          totalQuestions: questions.length,
-          currentIndex: 0,
-          question: {
-            id: firstQuestion.id,
-            topic: firstQuestion.topic,
-            question: firstQuestion.question,
-            options: firstQuestion.options,
-          },
+          sessionId,
+          questionId: question.id,
+          topic: question.topic,
+          question: question.question,
+          options: question.options,
+          questionNumber: session.shownIds.size,
         },
       };
     }
@@ -122,128 +116,47 @@ export function createServer(): McpServer {
     {
       title: "Submit Quiz Answer",
       description:
-        "Submit an answer for the current quiz question. Called from the quiz UI.",
+        "Submit the user's answer for a quiz question. Called from the quiz UI.",
       inputSchema: {
-        sessionId: z.string().describe("Quiz session ID"),
-        questionIndex: z.number().describe("Index of the question being answered"),
-        selectedIndex: z.number().describe("Index of the selected answer (0-3)"),
+        questionId: z.string().describe("Question ID"),
+        selectedIndex: z
+          .number()
+          .describe("Index of the selected answer (0-3)"),
       },
       _meta: { ui: { resourceUri, visibility: ["app"] } },
     },
-    async ({ sessionId, questionIndex, selectedIndex }) => {
-      const session = sessions.get(sessionId);
-      if (!session) {
-        return {
-          content: [{ type: "text" as const, text: "Session not found or expired." }],
-          isError: true,
-        };
-      }
-
-      const question = session.questions[questionIndex];
+    async ({ questionId, selectedIndex }) => {
+      const question = quizItems.find((q) => q.id === questionId);
       if (!question) {
         return {
-          content: [{ type: "text" as const, text: "Invalid question index." }],
+          content: [
+            { type: "text" as const, text: "Question not found." },
+          ],
           isError: true,
         };
       }
 
       const correct = selectedIndex === question.correctIndex;
-
-      session.answers[questionIndex] = {
-        selectedIndex,
-        correct,
-      };
-
-      const isLast = questionIndex >= session.questions.length - 1;
-      const nextIdx = questionIndex + 1;
-      const nextQuestion =
-        !isLast && session.questions[nextIdx]
-          ? session.questions[nextIdx]
-          : null;
-
-      if (!isLast) {
-        session.currentIndex = nextIdx;
-      }
+      const selectedAnswer = question.options[selectedIndex];
+      const correctAnswer = question.options[question.correctIndex];
 
       return {
         content: [
           {
             type: "text" as const,
-            text: correct ? "Correct!" : "Incorrect.",
+            text: correct
+              ? `Correct! "${selectedAnswer}" is right.`
+              : `Incorrect. Selected "${selectedAnswer}", correct answer was "${correctAnswer}".`,
           },
         ],
         structuredContent: {
           correct,
           correctIndex: question.correctIndex,
+          selectedIndex,
+          selectedAnswer,
+          correctAnswer,
           explanation: question.explanation,
-          nextQuestion: nextQuestion
-            ? {
-                id: nextQuestion.id,
-                topic: nextQuestion.topic,
-                question: nextQuestion.question,
-                options: nextQuestion.options,
-                correctIndex: -1,
-                explanation: "",
-              }
-            : null,
-          sessionComplete: isLast,
-          currentIndex: isLast ? questionIndex : nextIdx,
-        },
-      };
-    }
-  );
-
-  // ── Tool: get-results (app-only, called from iframe) ────────────
-  registerAppTool(
-    server,
-    "get-results",
-    {
-      title: "Get Quiz Results",
-      description:
-        "Get the final results for a completed quiz session. Called from the quiz UI.",
-      inputSchema: {
-        sessionId: z.string().describe("Quiz session ID"),
-      },
-      _meta: { ui: { resourceUri, visibility: ["app"] } },
-    },
-    async ({ sessionId }) => {
-      const session = sessions.get(sessionId);
-      if (!session) {
-        return {
-          content: [{ type: "text" as const, text: "Session not found or expired." }],
-          isError: true,
-        };
-      }
-
-      const answeredQuestions = session.answers.filter(
-        (a) => a !== null
-      ).length;
-      const correctCount = session.answers.filter(
-        (a) => a !== null && a.correct
-      ).length;
-      const score = answeredQuestions > 0 ? correctCount / answeredQuestions : 0;
-
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: `Quiz complete! Score: ${correctCount}/${session.questions.length} (${Math.round(score * 100)}%)`,
-          },
-        ],
-        structuredContent: {
-          totalQuestions: session.questions.length,
-          correctCount,
-          score,
-          perQuestion: session.questions.map((q, i) => {
-            const answer = session.answers[i];
-            return {
-              question: q.question,
-              selectedIndex: answer?.selectedIndex ?? -1,
-              correctIndex: q.correctIndex,
-              correct: answer?.correct ?? false,
-              explanation: q.explanation,
-            };
-          }),
+          question: question.question,
         },
       };
     }
@@ -256,13 +169,15 @@ export function createServer(): McpServer {
     resourceUri,
     {
       mimeType: RESOURCE_MIME_TYPE,
-      description: "Interactive vibecoding quiz UI",
+      description: "Interactive vibecoding quiz question card",
     },
     async (): Promise<ReadResourceResult> => {
       const htmlPath = path.join(DIST_DIR, "mcp-app.html");
       const html = await fs.readFile(htmlPath, "utf-8");
       return {
-        contents: [{ uri: resourceUri, mimeType: RESOURCE_MIME_TYPE, text: html }],
+        contents: [
+          { uri: resourceUri, mimeType: RESOURCE_MIME_TYPE, text: html },
+        ],
       };
     }
   );

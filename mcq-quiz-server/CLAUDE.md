@@ -4,12 +4,14 @@ MCP Apps server that presents interactive vibecoding quiz cards inline in Claude
 
 ## Architecture
 
-- `server.ts` — MCP server with tools (`start-quiz`, `submit-answer`, `get-results`) and `ui://` resource
+One question per tool call — Claude drives the quiz conversationally.
+
+- `server.ts` — MCP server with tools (`quiz-question`, `submit-answer`) and `ui://` resource
 - `main.ts` — Entry point supporting stdio (Claude Desktop) and HTTP transports
 - `src/mcp-app.tsx` — React app entry point (bundled by Vite into single HTML file)
-- `src/components/` — QuizCard, AnswerOption, FeedbackPanel, ProgressBar, SessionSummary
+- `src/components/` — QuizCard, AnswerOption, FeedbackPanel
 - `src/quiz-data.ts` — 30 vibecoding MCQs across 3 topics
-- `src/types.ts` — TypeScript interfaces
+- `src/types.ts` — QuizItem interface
 
 ## Commands
 
@@ -19,11 +21,13 @@ MCP Apps server that presents interactive vibecoding quiz cards inline in Claude
 
 ## How it works
 
-1. LLM calls `start-quiz` → creates session, returns first question + opens UI
-2. UI renders QuizCard, user clicks answer
+1. LLM calls `quiz-question` → picks a question, returns it + opens UI
+2. UI renders QuizCard with 4 answer option cards, user clicks one
 3. UI calls `submit-answer` (app-only tool) → server returns feedback
-4. After last question, UI calls `get-results` → shows SessionSummary
-5. `updateModelContext()` pushes results back into conversation
+4. UI shows correct/wrong feedback with explanation
+5. `updateModelContext()` pushes the answer result back into conversation
+6. Claude reacts conversationally, then calls `quiz-question` again for next question
+7. Session ID tracks shown questions to avoid repeats
 
 ## Dependencies
 

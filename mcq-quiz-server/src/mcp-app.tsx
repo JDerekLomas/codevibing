@@ -5,16 +5,33 @@ import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { QuizCard } from "./components/QuizCard";
 import { FeedbackPanel } from "./components/FeedbackPanel";
-import { ProgressBar } from "./components/ProgressBar";
-import { SessionSummary } from "./components/SessionSummary";
-import type { QuizItem, QuizSession, QuizState, QuizResults } from "./types";
+import type { QuizItem } from "./types";
 import "./styles.css";
 
 // ── Extract structured data from tool results ────────────────────
 function getStructured<T>(result: CallToolResult): T | null {
-  // structuredContent is the rich data from the MCP server
   const sc = (result as Record<string, unknown>).structuredContent;
   return (sc as T) ?? null;
+}
+
+// ── Data shapes from server ──────────────────────────────────────
+interface QuestionData {
+  sessionId: string;
+  questionId: string;
+  topic: string;
+  question: string;
+  options: [string, string, string, string];
+  questionNumber: number;
+}
+
+interface FeedbackData {
+  correct: boolean;
+  correctIndex: number;
+  selectedIndex: number;
+  selectedAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+  question: string;
 }
 
 // ── Main Quiz App ────────────────────────────────────────────────
@@ -22,7 +39,7 @@ function QuizApp() {
   const [toolResult, setToolResult] = useState<CallToolResult | null>(null);
 
   const { app, error } = useApp({
-    appInfo: { name: "Vibecoding Quiz", version: "0.1.0" },
+    appInfo: { name: "Vibecoding Quiz", version: "0.2.0" },
     capabilities: {},
     onAppCreated: (app) => {
       app.ontoolresult = async (result) => {
@@ -42,73 +59,36 @@ function QuizApp() {
     );
   }
 
-  return <QuizUI app={app} initialResult={toolResult} />;
+  return <QuestionUI app={app} initialResult={toolResult} />;
 }
 
-// ── Quiz UI Logic ────────────────────────────────────────────────
-interface QuizUIProps {
+// ── Single Question UI ───────────────────────────────────────────
+interface QuestionUIProps {
   app: App;
   initialResult: CallToolResult | null;
 }
 
-interface StartQuizData {
-  sessionId: string;
-  totalQuestions: number;
-  currentIndex: number;
-  question: {
-    id: string;
-    topic: string;
-    question: string;
-    options: [string, string, string, string];
-  };
-}
-
-function QuizUI({ app, initialResult }: QuizUIProps) {
-  const [state, setState] = useState<QuizState>({
-    phase: "answering",
-    session: null,
-    currentFeedback: null,
-  });
+function QuestionUI({ app, initialResult }: QuestionUIProps) {
+  const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [results, setResults] = useState<QuizResults | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Initialize from the start-quiz tool result
+  // Initialize from quiz-question tool result
   useEffect(() => {
     if (!initialResult) return;
-    const data = getStructured<StartQuizData>(initialResult);
-    if (!data?.sessionId) return;
-
-    const firstQuestion: QuizItem = {
-      id: data.question.id,
-      topic: data.question.topic,
-      question: data.question.question,
-      options: data.question.options,
-      correctIndex: -1,
-      explanation: "",
-    };
-
-    const session: QuizSession = {
-      id: data.sessionId,
-      questions: [firstQuestion],
-      answers: new Array(data.totalQuestions).fill(null),
-      currentIndex: 0,
-      startedAt: Date.now(),
-    };
-
-    setState({
-      phase: "answering",
-      session,
-      currentFeedback: null,
-    });
-    setSelectedIndex(null);
-    setResults(null);
+    const data = getStructured<QuestionData>(initialResult);
+    if (data?.questionId) {
+      setQuestionData(data);
+      setSelectedIndex(null);
+      setFeedback(null);
+    }
   }, [initialResult]);
 
-  // Submit answer
+  // Submit answer when user clicks an option
   const handleSelect = useCallback(
     async (index: number) => {
-      if (state.phase !== "answering" || !state.session || isSubmitting) return;
+      if (feedback || isSubmitting || !questionData) return;
 
       setSelectedIndex(index);
       setIsSubmitting(true);
@@ -117,174 +97,39 @@ function QuizUI({ app, initialResult }: QuizUIProps) {
         const result = await app.callServerTool({
           name: "submit-answer",
           arguments: {
-            sessionId: state.session.id,
-            questionIndex: state.session.currentIndex,
+            questionId: questionData.questionId,
             selectedIndex: index,
           },
         });
 
-        const feedback = getStructured<{
-          correct: boolean;
-          correctIndex: number;
-          explanation: string;
-          nextQuestion: QuizItem | null;
-          sessionComplete: boolean;
-          currentIndex: number;
-        }>(result);
+        const feedbackData = getStructured<FeedbackData>(result);
+        if (feedbackData) {
+          setFeedback(feedbackData);
 
-        if (!feedback) return;
-
-        setState((prev) => {
-          if (!prev.session) return prev;
-          const newAnswers = [...prev.session.answers];
-          newAnswers[prev.session.currentIndex] = {
-            selectedIndex: index,
-            correct: feedback.correct,
-          };
-
-          const newQuestions = [...prev.session.questions];
-          if (feedback.nextQuestion) {
-            // Add next question if we haven't seen it yet
-            if (newQuestions.length <= feedback.currentIndex) {
-              newQuestions.push(feedback.nextQuestion);
-            }
-          }
-
-          return {
-            phase: "feedback",
-            session: {
-              ...prev.session,
-              answers: newAnswers,
-              questions: newQuestions,
-            },
-            currentFeedback: {
-              correct: feedback.correct,
-              correctIndex: feedback.correctIndex,
-              explanation: feedback.explanation,
-            },
-          };
-        });
+          // Push result back to Claude so it can react conversationally
+          await app.updateModelContext({
+            content: [
+              {
+                type: "text",
+                text: feedbackData.correct
+                  ? `[Quiz Answer] Question: "${feedbackData.question}" — User answered "${feedbackData.selectedAnswer}" — CORRECT! Session ID: ${questionData.sessionId}`
+                  : `[Quiz Answer] Question: "${feedbackData.question}" — User answered "${feedbackData.selectedAnswer}" — INCORRECT. Correct answer: "${feedbackData.correctAnswer}". Session ID: ${questionData.sessionId}`,
+              },
+            ],
+          });
+        }
       } catch (e) {
         console.error("Failed to submit answer:", e);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [app, state.phase, state.session, isSubmitting]
+    [app, questionData, feedback, isSubmitting]
   );
-
-  // Next question or show results
-  const handleNext = useCallback(async () => {
-    if (!state.session) return;
-
-    const nextIndex = state.session.currentIndex + 1;
-    const isComplete = nextIndex >= state.session.answers.length;
-
-    if (isComplete) {
-      // Fetch final results
-      try {
-        const result = await app.callServerTool({
-          name: "get-results",
-          arguments: { sessionId: state.session.id },
-        });
-
-        const quizResults = getStructured<QuizResults>(result);
-        if (quizResults) {
-          setResults(quizResults);
-          setState((prev) => ({
-            ...prev,
-            phase: "complete",
-          }));
-
-          // Push results back into conversation context
-          await app.updateModelContext({
-            content: [
-              {
-                type: "text",
-                text: `Quiz completed! Score: ${quizResults.correctCount}/${quizResults.totalQuestions} (${Math.round(quizResults.score * 100)}%). ${quizResults.perQuestion.filter((q) => !q.correct).length > 0 ? `Missed: ${quizResults.perQuestion.filter((q) => !q.correct).map((q) => q.question).join("; ")}` : "Perfect score!"}`,
-              },
-            ],
-          });
-        }
-      } catch (e) {
-        console.error("Failed to get results:", e);
-      }
-    } else {
-      // Move to next question
-      setState((prev) => {
-        if (!prev.session) return prev;
-        return {
-          phase: "answering",
-          session: {
-            ...prev.session,
-            currentIndex: nextIndex,
-          },
-          currentFeedback: null,
-        };
-      });
-      setSelectedIndex(null);
-    }
-  }, [app, state.session]);
-
-  // Restart quiz
-  const handleRestart = useCallback(async () => {
-    try {
-      const result = await app.callServerTool({
-        name: "start-quiz",
-        arguments: {},
-      });
-
-      const data = getStructured<StartQuizData>(result);
-      if (!data?.sessionId) return;
-
-      const firstQuestion: QuizItem = {
-        id: data.question.id,
-        topic: data.question.topic,
-        question: data.question.question,
-        options: data.question.options,
-        correctIndex: -1,
-        explanation: "",
-      };
-
-      const session: QuizSession = {
-        id: data.sessionId,
-        questions: [firstQuestion],
-        answers: new Array(data.totalQuestions).fill(null),
-        currentIndex: 0,
-        startedAt: Date.now(),
-      };
-
-      setState({
-        phase: "answering",
-        session,
-        currentFeedback: null,
-      });
-      setSelectedIndex(null);
-      setResults(null);
-    } catch (e) {
-      console.error("Failed to restart quiz:", e);
-    }
-  }, [app]);
 
   // ── Render ─────────────────────────────────────────────────────
 
-  if (!state.session) {
-    return (
-      <div className="loading">
-        <div className="loading-spinner" />
-        Loading quiz...
-      </div>
-    );
-  }
-
-  if (state.phase === "complete" && results) {
-    return <SessionSummary results={results} onRestart={handleRestart} />;
-  }
-
-  const currentQuestion =
-    state.session.questions[state.session.currentIndex];
-
-  if (!currentQuestion) {
+  if (!questionData) {
     return (
       <div className="loading">
         <div className="loading-spinner" />
@@ -293,31 +138,29 @@ function QuizUI({ app, initialResult }: QuizUIProps) {
     );
   }
 
+  const quizItem: QuizItem = {
+    id: questionData.questionId,
+    topic: questionData.topic,
+    question: questionData.question,
+    options: questionData.options,
+    correctIndex: -1,
+    explanation: "",
+  };
+
   return (
     <div>
-      <ProgressBar session={state.session} />
       <QuizCard
-        question={currentQuestion}
-        questionNumber={state.session.currentIndex + 1}
-        totalQuestions={state.session.answers.length}
+        question={quizItem}
+        questionNumber={questionData.questionNumber}
         selectedIndex={selectedIndex}
-        correctIndex={
-          state.phase === "feedback"
-            ? state.currentFeedback?.correctIndex ?? null
-            : null
-        }
-        disabled={state.phase === "feedback" || isSubmitting}
+        correctIndex={feedback?.correctIndex ?? null}
+        disabled={!!feedback || isSubmitting}
         onSelect={handleSelect}
       />
-      {state.phase === "feedback" && state.currentFeedback && (
+      {feedback && (
         <FeedbackPanel
-          correct={state.currentFeedback.correct}
-          explanation={state.currentFeedback.explanation}
-          isLastQuestion={
-            state.session.currentIndex >=
-            state.session.answers.length - 1
-          }
-          onNext={handleNext}
+          correct={feedback.correct}
+          explanation={feedback.explanation}
         />
       )}
     </div>
