@@ -54,6 +54,15 @@ interface UserProfile {
   customHtml?: string;
   profileViews?: number;
   friendCount?: number;
+  learningProgress?: {
+    quizResults?: number;
+    quizAccuracy?: number;
+    totalXP?: number;
+    modulesVisited?: number;
+    projectsShared?: number;
+    discoveries?: number;
+    lastActive?: string;
+  } | null;
   createdAt: string;
 }
 
@@ -295,6 +304,46 @@ export default function UserPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Learning Progress */}
+        {profile.learningProgress && (profile.learningProgress.quizResults ?? 0) > 0 && (
+          <section className="py-12 px-6" style={{ backgroundColor: theme.secondary || '#fafafa' }}>
+            <div className="max-w-6xl mx-auto">
+              <h2
+                className="text-2xl font-serif mb-6"
+                style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', color: theme.primary }}
+              >
+                Learning Journey
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {(profile.learningProgress.totalXP ?? 0) > 0 && (
+                  <div className="rounded-xl p-4 text-center" style={{ backgroundColor: 'white', border: `1px solid ${theme.accent || '#e5e5e5'}` }}>
+                    <div className="text-2xl font-bold" style={{ color: theme.accent || theme.primary }}>{profile.learningProgress.totalXP}</div>
+                    <div className="text-xs mt-1" style={{ color: theme.text, opacity: 0.6 }}>XP Earned</div>
+                  </div>
+                )}
+                {(profile.learningProgress.quizResults ?? 0) > 0 && (
+                  <div className="rounded-xl p-4 text-center" style={{ backgroundColor: 'white', border: `1px solid ${theme.accent || '#e5e5e5'}` }}>
+                    <div className="text-2xl font-bold" style={{ color: theme.accent || theme.primary }}>{profile.learningProgress.quizResults}</div>
+                    <div className="text-xs mt-1" style={{ color: theme.text, opacity: 0.6 }}>Quizzes</div>
+                  </div>
+                )}
+                {(profile.learningProgress.quizAccuracy ?? 0) > 0 && (
+                  <div className="rounded-xl p-4 text-center" style={{ backgroundColor: 'white', border: `1px solid ${theme.accent || '#e5e5e5'}` }}>
+                    <div className="text-2xl font-bold" style={{ color: theme.accent || theme.primary }}>{Math.round((profile.learningProgress.quizAccuracy ?? 0) * 100)}%</div>
+                    <div className="text-xs mt-1" style={{ color: theme.text, opacity: 0.6 }}>Accuracy</div>
+                  </div>
+                )}
+                {(profile.learningProgress.modulesVisited ?? 0) > 0 && (
+                  <div className="rounded-xl p-4 text-center" style={{ backgroundColor: 'white', border: `1px solid ${theme.accent || '#e5e5e5'}` }}>
+                    <div className="text-2xl font-bold" style={{ color: theme.accent || theme.primary }}>{profile.learningProgress.modulesVisited}</div>
+                    <div className="text-xs mt-1" style={{ color: theme.text, opacity: 0.6 }}>Modules</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         )}
 
         {/* Projects Grid */}

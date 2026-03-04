@@ -68,6 +68,7 @@ export interface Profile {
   custom_css: string | null;
   custom_html: string | null;
   profile_views: number;
+  learning_progress: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
