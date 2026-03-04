@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers } from '@/lib/supabase';
+import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers, supabasePublic } from '@/lib/supabase';
 import { LinkifyText } from '@/components/LinkifyText';
 import { InlineJoinForm } from '@/components/InlineJoinForm';
 import { PostItNote } from '@/components/PostItNote';
@@ -7,22 +7,22 @@ import { PostItNote } from '@/components/PostItNote';
 export const revalidate = 60;
 
 const MEMES = [
-  { src: '/memes/01-rick-rubin-vibing.png', alt: 'Rick Rubin vibing' },
-  { src: '/memes/03-afraid-to-ask.png', alt: 'Too afraid to ask' },
-  { src: '/memes/05-what-do-you-want-to-build.png', alt: 'What do you want to build?' },
-  { src: '/memes/01-misinterpretation.png', alt: 'Vibe coding misinterpretation' },
-  { src: '/memes/04-karpathy-origin.jpg', alt: 'Karpathy origin' },
-  { src: '/memes/01-first-pancake.png', alt: 'First pancake' },
-  { src: '/memes/01-how-to-draw-owl.jpg', alt: 'How to draw an owl' },
-  { src: '/memes/01-solo-gamedev.jpeg', alt: 'This is fine - solo gamedev' },
-  { src: '/memes/02-vibe-coders-production.jpeg', alt: 'Vibe coders in production' },
-  { src: '/memes/01-speedrun.png', alt: 'Scope creep speedrun' },
-  { src: '/memes/02-one-more-feature.png', alt: 'One more feature' },
-  { src: '/memes/01-in-case-of-fire.png', alt: 'In case of fire: git commit' },
-  { src: '/memes/01-sharing-localhost.png', alt: 'Sharing localhost' },
-  { src: '/memes/01-classic.jpg', alt: 'Works on my machine' },
-  { src: '/memes/01-dog-driving.png', alt: 'Dog driving - dark flow' },
-  { src: '/memes/01-soulless-food.png', alt: 'The taste gap' },
+  { src: '/memes/01-rick-rubin-vibing.png', alt: 'Rick Rubin producing code by vibes alone' },
+  { src: '/memes/03-afraid-to-ask.png', alt: 'I don\'t know what vibe coding is and at this point I\'m too afraid to ask' },
+  { src: '/memes/05-what-do-you-want-to-build.png', alt: 'The hardest question: what do you actually want to build?' },
+  { src: '/memes/01-misinterpretation.png', alt: 'What I said vs what the AI built' },
+  { src: '/memes/04-karpathy-origin.jpg', alt: 'Karpathy\'s original "vibe coding" tweet that started it all' },
+  { src: '/memes/01-first-pancake.png', alt: 'Your first project is supposed to be bad — that\'s the first pancake' },
+  { src: '/memes/01-how-to-draw-owl.jpg', alt: 'Step 1: draw circles. Step 2: draw the rest of the owl.' },
+  { src: '/memes/01-solo-gamedev.jpeg', alt: 'This is fine — solo dev with everything on fire' },
+  { src: '/memes/02-vibe-coders-production.jpeg', alt: 'Vibe coders deploying straight to production' },
+  { src: '/memes/01-speedrun.png', alt: 'Scope creep speedrun any%' },
+  { src: '/memes/02-one-more-feature.png', alt: 'Just one more feature, I promise' },
+  { src: '/memes/01-in-case-of-fire.png', alt: 'In case of fire: git commit, git push, leave building' },
+  { src: '/memes/01-sharing-localhost.png', alt: 'Trying to share localhost:3000 with someone' },
+  { src: '/memes/01-classic.jpg', alt: 'It works on my machine — then we\'ll ship your machine' },
+  { src: '/memes/01-dog-driving.png', alt: 'Dog driving a car — when the AI is in flow and you\'re just watching' },
+  { src: '/memes/01-soulless-food.png', alt: 'AI-generated code that technically works but has no soul' },
 ];
 
 function formatTime(iso: string): string {
@@ -37,6 +37,73 @@ function formatTime(iso: string): string {
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;
   return date.toLocaleDateString();
+}
+
+async function SpotlightBuild() {
+  const profiles = await getFeaturedProjects();
+
+  const allProjects = profiles.flatMap(p =>
+    (p.projects || []).map(proj => ({ ...proj, author: p.username }))
+  );
+
+  // Prefer projects with preview images, then pick one randomly
+  const withPreviews = allProjects.filter(p => p.preview);
+  const pool = withPreviews.length > 0 ? withPreviews : allProjects;
+  if (pool.length === 0) return null;
+
+  const spotlight = pool[Math.floor(Math.random() * pool.length)];
+
+  return (
+    <a
+      href={spotlight.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block rounded-xl overflow-hidden border transition-all hover:shadow-lg"
+      style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+    >
+      {spotlight.preview && (
+        <div
+          className="w-full h-48 sm:h-56 bg-cover bg-center"
+          style={{ backgroundImage: `url(${spotlight.preview})`, backgroundColor: '#F5F0EB' }}
+        />
+      )}
+      <div className="p-5 sm:p-6">
+        <div className="text-xs uppercase tracking-wider mb-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
+          Look what someone built
+        </div>
+        <h3
+          className="text-lg sm:text-xl font-medium mb-1 group-hover:underline"
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+        >
+          {spotlight.title}
+        </h3>
+        {spotlight.description && (
+          <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-muted)' }}>
+            {spotlight.description}
+          </p>
+        )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
+              style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
+            >
+              {spotlight.author.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+              @{spotlight.author}
+            </span>
+          </div>
+          <span
+            className="text-xs px-3 py-1.5 rounded-full transition-colors group-hover:opacity-80"
+            style={{ backgroundColor: 'var(--color-accent)', color: 'white', fontFamily: 'var(--font-mono)' }}
+          >
+            Check it out &rarr;
+          </span>
+        </div>
+      </div>
+    </a>
+  );
 }
 
 async function FeaturedBuilds() {
@@ -227,8 +294,8 @@ async function CommunityStats() {
 }
 
 function MemeGallery() {
-  // Show a random-ish selection of 4 memes
-  const selection = MEMES.filter((_, i) => [0, 5, 6, 13].includes(i));
+  const shuffled = [...MEMES].sort(() => Math.random() - 0.5);
+  const selection = shuffled.slice(0, 4);
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -250,45 +317,19 @@ function MemeGallery() {
   );
 }
 
-const TOPICS = [
-  { slug: 'edtech', name: 'EdTech' },
-  { slug: 'fintech', name: 'FinTech' },
-  { slug: 'games', name: 'Games' },
-  { slug: 'tools', name: 'Tools & Utils' },
-];
+async function getTopCommunities(): Promise<Array<{ slug: string; name: string }>> {
+  const { data } = await supabasePublic
+    .from('cv_communities')
+    .select('slug, name')
+    .order('post_count', { ascending: false })
+    .limit(5);
+  return data || [];
+}
 
-export default function Home() {
+export default async function Home() {
+  const topics = await getTopCommunities();
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-sans)' }}>
-      {/* Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b"
-        style={{ backgroundColor: 'rgba(255, 253, 249, 0.9)', borderColor: 'var(--color-warm-border)' }}
-      >
-        <div className="max-w-3xl mx-auto px-6 py-3 flex justify-between items-center">
-          <Link
-            href="/"
-            className="text-sm hover:opacity-70 transition-opacity"
-            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}
-          >
-            codevibing
-          </Link>
-          <nav className="flex items-center gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
-            <Link href="/feed" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>feed</Link>
-            <Link href="/people" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>people</Link>
-            <Link href="/c" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>communities</Link>
-            <Link href="https://learnvibecoding.vercel.app" className="transition-colors hover:opacity-70 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>learn</Link>
-            <Link
-              href="/join"
-              className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-              style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
-            >
-              Join
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="max-w-3xl mx-auto px-6">
         {/* Hero */}
         <section className="pt-28 pb-10 sm:pt-32 sm:pb-12">
@@ -316,10 +357,15 @@ export default function Home() {
           <CommunityStats />
         </section>
 
+        {/* Spotlight build */}
+        <section className="pb-8">
+          <SpotlightBuild />
+        </section>
+
         {/* Topic tabs */}
         <section className="pb-8">
           <div className="flex items-center gap-3 flex-wrap">
-            {TOPICS.map((topic) => (
+            {topics.map((topic) => (
               <Link
                 key={topic.slug}
                 href={`/c/${topic.slug}`}
