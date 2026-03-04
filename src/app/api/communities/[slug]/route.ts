@@ -30,7 +30,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     .from('cv_vibes')
     .select('*')
     .eq('community', slug)
-    .order('created_at', { ascending: false })
+    .lte('publish_at', new Date().toISOString())
+    .order('publish_at', { ascending: false })
     .limit(limit);
 
   // Get member count

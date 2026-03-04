@@ -46,7 +46,8 @@ async function getCommunityPosts(slug: string): Promise<Vibe[]> {
     .from('cv_vibes')
     .select('*')
     .eq('community', slug)
-    .order('created_at', { ascending: false })
+    .lte('publish_at', new Date().toISOString())
+    .order('publish_at', { ascending: false })
     .limit(100);
   return data || [];
 }

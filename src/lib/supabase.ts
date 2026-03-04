@@ -90,6 +90,7 @@ export interface Vibe {
   reply_to: string | null;
   community: string | null;
   metadata: BuildLogMeta | null;
+  publish_at: string;
   created_at: string;
 }
 
@@ -142,11 +143,12 @@ export async function getVibes(limit = 50, since?: string, community?: string): 
   let query = supabasePublic
     .from('cv_vibes')
     .select('*')
-    .order('created_at', { ascending: false })
+    .lte('publish_at', new Date().toISOString())
+    .order('publish_at', { ascending: false })
     .limit(limit);
 
   if (since) {
-    query = query.gt('created_at', since);
+    query = query.gt('publish_at', since);
   }
 
   if (community) {
@@ -329,10 +331,52 @@ export async function incrementProfileViews(username: string): Promise<void> {
   }
 }
 
-export async function createVibe(vibe: Omit<Vibe, 'created_at'>): Promise<Vibe | null> {
+const MAX_POSTS_PER_DAY = 3;
+
+async function getNextPublishSlot(): Promise<string> {
+  // Find the earliest day (starting today) with fewer than MAX_POSTS_PER_DAY scheduled
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Get all future scheduled posts (today and beyond), ordered by publish_at
+  const { data: scheduled } = await supabaseAdmin
+    .from('cv_vibes')
+    .select('publish_at')
+    .gte('publish_at', today.toISOString())
+    .order('publish_at', { ascending: true });
+
+  // Count posts per day
+  const countsByDay = new Map<string, number>();
+  for (const row of scheduled || []) {
+    const day = row.publish_at.slice(0, 10); // YYYY-MM-DD
+    countsByDay.set(day, (countsByDay.get(day) || 0) + 1);
+  }
+
+  // Find first day with room, starting from today
+  let candidate = new Date(today);
+  for (let i = 0; i < 365; i++) {
+    const dayStr = candidate.toISOString().slice(0, 10);
+    if ((countsByDay.get(dayStr) || 0) < MAX_POSTS_PER_DAY) {
+      // Pick a random time during the day (9am-9pm) for natural spacing
+      const hour = 9 + Math.floor(Math.random() * 12);
+      const minute = Math.floor(Math.random() * 60);
+      candidate.setHours(hour, minute, 0, 0);
+      // If it's today but the time is in the past, that's fine — it publishes immediately
+      return candidate.toISOString();
+    }
+    candidate.setDate(candidate.getDate() + 1);
+  }
+
+  return now.toISOString(); // fallback
+}
+
+export async function createVibe(vibe: Omit<Vibe, 'created_at' | 'publish_at'> & { publish_at?: string }): Promise<Vibe | null> {
+  // If no publish_at provided, auto-schedule based on daily limit
+  const publishAt = vibe.publish_at || await getNextPublishSlot();
+
   const { data, error } = await supabaseAdmin
     .from('cv_vibes')
-    .insert(vibe)
+    .insert({ ...vibe, publish_at: publishAt })
     .select()
     .single();
   if (error) console.error('createVibe error:', error);
