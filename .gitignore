@@ -48,3 +48,4 @@ next-env.d.ts
 
 # Archived pre-2026 code (kept in git for reference)
 # interestingarchive/
+.env.vercel

@@ -109,9 +109,14 @@ async function SpotlightBuild() {
 async function FeaturedBuilds() {
   const profiles = await getFeaturedProjects();
 
+  const seen = new Set<string>();
   const projects = profiles.flatMap(p =>
     (p.projects || []).map(proj => ({ ...proj, author: p.username }))
-  ).slice(0, 6);
+  ).filter(p => {
+    if (seen.has(p.url)) return false;
+    seen.add(p.url);
+    return true;
+  }).slice(0, 6);
 
   if (projects.length === 0) {
     return (
