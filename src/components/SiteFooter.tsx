@@ -42,7 +42,7 @@ export function SiteFooter() {
             <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>Learn</h3>
             <ul className="space-y-2">
               <li>
-                <a href={`${LEARN_BASE}/curriculum`} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <a href={LEARN_BASE} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Curriculum
                 </a>
               </li>

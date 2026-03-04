@@ -11,7 +11,7 @@ const LEARN_BASE = 'https://learnvibecoding.vercel.app';
 const NAV_LINKS = [
   { href: '/feed', label: 'feed' },
   { href: '/c', label: 'topics' },
-  { href: `${LEARN_BASE}/curriculum`, label: 'learn' },
+  { href: LEARN_BASE, label: 'learn' },
   { href: `${LEARN_BASE}/quiz`, label: 'practice' },
 ];
 
