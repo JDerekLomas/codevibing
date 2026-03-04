@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth';
 const NAV_LINKS = [
   { href: '/feed', label: 'feed' },
   { href: '/c', label: 'topics' },
+  { href: '/skills', label: 'skills' },
   { href: '/curriculum', label: 'learn' },
   { href: '/quiz', label: 'practice' },
 ];

@@ -439,6 +439,256 @@ export async function createNotification(recipient: string, type: string, actor:
     });
 }
 
+// ============ Project Pool & Ratings ============
+
+export interface Project {
+  id: string;
+  title: string;
+  url: string;
+  description: string | null;
+  preview: string | null;
+  author: string;
+  source: string;
+  created_at: string;
+}
+
+export interface ProjectWithStats extends Project {
+  hot_count: number;
+  total_votes: number;
+  hot_percent: number;
+}
+
+export async function getUnratedProjects(voterId: string, count = 5): Promise<Project[]> {
+  // Get project IDs this voter has already rated
+  const { data: rated } = await supabasePublic
+    .from('cv_ratings')
+    .select('project_id')
+    .eq('voter_id', voterId);
+
+  const ratedIds = (rated || []).map(r => r.project_id);
+
+  let query = supabasePublic
+    .from('cv_projects')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(count);
+
+  if (ratedIds.length > 0) {
+    // Supabase doesn't support NOT IN directly, so we use .not with .in
+    query = query.not('id', 'in', `(${ratedIds.join(',')})`);
+  }
+
+  const { data, error } = await query;
+  if (error) console.error('getUnratedProjects error:', error);
+  return data || [];
+}
+
+export async function submitRating(projectId: string, voterId: string, score: 0 | 1): Promise<{ hot_count: number; total_votes: number; hot_percent: number }> {
+  // Upsert the rating
+  await supabaseAdmin
+    .from('cv_ratings')
+    .upsert({ project_id: projectId, voter_id: voterId, score }, { onConflict: 'project_id,voter_id' });
+
+  // Get aggregate stats for this project
+  const { data: ratings } = await supabasePublic
+    .from('cv_ratings')
+    .select('score')
+    .eq('project_id', projectId);
+
+  const votes = ratings || [];
+  const hotCount = votes.filter(r => r.score === 1).length;
+  const totalVotes = votes.length;
+  const hotPercent = totalVotes > 0 ? Math.round((hotCount / totalVotes) * 100) : 0;
+
+  return { hot_count: hotCount, total_votes: totalVotes, hot_percent: hotPercent };
+}
+
+export async function getProjectStats(sort: 'hot' | 'new' | 'controversial' = 'hot', limit = 20): Promise<ProjectWithStats[]> {
+  // Get all projects with their ratings
+  const { data: projects } = await supabasePublic
+    .from('cv_projects')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (!projects || projects.length === 0) return [];
+
+  const projectIds = projects.map(p => p.id);
+  const { data: ratings } = await supabasePublic
+    .from('cv_ratings')
+    .select('project_id, score')
+    .in('project_id', projectIds);
+
+  // Aggregate ratings per project
+  const ratingMap = new Map<string, { hot: number; total: number }>();
+  for (const r of ratings || []) {
+    const entry = ratingMap.get(r.project_id) || { hot: 0, total: 0 };
+    entry.total++;
+    if (r.score === 1) entry.hot++;
+    ratingMap.set(r.project_id, entry);
+  }
+
+  const withStats: ProjectWithStats[] = projects.map(p => {
+    const stats = ratingMap.get(p.id) || { hot: 0, total: 0 };
+    return {
+      ...p,
+      hot_count: stats.hot,
+      total_votes: stats.total,
+      hot_percent: stats.total > 0 ? Math.round((stats.hot / stats.total) * 100) : 0,
+    };
+  });
+
+  // Sort based on mode
+  if (sort === 'hot') {
+    // Wilson score lower bound for ranking
+    withStats.sort((a, b) => {
+      const scoreA = wilsonScore(a.hot_count, a.total_votes);
+      const scoreB = wilsonScore(b.hot_count, b.total_votes);
+      return scoreB - scoreA;
+    });
+  } else if (sort === 'new') {
+    // Already sorted by created_at desc
+  } else if (sort === 'controversial') {
+    // Closest to 50% with minimum votes
+    withStats.sort((a, b) => {
+      if (a.total_votes < 2 && b.total_votes < 2) return 0;
+      if (a.total_votes < 2) return 1;
+      if (b.total_votes < 2) return -1;
+      const distA = Math.abs(a.hot_percent - 50);
+      const distB = Math.abs(b.hot_percent - 50);
+      return distA - distB;
+    });
+  }
+
+  return withStats.slice(0, limit);
+}
+
+function wilsonScore(positive: number, total: number): number {
+  if (total === 0) return 0;
+  const z = 1.96; // 95% confidence
+  const phat = positive / total;
+  const numerator = phat + (z * z) / (2 * total) - z * Math.sqrt((phat * (1 - phat) + (z * z) / (4 * total)) / total);
+  const denominator = 1 + (z * z) / total;
+  return numerator / denominator;
+}
+
+export async function syncProjectsFromSources(): Promise<number> {
+  // Gather projects from all sources
+  const allProjects: Array<{ title: string; url: string; description?: string; preview?: string; author: string; source: string }> = [];
+
+  // 1. From cv_profiles.projects
+  const { data: profiles } = await supabaseAdmin
+    .from('cv_profiles')
+    .select('username, projects')
+    .not('projects', 'is', null);
+
+  for (const profile of profiles || []) {
+    for (const proj of profile.projects || []) {
+      if (proj.title && proj.url) {
+        allProjects.push({
+          title: proj.title,
+          url: proj.url,
+          description: proj.description,
+          preview: proj.preview,
+          author: profile.username,
+          source: 'profile',
+        });
+      }
+    }
+  }
+
+  // 2. From cv_vibes.project (feed posts with attached projects)
+  const { data: vibes } = await supabaseAdmin
+    .from('cv_vibes')
+    .select('author, project')
+    .not('project', 'is', null);
+
+  for (const vibe of vibes || []) {
+    if (vibe.project?.title && vibe.project?.url) {
+      allProjects.push({
+        title: vibe.project.title,
+        url: vibe.project.url,
+        author: vibe.author,
+        source: 'vibe',
+      });
+    }
+  }
+
+  // 3. From cv_sessions
+  const { data: sessions } = await supabaseAdmin
+    .from('cv_sessions')
+    .select('slug, title, author, thumbnail');
+
+  for (const session of sessions || []) {
+    if (session.title && session.slug) {
+      allProjects.push({
+        title: session.title,
+        url: `https://codevibing.com/replay/${session.slug}`,
+        preview: session.thumbnail,
+        author: session.author,
+        source: 'session',
+      });
+    }
+  }
+
+  // Deduplicate by URL, preferring profile > vibe > session
+  const byUrl = new Map<string, typeof allProjects[0]>();
+  const priority: Record<string, number> = { profile: 3, vibe: 2, session: 1 };
+  for (const proj of allProjects) {
+    const existing = byUrl.get(proj.url);
+    if (!existing || (priority[proj.source] || 0) > (priority[existing.source] || 0)) {
+      byUrl.set(proj.url, proj);
+    }
+  }
+
+  // Upsert into cv_projects
+  let count = 0;
+  for (const proj of Array.from(byUrl.values())) {
+    const id = `proj_${Buffer.from(proj.url).toString('base64url').slice(0, 32)}`;
+    const { error } = await supabaseAdmin
+      .from('cv_projects')
+      .upsert({
+        id,
+        title: proj.title,
+        url: proj.url,
+        description: proj.description || null,
+        preview: proj.preview || null,
+        author: proj.author,
+        source: proj.source,
+      }, { onConflict: 'url' });
+    if (!error) count++;
+  }
+
+  return count;
+}
+
+export async function getProjectCount(): Promise<number> {
+  const { count } = await supabasePublic
+    .from('cv_projects')
+    .select('*', { count: 'exact', head: true });
+  return count || 0;
+}
+
+export async function getRandomProjects(count = 3): Promise<Project[]> {
+  // Get all projects and pick random ones (Supabase doesn't support random ordering natively)
+  const { data } = await supabasePublic
+    .from('cv_projects')
+    .select('*')
+    .not('preview', 'is', null)
+    .limit(50);
+
+  if (!data || data.length === 0) {
+    // Fall back to any projects
+    const { data: all } = await supabasePublic
+      .from('cv_projects')
+      .select('*')
+      .limit(50);
+    const pool = all || [];
+    return pool.sort(() => Math.random() - 0.5).slice(0, count);
+  }
+
+  return data.sort(() => Math.random() - 0.5).slice(0, count);
+}
+
 // Legacy compatibility
 export async function getUserByToken(token: string): Promise<User | null> {
   const username = await verifyApiKey(token);
