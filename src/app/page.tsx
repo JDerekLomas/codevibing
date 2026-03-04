@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers, supabasePublic } from '@/lib/supabase';
 import { LinkifyText } from '@/components/LinkifyText';
 import { InlineJoinForm } from '@/components/InlineJoinForm';
-import { PostItNote } from '@/components/PostItNote';
+import CopyButton from '@/components/CopyButton';
 
 export const revalidate = 60;
 
@@ -295,15 +295,15 @@ async function CommunityStats() {
 
 function MemeGallery() {
   const shuffled = [...MEMES].sort(() => Math.random() - 0.5);
-  const selection = shuffled.slice(0, 4);
+  const selection = shuffled.slice(0, 3);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {selection.map((meme) => (
         <div
           key={meme.src}
           className="rounded-lg overflow-hidden border"
-          style={{ borderColor: 'var(--color-warm-border)' }}
+          style={{ borderColor: 'var(--color-warm-border)', backgroundColor: 'white' }}
         >
           <img
             src={meme.src}
@@ -311,6 +311,9 @@ function MemeGallery() {
             className="w-full h-auto"
             loading="lazy"
           />
+          <p className="px-3 py-2 text-xs leading-snug" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            {meme.alt}
+          </p>
         </div>
       ))}
     </div>
@@ -411,28 +414,27 @@ export default async function Home() {
           <FeaturedBuilds />
         </section>
 
-        {/* Post-it notes */}
+        {/* The Vibe — memes, moved up */}
         <section className="pb-10">
-          <div className="flex flex-wrap gap-4 justify-center">
-            <PostItNote
-              text="Join a conversation or get one going!"
-              href="/feed"
-              color="yellow"
-              rotation={-2}
-            />
-            <PostItNote
-              text="Just getting started? Learn code vibing"
-              href="https://learnvibecoding.vercel.app"
-              color="pink"
-              rotation={1.5}
-            />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+              The vibe
+            </h2>
+            <Link
+              href="/memes"
+              className="text-xs hover:underline"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            >
+              See all &rarr;
+            </Link>
           </div>
+          <MemeGallery />
         </section>
 
         {/* Divider */}
         <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
 
-        {/* Recent Activity — full width, no sidebar */}
+        {/* Recent Activity */}
         <section className="py-10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
@@ -449,16 +451,33 @@ export default async function Home() {
           <RecentActivity />
         </section>
 
+        {/* Learn Vibe Coding — standalone post-it */}
+        <section className="py-8 flex justify-end">
+          <a
+            href="https://learnvibecoding.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-48 aspect-square rounded-sm p-5 transition-transform hover:scale-105 hover:-rotate-0 flex items-center justify-center text-center"
+            style={{
+              backgroundColor: '#FCE4EC',
+              borderLeft: '3px solid #F48FB1',
+              boxShadow: '2px 3px 8px rgba(244, 143, 177, 0.3)',
+              transform: 'rotate(1.5deg)',
+            }}
+          >
+            <div>
+              <p className="text-lg font-bold leading-tight" style={{ fontFamily: 'var(--font-display)', color: '#3E2723' }}>
+                Learn Vibe Coding
+              </p>
+              <span className="inline-block mt-3 text-xs" style={{ color: '#795548', fontFamily: 'var(--font-mono)' }}>
+                &#8599; learnvibecoding.vercel.app
+              </span>
+            </div>
+          </a>
+        </section>
+
         {/* Divider */}
         <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
-
-        {/* Memes */}
-        <section className="py-10">
-          <h2 className="text-sm uppercase tracking-wider mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-            The vibe
-          </h2>
-          <MemeGallery />
-        </section>
 
         {/* Also: Claude Code */}
         <section className="py-10 sm:py-12 -mx-6 px-6" style={{ backgroundColor: '#F5F0EB' }}>
@@ -469,13 +488,16 @@ export default async function Home() {
             <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
               Install the codevibing skill and your Claude can share what you&apos;re building, update your profile, and post to communities automatically. No copy-pasting, no forms.
             </p>
-            <div
-              className="rounded-lg px-4 py-3 inline-block"
-              style={{ backgroundColor: '#1C1917' }}
-            >
-              <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                $ claude skill add JDerekLomas/codevibing-skill
-              </code>
+            <div className="flex items-center gap-3">
+              <div
+                className="rounded-lg px-4 py-3"
+                style={{ backgroundColor: '#1C1917' }}
+              >
+                <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
+                  $ claude skill add JDerekLomas/codevibing-skill
+                </code>
+              </div>
+              <CopyButton text="claude skill add JDerekLomas/codevibing-skill" label="Copy" />
             </div>
           </div>
         </section>

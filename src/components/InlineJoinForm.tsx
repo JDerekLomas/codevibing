@@ -174,7 +174,7 @@ export function InlineJoinForm() {
           <p className="text-xs mt-2" style={{ color: '#991B1B' }}>{error}</p>
         )}
         <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
-          Free forever. No email required. Takes 10 seconds.
+          Free forever. Takes 10 seconds. Save your API key &mdash; it&apos;s your login.
         </p>
       </div>
     </form>
