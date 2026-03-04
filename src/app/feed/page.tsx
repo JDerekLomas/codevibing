@@ -3,6 +3,7 @@ import { getVibes, getCommunities, getReactionCounts } from '@/lib/supabase';
 import { ComposeForm } from '@/components/ComposeForm';
 import { ThreadedPost } from '@/components/ThreadedPost';
 import { TopicFilter } from '@/components/TopicFilter';
+import { MemeOfTheDay } from '@/components/MemeOfTheDay';
 
 export const revalidate = 30;
 
@@ -64,6 +65,9 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
 
         {/* Topic filter chips */}
         <TopicFilter communities={communities} activeTopic={topic || null} />
+
+        {/* Meme of the day */}
+        <MemeOfTheDay />
 
         {/* Compose */}
         <ComposeForm community={topic} initialText={text} autoFocus={compose === 'true'} />
