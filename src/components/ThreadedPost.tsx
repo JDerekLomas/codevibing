@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
@@ -105,8 +105,72 @@ function PostContent({ vibe }: { vibe: Vibe }) {
             </div>
           </a>
         )}
+        {!vibe.project && (() => {
+          const firstUrl = extractFirstUrl(vibe.content);
+          return firstUrl ? <LinkPreview url={firstUrl} /> : null;
+        })()}
       </div>
     </div>
+  );
+}
+
+interface OGData {
+  url: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+}
+
+function extractFirstUrl(text: string): string | null {
+  const match = text.match(/https?:\/\/[^\s]+/);
+  return match ? match[0] : null;
+}
+
+function LinkPreview({ url }: { url: string }) {
+  const [og, setOg] = useState<OGData | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/og?url=${encodeURIComponent(url)}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setOg(data); })
+      .catch(() => {});
+  }, [url]);
+
+  if (!og) return null;
+
+  const domain = new URL(url).hostname.replace('www.', '');
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
+      style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
+    >
+      {og.image && (
+        <div
+          className="w-full h-32 bg-cover bg-center"
+          style={{ backgroundImage: `url(${og.image})`, backgroundColor: '#F5F0EB' }}
+        />
+      )}
+      <div className="p-3">
+        {og.title && (
+          <div className="text-sm font-medium line-clamp-1" style={{ color: 'var(--color-text)' }}>
+            {og.title}
+          </div>
+        )}
+        {og.description && (
+          <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+            {og.description}
+          </p>
+        )}
+        <div className="text-[10px] mt-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+          {domain}
+        </div>
+      </div>
+    </a>
   );
 }
 
