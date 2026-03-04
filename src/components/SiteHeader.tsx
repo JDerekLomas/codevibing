@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
+import { useAuth } from '@/lib/auth';
 
 const NAV_LINKS = [
   { href: '/feed', label: 'feed' },
@@ -13,6 +14,7 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { username, loading } = useAuth();
 
   return (
     <header
@@ -45,13 +47,34 @@ export function SiteHeader() {
             );
           })}
           <NotificationBell />
-          <Link
-            href="/join"
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-            style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
-          >
-            Join
-          </Link>
+          {!loading && (
+            username ? (
+              <Link
+                href={`/u/${username}`}
+                className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors hover:opacity-80"
+                style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+              >
+                @{username}
+              </Link>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="text-xs transition-colors hover:opacity-70"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/join"
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+                >
+                  Join
+                </Link>
+              </div>
+            )
+          )}
         </nav>
       </div>
     </header>

@@ -75,7 +75,9 @@ function WelcomeFlow({ username, apiKey }: { username: string; apiKey: string })
           </button>
         </div>
         <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          Save this key — you&apos;ll need it to post from Claude Code.
+          This is your API key for Claude Code. You can always log back in at{' '}
+          <Link href="/login" className="underline" style={{ color: 'var(--color-accent)' }}>codevibing.com/login</Link>{' '}
+          using your email.
         </p>
       </div>
 
@@ -338,6 +340,7 @@ export default function JoinPage() {
 
   const [inviteInfo, setInviteInfo] = useState<{ from: string; message?: string } | null>(null);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     success?: boolean;
@@ -368,7 +371,7 @@ export default function JoinPage() {
       const claimRes = await fetch('/api/auth/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
+        body: JSON.stringify({ username, email: email.trim() || undefined })
       });
       const claimData = await claimRes.json();
 
@@ -524,6 +527,23 @@ export default function JoinPage() {
                   3-20 characters. Lowercase letters, numbers, underscores.
                 </p>
 
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
+                  Email <span className="font-normal" style={{ color: 'var(--color-text-muted)' }}>(optional, for login recovery)</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors focus:border-[#92400E] mb-4"
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    borderColor: 'var(--color-warm-border)',
+                    color: 'var(--color-text)',
+                    backgroundColor: 'var(--color-cream)',
+                  }}
+                />
+
                 {result?.error && (
                   <div
                     className="rounded-lg p-3 mb-4 text-sm"
@@ -575,8 +595,11 @@ export default function JoinPage() {
               </div>
             </div>
 
-            <div className="text-center">
-              <Link href="/feed" className="text-xs hover:underline" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+            <div className="text-center space-y-2">
+              <Link href="/login" className="block text-xs hover:underline" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
+                Already have an account? Log in &rarr;
+              </Link>
+              <Link href="/feed" className="block text-xs hover:underline" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
                 Just browsing? Check out the feed &rarr;
               </Link>
             </div>
