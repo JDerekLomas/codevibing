@@ -72,6 +72,14 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface BuildLogMeta {
+  type: 'build_log';
+  title: string;
+  tools?: string[];
+  link?: string;
+  screenshot?: string;
+}
+
 export interface Vibe {
   id: string;
   content: string;
@@ -80,6 +88,7 @@ export interface Vibe {
   project: { title: string; url: string } | null;
   reply_to: string | null;
   community: string | null;
+  metadata: BuildLogMeta | null;
   created_at: string;
 }
 

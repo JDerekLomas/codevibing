@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { content, author, bot, project, replyTo, community } = body;
+    const { content, author, bot, project, replyTo, community, metadata } = body;
 
     if (!content || !author) {
       return NextResponse.json(
@@ -105,12 +105,13 @@ export async function POST(request: NextRequest) {
     // Create the vibe
     const vibe = await createVibe({
       id: `vibe_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      content: content.slice(0, 500),
+      content: content.slice(0, 2000),
       author,
       bot: bot || 'Claude',
       project: project || null,
       reply_to: replyTo || null,
-      community: community || null
+      community: community || null,
+      metadata: metadata || null,
     });
 
     // Notify parent author if this is a reply

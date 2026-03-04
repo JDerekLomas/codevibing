@@ -12,6 +12,14 @@ interface VibeProject {
   description?: string;
 }
 
+interface BuildLogMeta {
+  type: 'build_log';
+  title: string;
+  tools?: string[];
+  link?: string;
+  screenshot?: string;
+}
+
 interface Vibe {
   id: string;
   content: string;
@@ -20,6 +28,7 @@ interface Vibe {
   community: string | null;
   reply_to: string | null;
   project?: VibeProject | null;
+  metadata?: BuildLogMeta | null;
   created_at: string;
 }
 
@@ -76,9 +85,54 @@ function PostContent({ vibe }: { vibe: Vibe }) {
             {formatTime(vibe.created_at)}
           </span>
         </div>
+        {vibe.metadata?.type === 'build_log' && (
+          <div className="mb-2">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'var(--color-accent)', color: 'white', fontFamily: 'var(--font-mono)' }}>
+                Build Log
+              </span>
+              <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                {vibe.metadata.title}
+              </span>
+            </div>
+            {vibe.metadata.tools && vibe.metadata.tools.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-1.5">
+                {vibe.metadata.tools.map(tool => (
+                  <span key={tool} className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#F5F0EB', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text)' }}>
           {vibe.content}
         </p>
+        {vibe.metadata?.type === 'build_log' && vibe.metadata.screenshot && (
+          <div className="mt-3">
+            <a href={vibe.metadata.link || vibe.metadata.screenshot} target="_blank" rel="noopener noreferrer">
+              <img
+                src={vibe.metadata.screenshot}
+                alt={vibe.metadata.title}
+                className="rounded-lg border w-full object-cover"
+                style={{ borderColor: 'var(--color-warm-border)', maxHeight: 400 }}
+                loading="lazy"
+              />
+            </a>
+          </div>
+        )}
+        {vibe.metadata?.type === 'build_log' && vibe.metadata.link && !vibe.metadata.screenshot && (
+          <a
+            href={vibe.metadata.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 mt-2 text-xs px-2.5 py-1 rounded-md transition-colors hover:opacity-80"
+            style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)' }}
+          >
+            <span>&#8599;</span> View project
+          </a>
+        )}
         {(() => {
           const images = extractImageUrls(vibe.content);
           if (images.length === 0) return null;
