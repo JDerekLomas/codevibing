@@ -1,0 +1,163 @@
+'use client';
+
+import { useRef, useState, useCallback } from 'react';
+
+interface SwipeCardProps {
+  title: string;
+  description: string | null;
+  preview: string | null;
+  author: string;
+  url: string;
+  onSwipe: (direction: 'left' | 'right') => void;
+  overlay?: { hot_percent: number; total_votes: number } | null;
+  exiting?: 'left' | 'right' | null;
+}
+
+export default function SwipeCard({ title, description, preview, author, url, onSwipe, overlay, exiting }: SwipeCardProps): JSX.Element {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const isDragging = useRef(false);
+
+  const handleStart = useCallback((clientX: number, clientY: number) => {
+    startX.current = clientX;
+    startY.current = clientY;
+    isDragging.current = true;
+    setDragging(true);
+  }, []);
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!isDragging.current) return;
+    const dx = clientX - startX.current;
+    setDragX(dx);
+  }, []);
+
+  const handleEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    setDragging(false);
+    if (Math.abs(dragX) > 100) {
+      onSwipe(dragX > 0 ? 'right' : 'left');
+    }
+    setDragX(0);
+  }, [dragX, onSwipe]);
+
+  const rotation = dragX * 0.08;
+  const opacity = overlay ? 0.95 : 1;
+
+  let transform = `translateX(${dragX}px) rotate(${rotation}deg)`;
+  if (exiting === 'left') transform = 'translateX(-120%) rotate(-15deg)';
+  if (exiting === 'right') transform = 'translateX(120%) rotate(15deg)';
+
+  return (
+    <div
+      ref={cardRef}
+      className="absolute inset-0 rounded-xl border overflow-hidden cursor-grab active:cursor-grabbing select-none"
+      style={{
+        backgroundColor: 'white',
+        borderColor: 'var(--color-warm-border)',
+        boxShadow: dragging ? '0 10px 40px rgba(0,0,0,0.15)' : '0 4px 20px rgba(0,0,0,0.08)',
+        transform,
+        opacity,
+        transition: exiting || !dragging ? 'transform 0.4s ease, opacity 0.4s ease' : 'none',
+      }}
+      onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
+      onMouseMove={(e) => handleMove(e.clientX)}
+      onMouseUp={handleEnd}
+      onMouseLeave={() => { if (isDragging.current) handleEnd(); }}
+      onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+      onTouchEnd={handleEnd}
+    >
+      {/* Project image or gradient placeholder */}
+      <div className="relative w-full" style={{ height: '60%' }}>
+        {preview ? (
+          <div
+            className="w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${preview})` }}
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, #F5F0EB 0%, #E8E2DA 50%, #D4C9BD 100%)',
+            }}
+          >
+            <span
+              className="text-2xl font-medium text-center px-6 leading-snug"
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+            >
+              {title}
+            </span>
+          </div>
+        )}
+
+        {/* Swipe direction indicators */}
+        {dragX > 40 && (
+          <div className="absolute top-4 left-4 px-3 py-1.5 rounded-lg border-2 font-bold text-sm" style={{ borderColor: '#16a34a', color: '#16a34a', transform: 'rotate(-15deg)' }}>
+            HOT
+          </div>
+        )}
+        {dragX < -40 && (
+          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-lg border-2 font-bold text-sm" style={{ borderColor: '#dc2626', color: '#dc2626', transform: 'rotate(15deg)' }}>
+            NOT
+          </div>
+        )}
+      </div>
+
+      {/* Card info */}
+      <div className="p-5 flex flex-col justify-between" style={{ height: '40%' }}>
+        <div>
+          <h3
+            className="text-lg font-medium mb-1 leading-tight"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+          >
+            {title}
+          </h3>
+          {description && (
+            <p
+              className="text-sm leading-relaxed line-clamp-2"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              {description}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+            @{author}
+          </span>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs hover:underline"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            visit &rarr;
+          </a>
+        </div>
+      </div>
+
+      {/* Score reveal overlay */}
+      {overlay && (
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-xl"
+          style={{ backgroundColor: 'rgba(28, 25, 23, 0.85)' }}
+        >
+          <div className="text-center">
+            <div className="text-4xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'white' }}>
+              {overlay.hot_percent}% hot
+            </div>
+            <div className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.7)' }}>
+              {overlay.total_votes} vote{overlay.total_votes !== 1 ? 's' : ''}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

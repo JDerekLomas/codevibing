@@ -5,6 +5,7 @@ import { InlineJoinForm } from '@/components/InlineJoinForm';
 import CopyButton from '@/components/CopyButton';
 import { ReplayButton } from '@/components/SessionReplayModal';
 import { buildSessionMap } from '@/lib/sessions';
+import HotOrNotTeaser from '@/components/hotornot/HotOrNotTeaser';
 
 export const revalidate = 60;
 
@@ -478,6 +479,9 @@ export default async function Home() {
           </div>
           <FeaturedBuilds />
         </section>
+
+        {/* Hot or Not CTA */}
+        <HotOrNotTeaser />
 
         {/* The Vibe — memes, moved up */}
         <section className="pb-10">

@@ -643,7 +643,7 @@ export async function syncProjectsFromSources(): Promise<number> {
   // Upsert into cv_projects
   let count = 0;
   for (const proj of Array.from(byUrl.values())) {
-    const id = `proj_${Buffer.from(proj.url).toString('base64url').slice(0, 32)}`;
+    const id = `proj_${createHash('sha256').update(proj.url).digest('base64url').slice(0, 24)}`;
     const { error } = await supabaseAdmin
       .from('cv_projects')
       .upsert({
