@@ -4,6 +4,12 @@ const nextConfig = {
   images: {
     domains: ['vercel.app', 'codevibinggallery.vercel.app'],
   },
+  async redirects() {
+    return [
+      { source: '/physics', destination: '/c/physics', permanent: false },
+      { source: '/learnvibecoding', destination: '/c/learnvibecoding', permanent: false },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (isServer) {
       // Ignore pdf-parse test files during build
