@@ -3,6 +3,7 @@ import { IBM_Plex_Sans, IBM_Plex_Mono, Libre_Baskerville } from 'next/font/googl
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import InputWidget from '@/components/InputWidget';
+import { SiteHeader } from '@/components/SiteHeader';
 
 const plexSans = IBM_Plex_Sans({
   subsets: ['latin'],
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className={`h-full scroll-smooth ${plexSans.variable} ${plexMono.variable} ${libreBaskerville.variable}`}>
       <body className="h-full antialiased" style={{ fontFamily: 'var(--font-sans)', backgroundColor: '#FFFDF9' }}>
         <Providers>
+          <SiteHeader />
           {children}
           <InputWidget allowedHosts={["localhost", "codevibing.com", "vercel.app"]} />
         </Providers>
