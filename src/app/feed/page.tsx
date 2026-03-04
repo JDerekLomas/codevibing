@@ -119,11 +119,6 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
         )}
       </main>
 
-      <footer className="py-12 text-center border-t" style={{ borderColor: 'var(--color-warm-border)' }}>
-        <p className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-          Built with Claude Code, obviously.
-        </p>
-      </footer>
     </div>
   );
 }

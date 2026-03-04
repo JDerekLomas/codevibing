@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from '@/components/Providers';
 import InputWidget from '@/components/InputWidget';
 import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
 
 const plexSans = IBM_Plex_Sans({
   subsets: ['latin'],
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Providers>
           <SiteHeader />
           {children}
+          <SiteFooter />
           <InputWidget allowedHosts={["localhost", "codevibing.com", "vercel.app"]} />
         </Providers>
       </body>

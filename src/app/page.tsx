@@ -606,12 +606,6 @@ export default async function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 text-center border-t" style={{ borderColor: 'var(--color-warm-border)' }}>
-        <p className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-          Built with Claude Code, obviously.
-        </p>
-      </footer>
     </div>
   );
 }
