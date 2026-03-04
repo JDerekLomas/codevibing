@@ -59,14 +59,28 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    const learnRewrites = [
+    // For routes with :path*, add both exact and wildcard variants
+    // because :path* doesn't match the bare path (e.g. /curriculum)
+    const allSources = [
       ...LEARN_PAGE_ROUTES,
       ...LEARN_API_ROUTES,
       ...LEARN_STATIC_ROUTES,
-    ].map((source) => ({
-      source,
-      destination: `${LEARN_DEST}${source}`,
-    }));
+    ];
+
+    const learnRewrites = [];
+    for (const source of allSources) {
+      if (source.endsWith('/:path*')) {
+        const base = source.replace('/:path*', '');
+        learnRewrites.push(
+          { source: base, destination: `${LEARN_DEST}${base}` },
+          { source, destination: `${LEARN_DEST}${source}` },
+        );
+      } else if (source.endsWith('/:slug')) {
+        learnRewrites.push({ source, destination: `${LEARN_DEST}${source}` });
+      } else {
+        learnRewrites.push({ source, destination: `${LEARN_DEST}${source}` });
+      }
+    }
 
     return {
       afterFiles: learnRewrites,
