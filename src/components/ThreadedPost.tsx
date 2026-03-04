@@ -79,6 +79,25 @@ function PostContent({ vibe }: { vibe: Vibe }) {
         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text)' }}>
           {vibe.content}
         </p>
+        {(() => {
+          const images = extractImageUrls(vibe.content);
+          if (images.length === 0) return null;
+          return (
+            <div className={`mt-3 gap-2 ${images.length === 1 ? 'flex' : 'grid grid-cols-2'}`}>
+              {images.slice(0, 4).map((src, i) => (
+                <a key={i} href={src} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={src}
+                    alt=""
+                    className="rounded-lg border w-full object-cover"
+                    style={{ borderColor: 'var(--color-warm-border)', maxHeight: images.length === 1 ? 400 : 200 }}
+                    loading="lazy"
+                  />
+                </a>
+              ))}
+            </div>
+          );
+        })()}
         {vibe.project && (
           <a
             href={vibe.project.url}
@@ -122,9 +141,18 @@ interface OGData {
   siteName?: string;
 }
 
+const IMAGE_EXT_RE = /\.(png|jpg|jpeg|gif|webp|svg|avif)(\?[^\s]*)?$/i;
+
+function extractImageUrls(text: string): string[] {
+  const urls = text.match(/https?:\/\/[^\s]+/g) || [];
+  return urls.filter(u => IMAGE_EXT_RE.test(u));
+}
+
 function extractFirstUrl(text: string): string | null {
-  const match = text.match(/https?:\/\/[^\s]+/);
-  return match ? match[0] : null;
+  const urls = text.match(/https?:\/\/[^\s]+/g) || [];
+  // Skip image URLs — those are rendered inline
+  const nonImage = urls.find(u => !IMAGE_EXT_RE.test(u));
+  return nonImage || null;
 }
 
 function LinkPreview({ url }: { url: string }) {
