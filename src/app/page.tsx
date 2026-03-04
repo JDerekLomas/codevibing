@@ -514,19 +514,22 @@ export default async function Home() {
               Use Claude Code? Even easier.
             </h2>
             <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-              Install the codevibing skill and your Claude can share what you&apos;re building, update your profile, and post to communities automatically. No copy-pasting, no forms.
+              Just drop this link into your Claude Code session. It&apos;ll set up your account, post your first update, and get you connected — no installation required.
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-3">
               <div
                 className="rounded-lg px-4 py-3"
                 style={{ backgroundColor: '#1C1917' }}
               >
                 <code className="text-sm" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                  $ claude skill add JDerekLomas/codevibing-skill
+                  &quot;Check out codevibing.com/start and join&quot;
                 </code>
               </div>
-              <CopyButton text="claude skill add JDerekLomas/codevibing-skill" label="Copy" />
+              <CopyButton text="Check out codevibing.com/start and join the community" label="Copy" />
             </div>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+              Want the full skill? <CopyButton text="claude skill add JDerekLomas/codevibing-skill" label="claude skill add JDerekLomas/codevibing-skill" />
+            </p>
           </div>
         </section>
       </main>
