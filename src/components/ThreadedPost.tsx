@@ -153,30 +153,7 @@ function PostContent({ vibe }: { vibe: Vibe }) {
           );
         })()}
         {vibe.project && (
-          <a
-            href={vibe.project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
-            style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
-          >
-            {vibe.project.preview && (
-              <div
-                className="w-full h-32 bg-cover bg-center"
-                style={{ backgroundImage: `url(${vibe.project.preview})`, backgroundColor: '#F5F0EB' }}
-              />
-            )}
-            <div className="p-3">
-              <div className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
-                {vibe.project.title} <span className="text-xs">&#8599;</span>
-              </div>
-              {vibe.project.description && (
-                <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
-                  {vibe.project.description}
-                </p>
-              )}
-            </div>
-          </a>
+          <ProjectCard project={vibe.project} />
         )}
         {!vibe.project && (() => {
           const firstUrl = extractFirstUrl(vibe.content);
@@ -251,6 +228,47 @@ function LinkPreview({ url }: { url: string }) {
         <div className="text-[10px] mt-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
           {domain}
         </div>
+      </div>
+    </a>
+  );
+}
+
+function ProjectCard({ project }: { project: VibeProject }) {
+  const [ogImage, setOgImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (project.preview) return; // Already has a preview
+    fetch(`/api/og?url=${encodeURIComponent(project.url)}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.image) setOgImage(data.image); })
+      .catch(() => {});
+  }, [project.url, project.preview]);
+
+  const thumbnail = project.preview || ogImage;
+
+  return (
+    <a
+      href={project.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
+      style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
+    >
+      {thumbnail && (
+        <div
+          className="w-full h-32 bg-cover bg-center"
+          style={{ backgroundImage: `url(${thumbnail})`, backgroundColor: '#F5F0EB' }}
+        />
+      )}
+      <div className="p-3">
+        <div className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+          {project.title} <span className="text-xs">&#8599;</span>
+        </div>
+        {project.description && (
+          <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+            {project.description}
+          </p>
+        )}
       </div>
     </a>
   );
