@@ -27,6 +27,8 @@ interface ThreadedPostProps {
   post: Vibe;
   replies: Vibe[];
   community?: string;
+  heartCount?: number;
+  hearted?: boolean;
 }
 
 function formatTime(iso: string): string {
@@ -108,7 +110,50 @@ function PostContent({ vibe }: { vibe: Vibe }) {
   );
 }
 
-export function ThreadedPost({ post, replies, community }: ThreadedPostProps) {
+function HeartButton({ vibeId, initialCount, initialReacted }: { vibeId: string; initialCount: number; initialReacted: boolean }) {
+  const { apiKey, username } = useAuth();
+  const [count, setCount] = useState(initialCount);
+  const [reacted, setReacted] = useState(initialReacted);
+  const [busy, setBusy] = useState(false);
+
+  const toggle = async () => {
+    if (!apiKey || busy) return;
+    setBusy(true);
+    // Optimistic update
+    setReacted(!reacted);
+    setCount(c => reacted ? c - 1 : c + 1);
+
+    try {
+      const res = await fetch(`/api/vibes/${vibeId}/react`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+      });
+      if (!res.ok) {
+        // Revert on failure
+        setReacted(reacted);
+        setCount(count);
+      }
+    } catch {
+      setReacted(reacted);
+      setCount(count);
+    }
+    setBusy(false);
+  };
+
+  return (
+    <button
+      onClick={username ? toggle : undefined}
+      className="flex items-center gap-1 text-xs transition-colors hover:opacity-70"
+      style={{ fontFamily: 'var(--font-mono)', color: reacted ? '#e11d48' : 'var(--color-text-muted)' }}
+      title={username ? (reacted ? 'Remove heart' : 'Heart this') : 'Join to react'}
+    >
+      <span style={{ fontSize: 14 }}>{reacted ? '\u2665' : '\u2661'}</span>
+      {count > 0 && <span>{count}</span>}
+    </button>
+  );
+}
+
+export function ThreadedPost({ post, replies, community, heartCount = 0, hearted = false }: ThreadedPostProps) {
   const { apiKey, username } = useAuth();
   const router = useRouter();
   const [showReply, setShowReply] = useState(false);
@@ -158,6 +203,7 @@ export function ThreadedPost({ post, replies, community }: ThreadedPostProps) {
 
         {/* Actions */}
         <div className="mt-3 ml-11 flex items-center gap-4">
+          <HeartButton vibeId={post.id} initialCount={heartCount} initialReacted={hearted} />
           {username ? (
             <button
               onClick={() => setShowReply(!showReply)}
