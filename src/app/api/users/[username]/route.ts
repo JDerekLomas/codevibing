@@ -5,6 +5,7 @@ import {
   getFriends,
   verifyApiKey,
   incrementProfileViews,
+  getSessionsByAuthor,
   supabasePublic,
   supabaseAdmin
 } from '@/lib/supabase';
@@ -68,11 +69,15 @@ export async function GET(
   const humanFriends = allFriends.filter(f => !f.isBot);
   const botFriends = allFriends.filter(f => f.isBot);
 
-  // Increment profile views
-  await incrementProfileViews(username);
+  // Fetch sessions and increment views in parallel
+  const [sessions] = await Promise.all([
+    getSessionsByAuthor(username),
+    incrementProfileViews(username),
+  ]);
 
   // Convert snake_case to camelCase for frontend
   return NextResponse.json({
+    sessions,
     profile: {
       username: profile.username,
       displayName: profile.display_name,

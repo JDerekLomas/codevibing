@@ -204,6 +204,36 @@ export async function getInvite(code: string): Promise<Invite | null> {
   return data;
 }
 
+// ============ Session Replay Functions (use public client) ============
+
+export interface SessionSummary {
+  slug: string;
+  title: string;
+  author: string;
+  thumbnail: string | null;
+  duration: string | null;
+  prompt_count: number | null;
+}
+
+export async function getSessionsByAuthor(author: string): Promise<SessionSummary[]> {
+  const { data, error } = await supabasePublic
+    .from('cv_sessions')
+    .select('slug, title, author, thumbnail, duration, prompt_count')
+    .eq('author', author)
+    .order('created_at', { ascending: false });
+  if (error) console.error('getSessionsByAuthor error:', error);
+  return data || [];
+}
+
+export async function getAllSessions(): Promise<SessionSummary[]> {
+  const { data, error } = await supabasePublic
+    .from('cv_sessions')
+    .select('slug, title, author, thumbnail, duration, prompt_count')
+    .order('created_at', { ascending: false });
+  if (error) console.error('getAllSessions error:', error);
+  return data || [];
+}
+
 // ============ Aggregation Functions (use public client) ============
 
 export async function getUserCount(): Promise<number> {

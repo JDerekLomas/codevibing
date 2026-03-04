@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { ReplayButton } from '@/components/SessionReplayModal';
+
+interface SessionSummary {
+  slug: string;
+  title: string;
+  author: string;
+  thumbnail: string | null;
+  duration: string | null;
+  prompt_count: number | null;
+}
 
 interface Friend {
   username: string;
@@ -83,11 +93,25 @@ const GEOCITIES_GIFS = [
   'https://web.archive.org/web/20091027072655im_/http://www.geocities.com/TimesSquare/1848/welcome.gif'
 ];
 
+function findSessionForProject(
+  project: { title: string },
+  sessions: SessionSummary[]
+): SessionSummary | null {
+  const normalize = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  const normalized = normalize(project.title);
+  if (!normalized) return null;
+  return sessions.find(s => {
+    const sNorm = normalize(s.title);
+    return sNorm === normalized || sNorm.includes(normalized) || normalized.includes(sNorm);
+  }) || null;
+}
+
 export default function UserPage() {
   const params = useParams();
   const username = params.username as string;
   const auth = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [friendStatus, setFriendStatus] = useState<'none' | 'pending' | 'friends' | 'sending' | 'sent'>('none');
@@ -107,6 +131,9 @@ export default function UserPage() {
       .then(data => {
         if (data?.profile) {
           setProfile(data.profile);
+        }
+        if (data?.sessions) {
+          setSessions(data.sessions);
         }
         setLoading(false);
       })
@@ -179,7 +206,7 @@ export default function UserPage() {
   const isMySpace = theme.style === 'myspace';
 
   if (isMySpace) {
-    return <MySpaceLayout profile={profile} theme={theme} />;
+    return <MySpaceLayout profile={profile} theme={theme} sessions={sessions} />;
   }
 
   return (
@@ -357,55 +384,65 @@ export default function UserPage() {
                 Projects
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {profile.projects.map((project, i) => (
-                  <a
-                    key={i}
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block rounded-xl overflow-hidden border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all"
-                  >
-                    {/* Preview image - large */}
+                {profile.projects.map((project, i) => {
+                  const session = findSessionForProject(project, sessions);
+                  return (
                     <div
-                      className="aspect-video bg-neutral-100 relative overflow-hidden"
-                      style={{
-                        background: project.preview
-                          ? `url(${project.preview}) center/cover`
-                          : `linear-gradient(135deg, ${theme.accent}11, ${theme.accent}22)`
-                      }}
+                      key={i}
+                      className="group block rounded-xl overflow-hidden border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all"
                     >
-                      {!project.preview && (
-                        <div className="absolute inset-0 flex items-center justify-center text-4xl opacity-30">
-                          {project.title.charAt(0)}
-                        </div>
-                      )}
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-5">
-                      <div className="flex items-baseline justify-between gap-4 mb-2">
-                        <h3
-                          className="text-lg font-medium group-hover:text-amber-700 transition-colors"
-                          style={{ color: theme.primary }}
+                      {/* Preview image - large */}
+                      <a href={project.url} target="_blank" rel="noopener noreferrer">
+                        <div
+                          className="aspect-video bg-neutral-100 relative overflow-hidden"
+                          style={{
+                            background: project.preview
+                              ? `url(${project.preview}) center/cover`
+                              : `linear-gradient(135deg, ${theme.accent}11, ${theme.accent}22)`
+                          }}
                         >
-                          {project.title}
-                        </h3>
-                        {project.category && (
-                          <span className="text-xs text-neutral-400 uppercase tracking-wider flex-shrink-0">
-                            {project.category}
-                          </span>
+                          {!project.preview && (
+                            <div className="absolute inset-0 flex items-center justify-center text-4xl opacity-30">
+                              {project.title.charAt(0)}
+                            </div>
+                          )}
+                          {session && <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="overlay" />}
+                          {/* Hover overlay (only when no session overlay) */}
+                          {!session && <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />}
+                        </div>
+                      </a>
+
+                      {/* Info */}
+                      <div className="p-5">
+                        <div className="flex items-baseline justify-between gap-4 mb-2">
+                          <a href={project.url} target="_blank" rel="noopener noreferrer">
+                            <h3
+                              className="text-lg font-medium group-hover:text-amber-700 transition-colors"
+                              style={{ color: theme.primary }}
+                            >
+                              {project.title}
+                            </h3>
+                          </a>
+                          {project.category && (
+                            <span className="text-xs text-neutral-400 uppercase tracking-wider flex-shrink-0">
+                              {project.category}
+                            </span>
+                          )}
+                        </div>
+                        {project.description && (
+                          <p className="text-sm text-neutral-500 line-clamp-2">
+                            {project.description}
+                          </p>
+                        )}
+                        {session && (
+                          <div className="mt-3">
+                            <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="badge" />
+                          </div>
                         )}
                       </div>
-                      {project.description && (
-                        <p className="text-sm text-neutral-500 line-clamp-2">
-                          {project.description}
-                        </p>
-                      )}
                     </div>
-                  </a>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -602,7 +639,7 @@ export default function UserPage() {
 }
 
 // MySpace layout - chaotic but readable
-function MySpaceLayout({ profile, theme }: { profile: UserProfile; theme: UserProfile['theme'] }) {
+function MySpaceLayout({ profile, theme, sessions = [] }: { profile: UserProfile; theme: UserProfile['theme']; sessions?: SessionSummary[] }) {
   const [sparkles, setSparkles] = useState<Array<{id: number, x: number, y: number}>>([]);
 
   useEffect(() => {
@@ -806,22 +843,39 @@ function MySpaceLayout({ profile, theme }: { profile: UserProfile; theme: UserPr
               <div className="myspace-section">
                 <div className="myspace-header">★ Projects ★</div>
                 <div style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
-                  {profile.projects.map((p, i) => (
-                    <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="project-card"
-                      style={{ display: 'block', borderRadius: 10, border: `2px solid ${theme.accent || '#00ffff'}44`, background: 'rgba(0,0,0,0.4)', textDecoration: 'none', color: theme.text, overflow: 'hidden' }}>
-                      {p.preview ? (
-                        <div style={{ height: 130, background: `url(${p.preview}) center/cover` }} />
-                      ) : (
-                        <div style={{ height: 130, background: `linear-gradient(135deg, ${theme.primary}22, ${theme.accent || theme.primary}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, opacity: 0.3 }}>
-                          {p.title.charAt(0)}
+                  {profile.projects.map((p, i) => {
+                    const session = findSessionForProject(p, sessions);
+                    return (
+                      <div key={i} className="project-card"
+                        style={{ borderRadius: 10, border: `2px solid ${theme.accent || '#00ffff'}44`, background: 'rgba(0,0,0,0.4)', color: theme.text, overflow: 'hidden' }}>
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                          <div style={{ position: 'relative' }}>
+                            {p.preview ? (
+                              <div style={{ height: 130, background: `url(${p.preview}) center/cover` }} />
+                            ) : (
+                              <div style={{ height: 130, background: `linear-gradient(135deg, ${theme.primary}22, ${theme.accent || theme.primary}22)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, opacity: 0.3 }}>
+                                {p.title.charAt(0)}
+                              </div>
+                            )}
+                            {session && (
+                              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+                                <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="overlay" />
+                              </div>
+                            )}
+                          </div>
+                        </a>
+                        <div style={{ padding: 12 }}>
+                          <div style={{ fontWeight: 600, color: theme.primary, fontSize: 14 }}>{p.title}</div>
+                          {p.description && <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>{p.description}</div>}
+                          {session && (
+                            <div style={{ marginTop: 8 }}>
+                              <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="icon" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                      <div style={{ padding: 12 }}>
-                        <div style={{ fontWeight: 600, color: theme.primary, fontSize: 14 }}>{p.title}</div>
-                        {p.description && <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>{p.description}</div>}
                       </div>
-                    </a>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

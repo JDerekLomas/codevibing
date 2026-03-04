@@ -1,8 +1,10 @@
 import Link from 'next/link';
-import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers, supabasePublic } from '@/lib/supabase';
+import { getVibes, getFeaturedProjects, getUserCount, getPublicUsers, getAllSessions, supabasePublic } from '@/lib/supabase';
 import { LinkifyText } from '@/components/LinkifyText';
 import { InlineJoinForm } from '@/components/InlineJoinForm';
 import CopyButton from '@/components/CopyButton';
+import { ReplayButton } from '@/components/SessionReplayModal';
+import { buildSessionMap } from '@/lib/sessions';
 
 export const revalidate = 60;
 
@@ -40,7 +42,10 @@ function formatTime(iso: string): string {
 }
 
 async function SpotlightBuild() {
-  const profiles = await getFeaturedProjects();
+  const [profiles, sessions] = await Promise.all([
+    getFeaturedProjects(),
+    getAllSessions(),
+  ]);
 
   const allProjects = profiles.flatMap(p =>
     (p.projects || []).map(proj => ({ ...proj, author: p.username }))
@@ -52,31 +57,36 @@ async function SpotlightBuild() {
   if (pool.length === 0) return null;
 
   const spotlight = pool[Math.floor(Math.random() * pool.length)];
+  const sessionMap = buildSessionMap([spotlight], sessions);
+  const session = sessionMap.get(spotlight.title);
 
   return (
-    <a
-      href={spotlight.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block rounded-xl overflow-hidden border transition-all hover:shadow-lg"
+    <div
+      className="group block rounded-xl overflow-hidden border transition-all hover:shadow-lg relative"
       style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
     >
       {spotlight.preview && (
-        <div
-          className="w-full h-48 sm:h-56 bg-cover bg-center"
-          style={{ backgroundImage: `url(${spotlight.preview})`, backgroundColor: '#F5F0EB' }}
-        />
+        <a href={spotlight.url} target="_blank" rel="noopener noreferrer">
+          <div
+            className="w-full h-48 sm:h-56 bg-cover bg-center relative"
+            style={{ backgroundImage: `url(${spotlight.preview})`, backgroundColor: '#F5F0EB' }}
+          >
+            {session && <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="overlay" />}
+          </div>
+        </a>
       )}
       <div className="p-5 sm:p-6">
         <div className="text-xs uppercase tracking-wider mb-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}>
           Look what someone built
         </div>
-        <h3
-          className="text-lg sm:text-xl font-medium mb-1 group-hover:underline"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
-        >
-          {spotlight.title}
-        </h3>
+        <a href={spotlight.url} target="_blank" rel="noopener noreferrer">
+          <h3
+            className="text-lg sm:text-xl font-medium mb-1 group-hover:underline"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+          >
+            {spotlight.title}
+          </h3>
+        </a>
         {spotlight.description && (
           <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-muted)' }}>
             {spotlight.description}
@@ -94,20 +104,31 @@ async function SpotlightBuild() {
               @{spotlight.author}
             </span>
           </div>
-          <span
-            className="text-xs px-3 py-1.5 rounded-full transition-colors group-hover:opacity-80"
-            style={{ backgroundColor: 'var(--color-accent)', color: 'white', fontFamily: 'var(--font-mono)' }}
-          >
-            Check it out &rarr;
-          </span>
+          <div className="flex items-center gap-2">
+            {session && (
+              <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="badge" />
+            )}
+            <a
+              href={spotlight.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs px-3 py-1.5 rounded-full transition-colors group-hover:opacity-80"
+              style={{ backgroundColor: 'var(--color-accent)', color: 'white', fontFamily: 'var(--font-mono)' }}
+            >
+              Check it out &rarr;
+            </a>
+          </div>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
 
 async function FeaturedBuilds() {
-  const profiles = await getFeaturedProjects();
+  const [profiles, sessions] = await Promise.all([
+    getFeaturedProjects(),
+    getAllSessions(),
+  ]);
 
   const seen = new Set<string>();
   const projects = profiles.flatMap(p =>
@@ -128,50 +149,61 @@ async function FeaturedBuilds() {
     );
   }
 
+  const sessionMap = buildSessionMap(projects, sessions);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {projects.map((project, i) => (
-        <a
-          key={`${project.author}-${i}`}
-          href={project.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block rounded-xl p-5 border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-          style={{
-            backgroundColor: 'white',
-            borderColor: 'var(--color-warm-border)',
-          }}
-        >
-          {project.preview && (
-            <div
-              className="w-full h-32 rounded-lg mb-4 bg-cover bg-center"
-              style={{ backgroundImage: `url(${project.preview})`, backgroundColor: '#F5F0EB' }}
-            />
-          )}
-          <h3
-            className="font-medium text-sm mb-1 group-hover:underline"
-            style={{ color: 'var(--color-text)' }}
+      {projects.map((project, i) => {
+        const session = sessionMap.get(project.title);
+        return (
+          <div
+            key={`${project.author}-${i}`}
+            className="group block rounded-xl p-5 border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            style={{
+              backgroundColor: 'white',
+              borderColor: 'var(--color-warm-border)',
+            }}
           >
-            {project.title}
-          </h3>
-          {project.description && (
-            <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
-              {project.description}
-            </p>
-          )}
-          <div className="flex items-center gap-2">
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium"
-              style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
-            >
-              {project.author.charAt(0).toUpperCase()}
+            {project.preview && (
+              <div
+                className="w-full h-32 rounded-lg mb-4 bg-cover bg-center relative overflow-hidden"
+                style={{ backgroundImage: `url(${project.preview})`, backgroundColor: '#F5F0EB' }}
+              >
+                {session && <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="overlay" />}
+              </div>
+            )}
+            <a href={project.url} target="_blank" rel="noopener noreferrer">
+              <h3
+                className="font-medium text-sm mb-1 group-hover:underline"
+                style={{ color: 'var(--color-text)' }}
+              >
+                {project.title}
+              </h3>
+            </a>
+            {project.description && (
+              <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+                {project.description}
+              </p>
+            )}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium"
+                  style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
+                >
+                  {project.author.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                  @{project.author}
+                </span>
+              </div>
+              {session && !project.preview && (
+                <ReplayButton slug={session.slug} title={session.title} duration={session.duration} promptCount={session.prompt_count} variant="icon" />
+              )}
             </div>
-            <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-              @{project.author}
-            </span>
           </div>
-        </a>
-      ))}
+        );
+      })}
     </div>
   );
 }
