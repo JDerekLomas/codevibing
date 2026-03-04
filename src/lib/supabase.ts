@@ -212,6 +212,35 @@ export async function getFeaturedProjects(): Promise<Array<{ username: string; p
   return data || [];
 }
 
+export async function getReactionCounts(vibeIds: string[], username?: string): Promise<Map<string, { count: number; reacted: boolean }>> {
+  const result = new Map<string, { count: number; reacted: boolean }>();
+  if (vibeIds.length === 0) return result;
+
+  // Get counts
+  const { data: reactions } = await supabasePublic
+    .from('cv_reactions')
+    .select('vibe_id, username')
+    .in('vibe_id', vibeIds);
+
+  // Aggregate
+  for (const id of vibeIds) {
+    const vibeReactions = (reactions || []).filter(r => r.vibe_id === id);
+    result.set(id, {
+      count: vibeReactions.length,
+      reacted: username ? vibeReactions.some(r => r.username === username) : false,
+    });
+  }
+  return result;
+}
+
+export async function getCommunities(): Promise<Array<{ slug: string; name: string; description: string; post_count: number; member_count: number }>> {
+  const { data } = await supabasePublic
+    .from('cv_communities')
+    .select('slug, name, description, post_count, member_count')
+    .order('post_count', { ascending: false });
+  return data || [];
+}
+
 export async function getPublicUsers(limit = 10): Promise<Array<{ username: string; display_name: string; avatar: string | null }>> {
   const { data } = await supabasePublic
     .from('cv_profiles')

@@ -368,7 +368,7 @@ export default async function Home() {
             {topics.map((topic) => (
               <Link
                 key={topic.slug}
-                href={`/c/${topic.slug}`}
+                href={`/feed?topic=${topic.slug}`}
                 className="px-4 py-2 rounded-full text-sm border transition-all hover:-translate-y-0.5 hover:shadow-sm"
                 style={{
                   borderColor: 'var(--color-warm-border)',
@@ -381,7 +381,7 @@ export default async function Home() {
               </Link>
             ))}
             <Link
-              href="/c"
+              href="/feed"
               className="px-4 py-2 rounded-full text-sm border border-dashed transition-all hover:-translate-y-0.5"
               style={{
                 borderColor: 'var(--color-warm-border)',
@@ -389,7 +389,7 @@ export default async function Home() {
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              all topics &rarr;
+              see all &rarr;
             </Link>
           </div>
         </section>
@@ -416,7 +416,7 @@ export default async function Home() {
           <div className="flex flex-wrap gap-4 justify-center">
             <PostItNote
               text="Join a conversation or get one going!"
-              href="/c"
+              href="/feed"
               color="yellow"
               rotation={-2}
             />

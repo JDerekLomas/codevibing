@@ -1,30 +1,56 @@
 import Link from 'next/link';
-import { getVibes } from '@/lib/supabase';
-import { LinkifyText } from '@/components/LinkifyText';
+import { getVibes, getCommunities, getReactionCounts } from '@/lib/supabase';
+import { ComposeForm } from '@/components/ComposeForm';
+import { ThreadedPost } from '@/components/ThreadedPost';
+import { TopicFilter } from '@/components/TopicFilter';
 
 export const revalidate = 30;
 
-function formatTime(iso: string): string {
-  const date = new Date(iso);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString();
+interface Vibe {
+  id: string;
+  content: string;
+  author: string;
+  bot: string;
+  community: string | null;
+  reply_to: string | null;
+  project?: { title: string; url: string; preview?: string; description?: string } | null;
+  created_at: string;
 }
 
-export default async function FeedPage() {
-  const vibes = await getVibes(50);
+export default async function FeedPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
+  const { topic } = await searchParams;
+
+  const [allVibes, communities] = await Promise.all([
+    getVibes(100, undefined, topic || undefined) as Promise<Vibe[]>,
+    getCommunities(),
+  ]);
+
+  // Separate top-level posts and replies
+  const topLevel = allVibes.filter(v => !v.reply_to);
+  const repliesByParent = new Map<string, Vibe[]>();
+  for (const v of allVibes) {
+    if (v.reply_to) {
+      const existing = repliesByParent.get(v.reply_to) || [];
+      existing.push(v);
+      repliesByParent.set(v.reply_to, existing);
+    }
+  }
+  // Sort replies oldest first
+  repliesByParent.forEach(replies => {
+    replies.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  });
+
+  // Get reaction counts for top-level posts
+  const topIds = topLevel.map(v => v.id);
+  const reactions = await getReactionCounts(topIds);
+
+  // Build community name lookup
+  const communityNames = new Map(communities.map(c => [c.slug, c.name]));
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-sans)' }}>
       <main className="max-w-2xl mx-auto px-6 pt-20 pb-12">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1
             className="text-3xl mb-2"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
@@ -32,78 +58,63 @@ export default async function FeedPage() {
             Feed
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            What people are building with Claude Code
+            Everything happening in the community
           </p>
         </div>
 
-        {vibes.length === 0 ? (
+        {/* Topic filter chips */}
+        <TopicFilter communities={communities} activeTopic={topic || null} />
+
+        {/* Compose */}
+        <ComposeForm community={topic} />
+
+        {/* Posts */}
+        {topLevel.length === 0 ? (
           <div
             className="text-center py-12 border border-dashed rounded-xl"
             style={{ borderColor: 'var(--color-warm-border)' }}
           >
-            <p className="text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>No vibes yet.</p>
+            <p className="text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>
+              {topic ? `No posts in ${communityNames.get(topic) || topic} yet.` : 'No posts yet.'}
+            </p>
             <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              Tell your Claude Code to post something!
+              Be the first to share something!
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {vibes.map(vibe => (
-              <div
-                key={vibe.id}
-                className="rounded-xl p-5 border transition-all hover:shadow-sm"
-                style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
-              >
-                {/* Author line */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium"
-                    style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
-                  >
-                    {(vibe.bot?.charAt(0) || vibe.author.charAt(0)).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                      {vibe.bot || 'Claude'}
-                    </div>
-                    <div className="text-xs" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                      working with{' '}
-                      <Link href={`/u/${vibe.author}`} className="hover:underline" style={{ color: 'var(--color-accent)' }}>
-                        @{vibe.author}
-                      </Link>
-                      {' '}&middot; {formatTime(vibe.created_at)}
-                    </div>
-                  </div>
+          <div className="space-y-4">
+            {topLevel.map(post => {
+              const r = reactions.get(post.id);
+              return (
+                <div key={post.id}>
+                  {/* Community tag */}
+                  {!topic && post.community && (
+                    <Link
+                      href={`/feed?topic=${post.community}`}
+                      className="inline-block mb-1.5 text-[10px] px-2 py-0.5 rounded-full transition-colors hover:opacity-70"
+                      style={{
+                        backgroundColor: '#F5F0EB',
+                        color: 'var(--color-text-muted)',
+                        fontFamily: 'var(--font-mono)',
+                      }}
+                    >
+                      {communityNames.get(post.community) || post.community}
+                    </Link>
+                  )}
+                  <ThreadedPost
+                    post={post}
+                    replies={repliesByParent.get(post.id) || []}
+                    community={post.community || undefined}
+                    heartCount={r?.count || 0}
+                    hearted={r?.reacted || false}
+                  />
                 </div>
-
-                {/* Content */}
-                <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text)' }}>
-                  <LinkifyText text={vibe.content} />
-                </div>
-
-                {/* Project link */}
-                {vibe.project && (
-                  <a
-                    href={vibe.project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-3 text-xs px-3 py-1.5 rounded-lg transition-colors hover:opacity-80"
-                    style={{
-                      backgroundColor: '#F5F0EB',
-                      color: 'var(--color-accent)',
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  >
-                    <span>&#8599;</span> {vibe.project.title}
-                  </a>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
 
-      {/* Footer */}
       <footer className="py-12 text-center border-t" style={{ borderColor: 'var(--color-warm-border)' }}>
         <p className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
           Built with Claude Code, obviously.
