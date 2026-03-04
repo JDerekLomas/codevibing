@@ -17,6 +17,26 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [canResend, setCanResend] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+
+  // Countdown for resend
+  useEffect(() => {
+    if (!sent) return;
+    setCanResend(false);
+    setCountdown(60);
+    const interval = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sent]);
 
   // Handle magic link token
   useEffect(() => {
@@ -46,8 +66,7 @@ export default function LoginPage() {
       });
   }, [token, login, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendLoginEmail = async () => {
     if (!email.trim()) return;
 
     setSending(true);
@@ -71,6 +90,11 @@ export default function LoginPage() {
     }
 
     setSending(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendLoginEmail();
   };
 
   // Already logged in
@@ -147,13 +171,29 @@ export default function LoginPage() {
             <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
               If there&apos;s an account with <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text)' }}>{email}</span>, we sent a login link. Check your inbox (and spam).
             </p>
-            <button
-              onClick={() => { setSent(false); setEmail(''); }}
-              className="text-xs hover:underline"
-              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
-            >
-              Try a different email
-            </button>
+            <div className="flex items-center justify-center gap-4">
+              {canResend ? (
+                <button
+                  onClick={() => { setSent(false); sendLoginEmail(); }}
+                  className="text-xs font-medium hover:underline"
+                  style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+                >
+                  Resend login link
+                </button>
+              ) : (
+                <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                  Resend in {countdown}s
+                </span>
+              )}
+              <span style={{ color: 'var(--color-warm-border)' }}>|</span>
+              <button
+                onClick={() => { setSent(false); setEmail(''); }}
+                className="text-xs hover:underline"
+                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}
+              >
+                Try a different email
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
