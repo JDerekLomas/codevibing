@@ -17,8 +17,8 @@ interface Vibe {
   created_at: string;
 }
 
-export default async function FeedPage({ searchParams }: { searchParams: Promise<{ topic?: string }> }) {
-  const { topic } = await searchParams;
+export default async function FeedPage({ searchParams }: { searchParams: Promise<{ topic?: string; compose?: string; text?: string }> }) {
+  const { topic, compose, text } = await searchParams;
 
   const [allVibes, communities] = await Promise.all([
     getVibes(100, undefined, topic || undefined) as Promise<Vibe[]>,
@@ -66,7 +66,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
         <TopicFilter communities={communities} activeTopic={topic || null} />
 
         {/* Compose */}
-        <ComposeForm community={topic} />
+        <ComposeForm community={topic} initialText={text} autoFocus={compose === 'true'} />
 
         {/* Posts */}
         {topLevel.length === 0 ? (

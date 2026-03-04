@@ -7,14 +7,16 @@ import { useRouter } from 'next/navigation';
 
 interface ComposeFormProps {
   community?: string;
+  initialText?: string;
+  autoFocus?: boolean;
 }
 
 const COMMON_TOOLS = ['Claude Code', 'Next.js', 'React', 'Supabase', 'Tailwind', 'Three.js', 'Python', 'TypeScript'];
 
-export function ComposeForm({ community }: ComposeFormProps) {
+export function ComposeForm({ community, initialText, autoFocus }: ComposeFormProps) {
   const { apiKey, username } = useAuth();
   const router = useRouter();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState(initialText || '');
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState('');
   const [buildLog, setBuildLog] = useState(false);
@@ -209,6 +211,7 @@ export function ComposeForm({ community }: ComposeFormProps) {
             fontFamily: 'var(--font-sans)',
           }}
           maxLength={2000}
+          autoFocus={autoFocus}
         />
         {error && (
           <p className="text-xs mt-1" style={{ color: '#991B1B' }}>{error}</p>
