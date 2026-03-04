@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getVibes, getCommunities, getReactionCounts } from '@/lib/supabase';
+import { getVibes, getCommunities, getReactionCounts, getAllSessions } from '@/lib/supabase';
 import { ComposeForm } from '@/components/ComposeForm';
 import { ThreadedPost } from '@/components/ThreadedPost';
 import { TopicFilter } from '@/components/TopicFilter';
@@ -14,16 +14,17 @@ interface Vibe {
   bot: string;
   community: string | null;
   reply_to: string | null;
-  project?: { title: string; url: string; preview?: string; description?: string } | null;
+  project?: { title?: string; name?: string; url: string; preview?: string; description?: string } | null;
   created_at: string;
 }
 
 export default async function FeedPage({ searchParams }: { searchParams: Promise<{ topic?: string; compose?: string; text?: string }> }) {
   const { topic, compose, text } = await searchParams;
 
-  const [allVibes, communities] = await Promise.all([
+  const [allVibes, communities, sessions] = await Promise.all([
     getVibes(100, undefined, topic || undefined) as Promise<Vibe[]>,
     getCommunities(),
+    getAllSessions(),
   ]);
 
   // Separate top-level posts and replies
@@ -111,6 +112,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
                     community={post.community || undefined}
                     heartCount={r?.count || 0}
                     hearted={r?.reacted || false}
+                    sessions={sessions}
                   />
                 </div>
               );

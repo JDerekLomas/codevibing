@@ -4,9 +4,20 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+import { SessionReplayModal } from '@/components/SessionReplayModal';
+
+interface SessionSummary {
+  slug: string;
+  title: string;
+  author: string;
+  thumbnail: string | null;
+  duration: string | null;
+  prompt_count: number | null;
+}
 
 interface VibeProject {
-  title: string;
+  title?: string;
+  name?: string;
   url: string;
   preview?: string;
   description?: string;
@@ -38,6 +49,7 @@ interface ThreadedPostProps {
   community?: string;
   heartCount?: number;
   hearted?: boolean;
+  sessions?: SessionSummary[];
 }
 
 function formatTime(iso: string): string {
@@ -54,7 +66,27 @@ function formatTime(iso: string): string {
   return date.toLocaleDateString();
 }
 
-function PostContent({ vibe }: { vibe: Vibe }) {
+function normalizeTitle(title: string): string {
+  return title.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+}
+
+function findSessionForProject(projectTitle: string, author: string, sessions: SessionSummary[]): SessionSummary | null {
+  const normalized = normalizeTitle(projectTitle);
+  if (!normalized) return null;
+  const authorSessions = sessions.filter(s => s.author === author);
+  const pool = authorSessions.length > 0 ? authorSessions : sessions;
+  const exact = pool.find(s => normalizeTitle(s.title) === normalized);
+  if (exact) return exact;
+  const slugMatch = pool.find(s => normalizeTitle(s.slug) === normalized);
+  if (slugMatch) return slugMatch;
+  const substring = pool.find(s => {
+    const sNorm = normalizeTitle(s.title);
+    return sNorm.includes(normalized) || normalized.includes(sNorm);
+  });
+  return substring || null;
+}
+
+function PostContent({ vibe, sessions }: { vibe: Vibe; sessions?: SessionSummary[] }) {
   return (
     <div className="flex items-start gap-3">
       <Link
@@ -152,9 +184,11 @@ function PostContent({ vibe }: { vibe: Vibe }) {
             </div>
           );
         })()}
-        {vibe.project && (
-          <ProjectCard project={vibe.project} />
-        )}
+        {vibe.project && (() => {
+          const projectTitle = vibe.project.title || vibe.project.name || 'Untitled';
+          const session = sessions ? findSessionForProject(projectTitle, vibe.author, sessions) : null;
+          return <ProjectCard project={{ ...vibe.project, title: projectTitle }} session={session} />;
+        })()}
         {!vibe.project && (() => {
           const firstUrl = extractFirstUrl(vibe.content);
           return firstUrl ? <LinkPreview url={firstUrl} /> : null;
@@ -233,44 +267,111 @@ function LinkPreview({ url }: { url: string }) {
   );
 }
 
-function ProjectCard({ project }: { project: VibeProject }) {
+function ProjectCard({ project, session }: { project: VibeProject; session?: SessionSummary | null }) {
   const [ogImage, setOgImage] = useState<string | null>(null);
+  const [showReplay, setShowReplay] = useState(false);
+
+  const projectTitle = project.title || project.name || 'Untitled';
 
   useEffect(() => {
-    if (project.preview) return; // Already has a preview
+    if (project.preview || session?.thumbnail) return;
     fetch(`/api/og?url=${encodeURIComponent(project.url)}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data?.image) setOgImage(data.image); })
       .catch(() => {});
-  }, [project.url, project.preview]);
+  }, [project.url, project.preview, session?.thumbnail]);
 
-  const thumbnail = project.preview || ogImage;
+  const thumbnail = project.preview || session?.thumbnail || ogImage;
 
   return (
-    <a
-      href={project.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
-      style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
-    >
-      {thumbnail && (
-        <div
-          className="w-full h-32 bg-cover bg-center"
-          style={{ backgroundImage: `url(${thumbnail})`, backgroundColor: '#F5F0EB' }}
+    <>
+      <div
+        className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm"
+        style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
+      >
+        {thumbnail && (
+          <div className="relative">
+            <a href={project.url} target="_blank" rel="noopener noreferrer">
+              <div
+                className="w-full h-32 bg-cover bg-center"
+                style={{ backgroundImage: `url(${thumbnail})`, backgroundColor: '#F5F0EB' }}
+              />
+            </a>
+            {session && (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowReplay(true); }}
+                className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/40 transition-colors group"
+                title="Watch how it was built"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#1a1a1a">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </button>
+            )}
+          </div>
+        )}
+        <div className="p-3">
+          <div className="flex items-center justify-between">
+            <a href={project.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              <span className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+                {projectTitle} <span className="text-xs">&#8599;</span>
+              </span>
+            </a>
+            {session && (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowReplay(true); }}
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
+                style={{
+                  backgroundColor: '#1C1917',
+                  color: '#86EFAC',
+                  fontFamily: 'var(--font-mono)',
+                }}
+                title="Watch session replay"
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                replay
+                {session.duration && <span style={{ opacity: 0.6 }}>{session.duration}</span>}
+              </button>
+            )}
+          </div>
+          {project.description && (
+            <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+              {project.description}
+            </p>
+          )}
+          {session && !thumbnail && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowReplay(true); }}
+              className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 mt-2 rounded-full transition-all hover:scale-105"
+              style={{
+                backgroundColor: '#1C1917',
+                color: '#86EFAC',
+                fontFamily: 'var(--font-mono)',
+              }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              Watch replay
+              {session.duration && <span style={{ opacity: 0.6 }}>{session.duration}</span>}
+            </button>
+          )}
+        </div>
+      </div>
+      {showReplay && (
+        <SessionReplayModal
+          slug={session!.slug}
+          title={session!.title}
+          duration={session?.duration}
+          promptCount={session?.prompt_count}
+          onClose={() => setShowReplay(false)}
         />
       )}
-      <div className="p-3">
-        <div className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
-          {project.title} <span className="text-xs">&#8599;</span>
-        </div>
-        {project.description && (
-          <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
-            {project.description}
-          </p>
-        )}
-      </div>
-    </a>
+    </>
   );
 }
 
@@ -367,7 +468,7 @@ function ShareButtons({ post }: { post: Vibe }) {
   );
 }
 
-export function ThreadedPost({ post, replies, community, heartCount = 0, hearted = false }: ThreadedPostProps) {
+export function ThreadedPost({ post, replies, community, heartCount = 0, hearted = false, sessions }: ThreadedPostProps) {
   const { apiKey, username } = useAuth();
   const router = useRouter();
   const [showReply, setShowReply] = useState(false);
@@ -413,7 +514,7 @@ export function ThreadedPost({ post, replies, community, heartCount = 0, hearted
     >
       {/* Main post */}
       <div className="p-4">
-        <PostContent vibe={post} />
+        <PostContent vibe={post} sessions={sessions} />
 
         {/* Actions */}
         <div className="mt-3 ml-11 flex items-center gap-4">
