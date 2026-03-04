@@ -340,6 +340,19 @@ export async function useInvite(code: string, usedBy: string): Promise<void> {
     .eq('code', code);
 }
 
+export async function createNotification(recipient: string, type: string, actor: string, referenceId?: string, message?: string): Promise<void> {
+  if (recipient === actor) return; // Don't notify yourself
+  await supabaseAdmin
+    .from('cv_notifications')
+    .insert({
+      recipient,
+      type,
+      actor,
+      reference_id: referenceId,
+      message,
+    });
+}
+
 // Legacy compatibility
 export async function getUserByToken(token: string): Promise<User | null> {
   const username = await verifyApiKey(token);

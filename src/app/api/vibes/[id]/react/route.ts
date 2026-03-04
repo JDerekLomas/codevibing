@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyApiKey, supabaseAdmin, supabasePublic } from '@/lib/supabase';
+import { verifyApiKey, supabaseAdmin, supabasePublic, createNotification } from '@/lib/supabase';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -67,6 +67,17 @@ export async function POST(request: Request, context: RouteContext) {
     await supabaseAdmin
       .from('cv_reactions')
       .insert({ vibe_id: id, username });
+
+    // Notify post author
+    const { data: vibe } = await supabasePublic
+      .from('cv_vibes')
+      .select('author')
+      .eq('id', id)
+      .single();
+    if (vibe) {
+      await createNotification(vibe.author, 'reaction', username, id, `@${username} hearted your post`);
+    }
+
     return NextResponse.json({ reacted: true });
   }
 }
