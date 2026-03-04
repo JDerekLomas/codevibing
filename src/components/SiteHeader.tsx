@@ -6,13 +6,11 @@ import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import { useAuth } from '@/lib/auth';
 
-const LEARN_BASE = 'https://learnvibecoding.vercel.app';
-
 const NAV_LINKS = [
   { href: '/feed', label: 'feed' },
   { href: '/c', label: 'topics' },
-  { href: LEARN_BASE, label: 'learn' },
-  { href: `${LEARN_BASE}/quiz`, label: 'practice' },
+  { href: '/curriculum', label: 'learn' },
+  { href: '/quiz', label: 'practice' },
 ];
 
 function UserDropdown({ username, onLogout }: { username: string; onLogout: () => void }) {
@@ -100,10 +98,7 @@ export function SiteHeader() {
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
           {NAV_LINKS.map((link) => {
-            const isInternal = link.href.startsWith('/');
-            const isActive = isInternal
-              ? pathname === link.href || pathname.startsWith(link.href + '/')
-              : false;
+            const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
 
             return (
               <Link
@@ -111,7 +106,6 @@ export function SiteHeader() {
                 href={link.href}
                 className={`transition-colors hover:opacity-70 ${isActive ? 'font-medium' : ''}`}
                 style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
-                {...(!isInternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 {link.label}
               </Link>
@@ -188,10 +182,7 @@ export function SiteHeader() {
           }}
         >
           {NAV_LINKS.map((link) => {
-            const isInternal = link.href.startsWith('/');
-            const isActive = isInternal
-              ? pathname === link.href || pathname.startsWith(link.href + '/')
-              : false;
+            const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
 
             return (
               <Link
@@ -200,7 +191,6 @@ export function SiteHeader() {
                 className="px-3 py-2 rounded-lg text-sm transition-colors hover:opacity-70"
                 style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)', fontWeight: isActive ? 500 : 400 }}
                 onClick={() => setMenuOpen(false)}
-                {...(!isInternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 {link.label}
               </Link>

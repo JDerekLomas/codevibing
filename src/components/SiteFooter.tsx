@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-const LEARN_BASE = 'https://learnvibecoding.vercel.app';
-
 export function SiteFooter() {
   return (
     <footer className="py-12 border-t" style={{ borderColor: 'var(--color-warm-border)' }}>
@@ -42,24 +40,24 @@ export function SiteFooter() {
             <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>Learn</h3>
             <ul className="space-y-2">
               <li>
-                <a href={LEARN_BASE} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <Link href="/curriculum" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Curriculum
-                </a>
+                </Link>
               </li>
               <li>
-                <a href={`${LEARN_BASE}/quiz`} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <Link href="/quiz" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Quiz
-                </a>
+                </Link>
               </li>
               <li>
-                <a href={`${LEARN_BASE}/discover`} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <Link href="/discover" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Discover
-                </a>
+                </Link>
               </li>
               <li>
-                <a href={`${LEARN_BASE}/claude-code`} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <Link href="/claude-code" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Claude Code Roadmap
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -79,9 +77,9 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <a href={`${LEARN_BASE}/concepts`} className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
+                <Link href="/concepts" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
                   Key Concepts
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

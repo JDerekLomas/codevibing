@@ -518,10 +518,8 @@ export default async function Home() {
 
         {/* Learn Vibe Coding — standalone post-it */}
         <section className="py-8 flex justify-end">
-          <a
-            href="https://learnvibecoding.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/curriculum"
             className="block w-48 aspect-square rounded-sm p-5 transition-transform hover:scale-105 hover:-rotate-0 flex items-center justify-center text-center"
             style={{
               backgroundColor: '#FCE4EC',
@@ -535,10 +533,10 @@ export default async function Home() {
                 Learn Vibe Coding
               </p>
               <span className="inline-block mt-3 text-xs" style={{ color: '#795548', fontFamily: 'var(--font-mono)' }}>
-                &#8599; learnvibecoding.vercel.app
+                Start learning &rarr;
               </span>
             </div>
-          </a>
+          </Link>
         </section>
 
         {/* Divider */}
