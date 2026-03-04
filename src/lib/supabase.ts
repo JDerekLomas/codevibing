@@ -262,10 +262,12 @@ export async function getPublicUsers(limit = 10): Promise<Array<{ username: stri
 
 // ============ Write Functions (use admin client) ============
 
-export async function createUser(username: string, tokenHash: string | null = null, autoCreated = false): Promise<User | null> {
+export async function createUser(username: string, tokenHash: string | null = null, autoCreated = false, email?: string): Promise<User | null> {
+  const row: Record<string, unknown> = { username, token_hash: tokenHash, auto_created: autoCreated };
+  if (email) row.email = email;
   const { data, error } = await supabaseAdmin
     .from('cv_users')
-    .insert({ username, token_hash: tokenHash, auto_created: autoCreated })
+    .insert(row)
     .select('username, auto_created, created_at')
     .single();
   if (error) console.error('createUser error:', error);

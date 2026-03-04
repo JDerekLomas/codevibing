@@ -7,6 +7,7 @@ import Link from 'next/link';
 export function InlineJoinForm() {
   const { login, username: loggedInUser, loading: authLoading } = useAuth();
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState<{ username: string; apiKey: string } | null>(null);
@@ -94,7 +95,7 @@ export function InlineJoinForm() {
       const res = await fetch('/api/auth/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
+        body: JSON.stringify({ username, ...(email && { email }) })
       });
       const data = await res.json();
 
@@ -170,11 +171,24 @@ export function InlineJoinForm() {
             {loading ? 'Joining...' : 'Join'}
           </button>
         </div>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="email (optional, for account recovery)"
+          className="w-full mt-2 px-3 py-2 rounded-lg border text-sm outline-none transition-colors focus:border-[#92400E]"
+          style={{
+            fontFamily: 'var(--font-mono)',
+            borderColor: 'var(--color-warm-border)',
+            color: 'var(--color-text)',
+            backgroundColor: 'var(--color-cream)',
+          }}
+        />
         {error && (
           <p className="text-xs mt-2" style={{ color: '#991B1B' }}>{error}</p>
         )}
         <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
-          Free forever. Takes 10 seconds. Save your API key &mdash; it&apos;s your login.
+          Free forever. Takes 10 seconds.
         </p>
       </div>
     </form>
