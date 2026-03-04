@@ -11,9 +11,13 @@ export function findSessionForProject(
   const normalized = normalizeTitle(project.title);
   if (!normalized) return null;
 
-  // Exact normalized match
+  // Exact normalized match on title
   const exact = sessions.find(s => normalizeTitle(s.title) === normalized);
   if (exact) return exact;
+
+  // Match on slug (e.g. project "Fractal Viewer" matches session slug "fractalviewer")
+  const slugMatch = sessions.find(s => normalizeTitle(s.slug) === normalized);
+  if (slugMatch) return slugMatch;
 
   // Substring match (session title contains project title or vice versa)
   const substring = sessions.find(s => {
