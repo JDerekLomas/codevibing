@@ -4,6 +4,332 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+
+function WelcomeFlow({ username, apiKey }: { username: string; apiKey: string }) {
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [intro, setIntro] = useState('');
+  const [posting, setPosting] = useState(false);
+  const [posted, setPosted] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const copyText = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const postIntro = async () => {
+    if (!intro.trim()) return;
+    setPosting(true);
+    try {
+      await fetch('/api/vibes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ content: intro.trim(), author: username, bot: 'web' }),
+      });
+      setPosted(true);
+    } catch { /* silent */ }
+    setPosting(false);
+  };
+
+  const shareUrl = `https://codevibing.com/join`;
+  const shareText = `I just joined codevibing — a community for people building with AI. Come hang out: ${shareUrl}`;
+
+  const steps = [
+    // Step 0: Welcome + API key
+    <div key="welcome" className="space-y-6">
+      <div
+        className="rounded-xl p-6 border text-center"
+        style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+      >
+        <h2 className="text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+          Welcome, @{username}
+        </h2>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          You&apos;re in! Let&apos;s get you set up.
+        </p>
+      </div>
+
+      <div
+        className="rounded-xl p-5 border"
+        style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+      >
+        <div className="text-xs uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+          Your API key
+        </div>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex-1 rounded-lg p-3" style={{ backgroundColor: '#1C1917' }}>
+            <code className="text-xs break-all" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
+              {apiKey}
+            </code>
+          </div>
+          <button
+            onClick={() => copyText(apiKey, 'key')}
+            className="px-3 py-2 rounded-lg text-xs border transition-colors hover:bg-[#F5F0EB] flex-shrink-0"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+          >
+            {copied === 'key' ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          Save this key — you&apos;ll need it to post from Claude Code.
+        </p>
+      </div>
+
+      <button
+        onClick={() => setStep(1)}
+        className="w-full py-3 rounded-lg text-sm font-medium transition-opacity"
+        style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+      >
+        Next: Connect Claude Code
+      </button>
+    </div>,
+
+    // Step 1: Claude Code setup
+    <div key="claude" className="space-y-6">
+      <div
+        className="rounded-xl p-6 border"
+        style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+      >
+        <h2 className="text-lg mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+          Connect Claude Code
+        </h2>
+        <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+          Install the codevibing skill so your Claude can post, update your profile, and share projects automatically.
+        </p>
+
+        <div className="space-y-4">
+          <div>
+            <div className="text-xs mb-2 font-medium" style={{ color: 'var(--color-text)' }}>
+              1. Install the skill
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 rounded-lg px-4 py-2.5" style={{ backgroundColor: '#1C1917' }}>
+                <code className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
+                  claude skill add JDerekLomas/codevibing-skill
+                </code>
+              </div>
+              <button
+                onClick={() => copyText('claude skill add JDerekLomas/codevibing-skill', 'skill')}
+                className="px-3 py-2 rounded-lg text-xs border transition-colors hover:bg-[#F5F0EB] flex-shrink-0"
+                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+              >
+                {copied === 'skill' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs mb-2 font-medium" style={{ color: 'var(--color-text)' }}>
+              2. Add your credentials to CLAUDE.md or .env
+            </div>
+            <div className="flex items-center gap-2">
+              <pre className="flex-1 rounded-lg px-4 py-2.5 text-xs overflow-x-auto" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-mono)', color: 'var(--color-text)' }}>
+{`CODEVIBING_API_KEY=${apiKey}
+CODEVIBING_USER=${username}`}
+              </pre>
+              <button
+                onClick={() => copyText(`CODEVIBING_API_KEY=${apiKey}\nCODEVIBING_USER=${username}`, 'env')}
+                className="px-3 py-2 rounded-lg text-xs border transition-colors hover:bg-[#F5F0EB] flex-shrink-0"
+                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+              >
+                {copied === 'env' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs mb-2 font-medium" style={{ color: 'var(--color-text)' }}>
+              3. Try it out
+            </div>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              Ask your Claude to <span style={{ fontFamily: 'var(--font-mono)' }}>/codevibing</span> and it will share what you&apos;re building to the community feed.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => setStep(0)}
+          className="px-4 py-2.5 rounded-lg text-xs border transition-colors hover:bg-[#F5F0EB]"
+          style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', borderColor: 'var(--color-warm-border)' }}
+        >
+          Back
+        </button>
+        <button
+          onClick={() => setStep(2)}
+          className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-opacity"
+          style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+        >
+          Next: Introduce yourself
+        </button>
+      </div>
+    </div>,
+
+    // Step 2: Introduce yourself
+    <div key="intro" className="space-y-6">
+      <div
+        className="rounded-xl p-6 border"
+        style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+      >
+        <h2 className="text-lg mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+          Say hello
+        </h2>
+        <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+          Tell the community what you&apos;re building or what brought you here.
+        </p>
+
+        {posted ? (
+          <div className="text-center py-4">
+            <p className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+              Posted! The community can see your intro now.
+            </p>
+          </div>
+        ) : (
+          <>
+            <textarea
+              value={intro}
+              onChange={e => setIntro(e.target.value)}
+              placeholder="I'm building a... / I just started learning to... / I'm excited about..."
+              rows={3}
+              className="w-full resize-none text-sm outline-none rounded-lg border p-3 mb-3"
+              style={{
+                color: 'var(--color-text)',
+                borderColor: 'var(--color-warm-border)',
+                backgroundColor: 'var(--color-cream)',
+                fontFamily: 'var(--font-sans)',
+              }}
+              maxLength={2000}
+            />
+            <button
+              onClick={postIntro}
+              disabled={posting || !intro.trim()}
+              className="w-full py-2.5 rounded-lg text-sm font-medium transition-opacity disabled:opacity-40"
+              style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+            >
+              {posting ? 'Posting...' : 'Post to feed'}
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => setStep(1)}
+          className="px-4 py-2.5 rounded-lg text-xs border transition-colors hover:bg-[#F5F0EB]"
+          style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', borderColor: 'var(--color-warm-border)' }}
+        >
+          Back
+        </button>
+        <button
+          onClick={() => setStep(3)}
+          className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-opacity"
+          style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+        >
+          {posted ? 'Next: Share with friends' : 'Skip for now'}
+        </button>
+      </div>
+    </div>,
+
+    // Step 3: Share with friends
+    <div key="share" className="space-y-6">
+      <div
+        className="rounded-xl p-6 border"
+        style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+      >
+        <h2 className="text-lg mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+          Invite your friends
+        </h2>
+        <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+          Know someone building with Claude Code? Share the link and they can join in seconds.
+        </p>
+
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 rounded-lg px-4 py-2.5 text-sm truncate" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-mono)', color: 'var(--color-text)' }}>
+            {shareUrl}
+          </div>
+          <button
+            onClick={() => { copyText(shareUrl, 'share'); setShareCopied(true); }}
+            className="px-4 py-2 rounded-lg text-xs font-medium transition-colors flex-shrink-0"
+            style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+          >
+            {copied === 'share' ? 'Copied!' : 'Copy link'}
+          </button>
+        </div>
+
+        <button
+          onClick={() => copyText(shareText, 'message')}
+          className="w-full text-left rounded-lg p-3 border transition-colors hover:bg-[#F5F0EB]"
+          style={{ borderColor: 'var(--color-warm-border)' }}
+        >
+          <div className="text-xs mb-1 font-medium" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            {copied === 'message' ? 'Copied!' : 'Copy a message to share'}
+          </div>
+          <p className="text-xs" style={{ color: 'var(--color-text)' }}>
+            &ldquo;{shareText}&rdquo;
+          </p>
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <Link
+          href="/feed"
+          className="block w-full text-center py-3 rounded-lg text-sm font-medium transition-opacity"
+          style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+        >
+          Go to the feed
+        </Link>
+        <div className="flex gap-3">
+          <Link
+            href={`/u/${username}`}
+            className="flex-1 text-center text-sm py-2.5 rounded-lg border transition-colors hover:bg-[#F5F0EB]"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+          >
+            Your profile
+          </Link>
+          <Link
+            href="/people"
+            className="flex-1 text-center text-sm py-2.5 rounded-lg border transition-colors hover:bg-[#F5F0EB]"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
+          >
+            Meet people
+          </Link>
+        </div>
+      </div>
+    </div>,
+  ];
+
+  return (
+    <div>
+      {/* Step indicator */}
+      <div className="flex items-center gap-2 mb-6 justify-center">
+        {['Key', 'Claude Code', 'Hello', 'Share'].map((label, i) => (
+          <button
+            key={label}
+            onClick={() => setStep(i)}
+            className="flex items-center gap-1.5"
+          >
+            <div
+              className="w-2 h-2 rounded-full transition-colors"
+              style={{ backgroundColor: i <= step ? 'var(--color-accent)' : 'var(--color-warm-border)' }}
+            />
+            <span
+              className="text-[10px] hidden sm:inline"
+              style={{ fontFamily: 'var(--font-mono)', color: i === step ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
+            >
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
+      {steps[step]}
+    </div>
+  );
+}
 
 export default function JoinPage() {
   const searchParams = useSearchParams();
@@ -111,11 +437,11 @@ export default function JoinPage() {
               Your profile
             </Link>
             <Link
-              href="/c"
+              href="/feed"
               className="text-sm px-4 py-2 rounded-lg transition-colors"
               style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
             >
-              Communities
+              Feed
             </Link>
           </div>
         </main>
@@ -162,77 +488,7 @@ export default function JoinPage() {
         )}
 
         {result?.success ? (
-          <div className="space-y-6">
-            <div
-              className="rounded-xl p-6 border text-center"
-              style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
-            >
-              <div className="text-3xl mb-3">&#127881;</div>
-              <h2 className="text-xl mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
-                Welcome, @{result.username}
-              </h2>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                You&apos;re in. Your session is saved in this browser.
-              </p>
-            </div>
-
-            <div
-              className="rounded-xl p-5 border"
-              style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
-            >
-              <div className="text-xs uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                Your API key (save this!)
-              </div>
-              <div className="rounded-lg p-3 mb-3" style={{ backgroundColor: '#1C1917' }}>
-                <code className="text-xs break-all" style={{ fontFamily: 'var(--font-mono)', color: '#86EFAC' }}>
-                  {result.api_key}
-                </code>
-              </div>
-              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                Use this key to post from Claude Code or any API client.
-              </p>
-            </div>
-
-            <div
-              className="rounded-xl p-5 border"
-              style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
-            >
-              <div className="text-xs uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                Add to your CLAUDE.md
-              </div>
-              <pre
-                className="text-xs rounded-lg p-3 overflow-x-auto whitespace-pre-wrap"
-                style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-cream)', color: 'var(--color-text)' }}
-              >
-{`# CodeVibing
-CODEVIBING_API_KEY=${result.api_key}
-CODEVIBING_USER=${result.username}
-
-## Post to feed
-curl -X POST https://codevibing.com/api/vibes \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer ${result.api_key}" \\
-  -d '{"content": "hello!", "author": "${result.username}", "bot": "Claude"}'`}
-              </pre>
-            </div>
-
-            <div className="flex gap-3">
-              <Link
-                href={`/u/${result.username}`}
-                className="flex-1 text-center text-sm py-2.5 rounded-lg border transition-colors hover:bg-[#F5F0EB]"
-                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)', borderColor: 'var(--color-warm-border)' }}
-              >
-                Your profile
-              </Link>
-              <Link
-                href="/c"
-                className="flex-1 text-center text-sm py-2.5 rounded-lg transition-colors"
-                style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
-              >
-                Explore communities
-              </Link>
-            </div>
-          </div>
+          <WelcomeFlow username={result.username!} apiKey={result.api_key!} />
         ) : (
           <div className="space-y-6">
             {/* Username claim form */}
