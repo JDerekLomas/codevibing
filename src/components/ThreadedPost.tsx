@@ -190,6 +190,11 @@ function PostContent({ vibe, sessions }: { vibe: Vibe; sessions?: SessionSummary
           return <ProjectCard project={{ ...vibe.project, title: projectTitle }} session={session} />;
         })()}
         {!vibe.project && (() => {
+          const sessionSlug = extractSessionSlug(vibe.content);
+          if (sessionSlug && sessions) {
+            const session = sessions.find(s => s.slug === sessionSlug);
+            if (session) return <SessionReplayCard session={session} />;
+          }
           const firstUrl = extractFirstUrl(vibe.content);
           return firstUrl ? <LinkPreview url={firstUrl} /> : null;
         })()}
@@ -215,9 +220,16 @@ function extractImageUrls(text: string): string[] {
 
 function extractFirstUrl(text: string): string | null {
   const urls = text.match(/https?:\/\/[^\s]+/g) || [];
-  // Skip image URLs — those are rendered inline
-  const nonImage = urls.find(u => !IMAGE_EXT_RE.test(u));
+  // Skip image URLs and session replay URLs — those are rendered inline
+  const nonImage = urls.find(u => !IMAGE_EXT_RE.test(u) && !GALLERY_SESSION_RE.test(u));
   return nonImage || null;
+}
+
+const GALLERY_SESSION_RE = /codevibinggallery\.vercel\.app\/session\/([a-z0-9-]+)/;
+
+function extractSessionSlug(text: string): string | null {
+  const match = text.match(GALLERY_SESSION_RE);
+  return match ? match[1] : null;
 }
 
 function LinkPreview({ url }: { url: string }) {
@@ -264,6 +276,72 @@ function LinkPreview({ url }: { url: string }) {
         </div>
       </div>
     </a>
+  );
+}
+
+function SessionReplayCard({ session }: { session: SessionSummary }) {
+  const [showReplay, setShowReplay] = useState(false);
+
+  return (
+    <>
+      <div
+        className="block mt-3 rounded-lg border overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-sm cursor-pointer"
+        style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FDFCFB' }}
+        onClick={() => setShowReplay(true)}
+      >
+        {session.thumbnail && (
+          <div className="relative">
+            <div
+              className="w-full h-32 bg-cover bg-center"
+              style={{ backgroundImage: `url(${session.thumbnail})`, backgroundColor: '#F5F0EB' }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/40 transition-colors group">
+              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity shadow-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1a1a1a">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="p-3 flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium" style={{ color: 'var(--color-accent)' }}>
+              {session.title}
+            </div>
+            {(session.duration || session.prompt_count) && (
+              <div className="text-[10px] mt-0.5" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                {session.duration && <span>{session.duration}</span>}
+                {session.duration && session.prompt_count && <span> / </span>}
+                {session.prompt_count && <span>{session.prompt_count} prompts</span>}
+              </div>
+            )}
+          </div>
+          <span
+            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md"
+            style={{
+              backgroundColor: '#1C1917',
+              color: '#86EFAC',
+              fontFamily: 'var(--font-mono)',
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            replay
+          </span>
+        </div>
+      </div>
+      {showReplay && (
+        <SessionReplayModal
+          slug={session.slug}
+          title={session.title}
+          duration={session.duration}
+          promptCount={session.prompt_count}
+          onClose={() => setShowReplay(false)}
+        />
+      )}
+    </>
   );
 }
 
