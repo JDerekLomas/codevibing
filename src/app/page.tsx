@@ -171,6 +171,14 @@ async function FeaturedBuilds() {
   );
 }
 
+const IMAGE_URL_REGEX = /https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?/gi;
+
+function extractImages(content: string): { text: string; images: string[] } {
+  const images = content.match(IMAGE_URL_REGEX) || [];
+  const text = content.replace(IMAGE_URL_REGEX, '').replace(/\n{3,}/g, '\n\n').trim();
+  return { text, images };
+}
+
 async function RecentActivity() {
   const vibes = await getVibes(10);
 
@@ -184,60 +192,80 @@ async function RecentActivity() {
 
   return (
     <div className="space-y-0">
-      {vibes.map((vibe, i) => (
-        <div key={vibe.id}>
-          {i > 0 && (
-            <div className="border-b" style={{ borderColor: 'var(--color-warm-border)' }} />
-          )}
-          <div className="py-4">
-            <div className="flex items-start gap-3">
-              <div
-                className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-medium mt-0.5"
-                style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
-              >
-                {(vibe.bot?.charAt(0) || vibe.author.charAt(0)).toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Link
-                    href={`/u/${vibe.author}`}
-                    className="hover:underline text-sm font-medium"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    @{vibe.author}
-                  </Link>
-                  {vibe.bot && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#F5F0EB', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                      {vibe.bot}
-                    </span>
-                  )}
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    {formatTime(vibe.created_at)}
-                  </span>
+      {vibes.map((vibe, i) => {
+        const { text, images } = extractImages(vibe.content);
+        return (
+          <div key={vibe.id}>
+            {i > 0 && (
+              <div className="border-b" style={{ borderColor: 'var(--color-warm-border)' }} />
+            )}
+            <div className="py-4">
+              <div className="flex items-start gap-3">
+                <div
+                  className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-medium mt-0.5"
+                  style={{ backgroundColor: '#F5F0EB', color: 'var(--color-accent)' }}
+                >
+                  {(vibe.bot?.charAt(0) || vibe.author.charAt(0)).toUpperCase()}
                 </div>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text-muted)' }}>
-                  <LinkifyText text={vibe.content} />
-                </p>
-                {vibe.project && (
-                  <a
-                    href={vibe.project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-2 text-xs px-2.5 py-1 rounded-md transition-colors hover:opacity-80"
-                    style={{
-                      backgroundColor: '#F5F0EB',
-                      color: 'var(--color-accent)',
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  >
-                    <span>&#8599;</span> {vibe.project.title}
-                  </a>
-                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Link
+                      href={`/u/${vibe.author}`}
+                      className="hover:underline text-sm font-medium"
+                      style={{ color: 'var(--color-text)' }}
+                    >
+                      @{vibe.author}
+                    </Link>
+                    {vibe.bot && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: '#F5F0EB', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                        {vibe.bot}
+                      </span>
+                    )}
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      {formatTime(vibe.created_at)}
+                    </span>
+                  </div>
+                  {text && (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text-muted)' }}>
+                      <LinkifyText text={text} />
+                    </p>
+                  )}
+                  {images.length > 0 && (
+                    <div className={`mt-2 grid gap-2 ${images.length === 1 ? '' : 'grid-cols-2'}`}>
+                      {images.map((src, j) => (
+                        <a key={j} href={src} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={src}
+                            alt=""
+                            className="w-full rounded-lg border"
+                            style={{ borderColor: 'var(--color-warm-border)' }}
+                            loading="lazy"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {vibe.project && (
+                    <a
+                      href={vibe.project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 mt-2 text-xs px-2.5 py-1 rounded-md transition-colors hover:opacity-80"
+                      style={{
+                        backgroundColor: '#F5F0EB',
+                        color: 'var(--color-accent)',
+                        fontFamily: 'var(--font-mono)',
+                      }}
+                    >
+                      <span>&#8599;</span> {vibe.project.title}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
