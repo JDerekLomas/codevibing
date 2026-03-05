@@ -446,6 +446,7 @@ export interface Project {
   title: string;
   url: string;
   description: string | null;
+  description_long: string | null;
   preview: string | null;
   author: string;
   source: string;

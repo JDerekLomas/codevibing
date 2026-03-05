@@ -8,6 +8,7 @@ interface ProjectWithStats {
   title: string;
   url: string;
   description: string | null;
+  description_long: string | null;
   preview: string | null;
   author: string;
   hot_count: number;
@@ -17,6 +18,125 @@ interface ProjectWithStats {
 }
 
 type SortMode = 'hot' | 'new' | 'controversial';
+
+function TrendingRow({ project, rank, isFirst }: { project: ProjectWithStats; rank: number; isFirst: boolean }): JSX.Element {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div>
+      {!isFirst && (
+        <div className="border-b" style={{ borderColor: 'var(--color-warm-border)' }} />
+      )}
+      <div className="relative py-4 overflow-hidden">
+        {/* Heatmap background bar */}
+        {project.total_votes > 0 && (
+          <div
+            className="absolute inset-0 opacity-[0.07] rounded-lg"
+            style={{
+              width: `${project.hot_percent}%`,
+              backgroundColor: project.hot_percent >= 50 ? '#ea580c' : '#6b7280',
+            }}
+          />
+        )}
+
+        <div className="flex items-center gap-4 relative z-10">
+          {/* Rank */}
+          <div
+            className="text-2xl font-bold w-10 text-center flex-shrink-0"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-muted)' }}
+          >
+            {rank}
+          </div>
+
+          {/* Thumbnail */}
+          <div className="flex-shrink-0">
+            {project.preview ? (
+              <div
+                className="w-14 h-14 rounded-lg bg-cover bg-center border"
+                style={{ backgroundImage: `url(${project.preview})`, borderColor: 'var(--color-warm-border)' }}
+              />
+            ) : (
+              <div
+                className="w-14 h-14 rounded-lg flex items-center justify-center border"
+                style={{ backgroundColor: '#F5F0EB', borderColor: 'var(--color-warm-border)' }}
+              >
+                <span className="text-xs" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-muted)' }}>
+                  {project.title.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium hover:underline block truncate"
+              style={{ color: 'var(--color-text)' }}
+            >
+              {project.title}
+            </a>
+            <div className="flex items-center gap-2">
+              <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+                @{project.author}
+              </span>
+              {project.description && (
+                <span className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>
+                  &middot; {project.description}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="text-right flex-shrink-0">
+            <div
+              className="text-sm font-bold"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                color: project.hot_percent >= 70 ? '#ea580c' : project.hot_percent >= 50 ? 'var(--color-text)' : 'var(--color-text-muted)',
+              }}
+            >
+              {project.total_votes > 0 ? `${project.hot_percent}% hot` : '--'}
+            </div>
+            <div className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
+              {project.total_votes} vote{project.total_votes !== 1 ? 's' : ''}
+            </div>
+          </div>
+        </div>
+
+        {/* Expandable long description */}
+        {project.description_long && (
+          <div className="relative z-10 ml-[88px] mt-1">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-xs flex items-center gap-1 hover:underline cursor-pointer"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            >
+              <span
+                className="inline-block transition-transform duration-200"
+                style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+              >
+                &#9656;
+              </span>
+              {expanded ? 'less' : 'more'}
+            </button>
+            {expanded && (
+              <p
+                className="text-xs leading-relaxed mt-1.5 pr-4"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                {project.description_long}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function TrendingPage(): JSX.Element {
   const [projects, setProjects] = useState<ProjectWithStats[]>([]);
@@ -107,89 +227,7 @@ export default function TrendingPage(): JSX.Element {
         ) : (
           <div className="space-y-0">
             {projects.map((project, i) => (
-              <div key={project.id}>
-                {i > 0 && (
-                  <div className="border-b" style={{ borderColor: 'var(--color-warm-border)' }} />
-                )}
-                <div className="relative py-4 flex items-center gap-4 overflow-hidden">
-                  {/* Heatmap background bar */}
-                  {project.total_votes > 0 && (
-                    <div
-                      className="absolute inset-0 opacity-[0.07] rounded-lg"
-                      style={{
-                        width: `${project.hot_percent}%`,
-                        backgroundColor: project.hot_percent >= 50 ? '#ea580c' : '#6b7280',
-                      }}
-                    />
-                  )}
-
-                  {/* Rank */}
-                  <div
-                    className="text-2xl font-bold w-10 text-center flex-shrink-0 relative z-10"
-                    style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-muted)' }}
-                  >
-                    {i + 1}
-                  </div>
-
-                  {/* Thumbnail */}
-                  <div className="flex-shrink-0 relative z-10">
-                    {project.preview ? (
-                      <div
-                        className="w-14 h-14 rounded-lg bg-cover bg-center border"
-                        style={{ backgroundImage: `url(${project.preview})`, borderColor: 'var(--color-warm-border)' }}
-                      />
-                    ) : (
-                      <div
-                        className="w-14 h-14 rounded-lg flex items-center justify-center border"
-                        style={{ backgroundColor: '#F5F0EB', borderColor: 'var(--color-warm-border)' }}
-                      >
-                        <span className="text-xs" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-muted)' }}>
-                          {project.title.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0 relative z-10">
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium hover:underline block truncate"
-                      style={{ color: 'var(--color-text)' }}
-                    >
-                      {project.title}
-                    </a>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                        @{project.author}
-                      </span>
-                      {project.description && (
-                        <span className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>
-                          &middot; {project.description}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="text-right flex-shrink-0 relative z-10">
-                    <div
-                      className="text-sm font-bold"
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        color: project.hot_percent >= 70 ? '#ea580c' : project.hot_percent >= 50 ? 'var(--color-text)' : 'var(--color-text-muted)',
-                      }}
-                    >
-                      {project.total_votes > 0 ? `${project.hot_percent}% hot` : '--'}
-                    </div>
-                    <div className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-                      {project.total_votes} vote{project.total_votes !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <TrendingRow key={project.id} project={project} rank={i + 1} isFirst={i === 0} />
             ))}
           </div>
         )}

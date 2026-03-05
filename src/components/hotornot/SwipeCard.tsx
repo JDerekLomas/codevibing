@@ -5,6 +5,7 @@ import { useRef, useState, useCallback } from 'react';
 interface SwipeCardProps {
   title: string;
   description: string | null;
+  descriptionLong: string | null;
   preview: string | null;
   author: string;
   url: string;
@@ -13,10 +14,11 @@ interface SwipeCardProps {
   exiting?: 'left' | 'right' | null;
 }
 
-export default function SwipeCard({ title, description, preview, author, url, onSwipe, overlay, exiting }: SwipeCardProps): JSX.Element {
+export default function SwipeCard({ title, description, descriptionLong, preview, author, url, onSwipe, overlay, exiting }: SwipeCardProps): JSX.Element {
   const cardRef = useRef<HTMLDivElement>(null);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const startX = useRef(0);
   const startY = useRef(0);
   const isDragging = useRef(false);
@@ -51,6 +53,9 @@ export default function SwipeCard({ title, description, preview, author, url, on
   if (exiting === 'left') transform = 'translateX(-120%) rotate(-15deg)';
   if (exiting === 'right') transform = 'translateX(120%) rotate(15deg)';
 
+  const imageHeight = expanded ? '40%' : '60%';
+  const infoHeight = expanded ? '60%' : '40%';
+
   return (
     <div
       ref={cardRef}
@@ -63,16 +68,23 @@ export default function SwipeCard({ title, description, preview, author, url, on
         opacity,
         transition: exiting || !dragging ? 'transform 0.4s ease, opacity 0.4s ease' : 'none',
       }}
-      onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
+      onMouseDown={(e) => {
+        // Don't start drag on the accordion area
+        if ((e.target as HTMLElement).closest('[data-accordion]')) return;
+        handleStart(e.clientX, e.clientY);
+      }}
       onMouseMove={(e) => handleMove(e.clientX)}
       onMouseUp={handleEnd}
       onMouseLeave={() => { if (isDragging.current) handleEnd(); }}
-      onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+      onTouchStart={(e) => {
+        if ((e.target as HTMLElement).closest('[data-accordion]')) return;
+        handleStart(e.touches[0].clientX, e.touches[0].clientY);
+      }}
       onTouchMove={(e) => handleMove(e.touches[0].clientX)}
       onTouchEnd={handleEnd}
     >
       {/* Project image or gradient placeholder */}
-      <div className="relative w-full" style={{ height: '60%' }}>
+      <div className="relative w-full transition-all duration-300" style={{ height: imageHeight }}>
         {preview ? (
           <div
             className="w-full h-full bg-cover bg-center"
@@ -108,8 +120,8 @@ export default function SwipeCard({ title, description, preview, author, url, on
       </div>
 
       {/* Card info */}
-      <div className="p-5 flex flex-col justify-between" style={{ height: '40%' }}>
-        <div>
+      <div className="p-5 flex flex-col transition-all duration-300 overflow-hidden" style={{ height: infoHeight }}>
+        <div className="flex-1 min-h-0 overflow-hidden">
           <h3
             className="text-lg font-medium mb-1 leading-tight"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
@@ -118,14 +130,44 @@ export default function SwipeCard({ title, description, preview, author, url, on
           </h3>
           {description && (
             <p
-              className="text-sm leading-relaxed line-clamp-2"
+              className="text-sm leading-relaxed"
               style={{ color: 'var(--color-text-muted)' }}
             >
               {description}
             </p>
           )}
+
+          {/* Accordion for long description */}
+          {descriptionLong && (
+            <div data-accordion className="mt-1.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpanded(!expanded);
+                }}
+                className="text-xs flex items-center gap-1 hover:underline cursor-pointer"
+                style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+              >
+                <span
+                  className="inline-block transition-transform duration-200"
+                  style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                >
+                  &#9656;
+                </span>
+                {expanded ? 'less' : 'more'}
+              </button>
+              {expanded && (
+                <p
+                  className="text-xs leading-relaxed mt-1.5 overflow-y-auto"
+                  style={{ color: 'var(--color-text-muted)', maxHeight: '100px' }}
+                >
+                  {descriptionLong}
+                </p>
+              )}
+            </div>
+          )}
         </div>
-        <div className="flex items-center justify-between mt-2">
+        <div className="flex items-center justify-between mt-2 flex-shrink-0">
           <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
             @{author}
           </span>

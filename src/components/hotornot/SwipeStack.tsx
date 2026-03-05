@@ -10,6 +10,7 @@ interface Project {
   title: string;
   url: string;
   description: string | null;
+  description_long: string | null;
   preview: string | null;
   author: string;
 }
@@ -177,6 +178,7 @@ export default function SwipeStack(): JSX.Element {
         <SwipeCard
           title={currentProject.title}
           description={currentProject.description}
+          descriptionLong={currentProject.description_long}
           preview={currentProject.preview}
           author={currentProject.author}
           url={currentProject.url}
