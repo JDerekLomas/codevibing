@@ -522,7 +522,7 @@ export default async function Home() {
 
         {/* Learn Vibe Coding — standalone post-it */}
         <section className="py-8 flex justify-end">
-          <Link
+          <a
             href="/curriculum"
             className="block w-48 aspect-square rounded-sm p-5 transition-transform hover:scale-105 hover:-rotate-0 flex items-center justify-center text-center"
             style={{
@@ -540,7 +540,7 @@ export default async function Home() {
                 Start learning &rarr;
               </span>
             </div>
-          </Link>
+          </a>
         </section>
 
         {/* Divider */}

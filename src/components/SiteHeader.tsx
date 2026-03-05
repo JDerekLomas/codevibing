@@ -6,6 +6,9 @@ import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import { useAuth } from '@/lib/auth';
 
+// Routes proxied to learnvibecoding via Vercel rewrites — must use <a> not <Link>
+const CROSS_ZONE_ROUTES = new Set(['/curriculum', '/quiz', '/discover', '/claude-code', '/concepts']);
+
 const NAV_LINKS = [
   { href: '/feed', label: 'feed' },
   { href: '/c', label: 'topics' },
@@ -100,14 +103,15 @@ export function SiteHeader() {
         <nav className="hidden sm:flex items-center gap-6 text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
+            const className = `transition-colors hover:opacity-70 ${isActive ? 'font-medium' : ''}`;
+            const style = { color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)' };
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`transition-colors hover:opacity-70 ${isActive ? 'font-medium' : ''}`}
-                style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
-              >
+            return CROSS_ZONE_ROUTES.has(link.href) ? (
+              <a key={link.href} href={link.href} className={className} style={style}>
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.href} href={link.href} className={className} style={style}>
                 {link.label}
               </Link>
             );
@@ -184,15 +188,15 @@ export function SiteHeader() {
         >
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
+            const className = "px-3 py-2 rounded-lg text-sm transition-colors hover:opacity-70";
+            const style = { color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)', fontWeight: isActive ? 500 : 400 };
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-3 py-2 rounded-lg text-sm transition-colors hover:opacity-70"
-                style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)', fontWeight: isActive ? 500 : 400 }}
-                onClick={() => setMenuOpen(false)}
-              >
+            return CROSS_ZONE_ROUTES.has(link.href) ? (
+              <a key={link.href} href={link.href} className={className} style={style} onClick={() => setMenuOpen(false)}>
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.href} href={link.href} className={className} style={style} onClick={() => setMenuOpen(false)}>
                 {link.label}
               </Link>
             );

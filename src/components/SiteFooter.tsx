@@ -1,5 +1,18 @@
 import Link from 'next/link';
 
+// Routes proxied to learnvibecoding via Vercel rewrites — must use <a> not <Link>
+const CROSS_ZONE_ROUTES = new Set(['/curriculum', '/quiz', '/discover', '/claude-code', '/concepts']);
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const className = "transition-colors hover:opacity-70";
+  const style = { color: 'var(--color-text-muted)' };
+  return CROSS_ZONE_ROUTES.has(href) ? (
+    <a href={href} className={className} style={style}>{children}</a>
+  ) : (
+    <Link href={href} className={className} style={style}>{children}</Link>
+  );
+}
+
 export function SiteFooter() {
   return (
     <footer className="py-12 border-t" style={{ borderColor: 'var(--color-warm-border)' }}>
@@ -12,26 +25,10 @@ export function SiteFooter() {
           <div>
             <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>Community</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/feed" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Feed
-                </Link>
-              </li>
-              <li>
-                <Link href="/c" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Topics
-                </Link>
-              </li>
-              <li>
-                <Link href="/people" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  People
-                </Link>
-              </li>
-              <li>
-                <Link href="/bots" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Bots
-                </Link>
-              </li>
+              <li><FooterLink href="/feed">Feed</FooterLink></li>
+              <li><FooterLink href="/c">Topics</FooterLink></li>
+              <li><FooterLink href="/people">People</FooterLink></li>
+              <li><FooterLink href="/bots">Bots</FooterLink></li>
             </ul>
           </div>
 
@@ -39,26 +36,10 @@ export function SiteFooter() {
           <div>
             <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>Learn</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/curriculum" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Curriculum
-                </Link>
-              </li>
-              <li>
-                <Link href="/quiz" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Quiz
-                </Link>
-              </li>
-              <li>
-                <Link href="/discover" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Discover
-                </Link>
-              </li>
-              <li>
-                <Link href="/claude-code" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Claude Code Roadmap
-                </Link>
-              </li>
+              <li><FooterLink href="/curriculum">Curriculum</FooterLink></li>
+              <li><FooterLink href="/quiz">Quiz</FooterLink></li>
+              <li><FooterLink href="/discover">Discover</FooterLink></li>
+              <li><FooterLink href="/claude-code">Claude Code Roadmap</FooterLink></li>
             </ul>
           </div>
 
@@ -66,21 +47,9 @@ export function SiteFooter() {
           <div>
             <h3 className="font-medium mb-3" style={{ color: 'var(--color-text)' }}>More</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/join" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Join
-                </Link>
-              </li>
-              <li>
-                <Link href="/start" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  API / Claude Code
-                </Link>
-              </li>
-              <li>
-                <Link href="/concepts" className="transition-colors hover:opacity-70" style={{ color: 'var(--color-text-muted)' }}>
-                  Key Concepts
-                </Link>
-              </li>
+              <li><FooterLink href="/join">Join</FooterLink></li>
+              <li><FooterLink href="/start">API / Claude Code</FooterLink></li>
+              <li><FooterLink href="/concepts">Key Concepts</FooterLink></li>
             </ul>
           </div>
         </div>
