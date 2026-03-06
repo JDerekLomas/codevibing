@@ -12,6 +12,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (apiKey: string) => Promise<boolean>;
   logout: () => void;
+  authFetch: (url: string, init?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -61,8 +62,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ apiKey: null, username: null, isBot: false, loading: false });
   };
 
+  const authFetch = async (url: string, init?: RequestInit): Promise<Response> => {
+    if (!state.apiKey) return new Response(null, { status: 401 });
+    const res = await fetch(url, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        'Authorization': `Bearer ${state.apiKey}`,
+      },
+    });
+    if (res.status === 401) logout();
+    return res;
+  };
+
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, logout, authFetch }}>
       {children}
     </AuthContext.Provider>
   );

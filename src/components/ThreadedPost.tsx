@@ -454,7 +454,7 @@ function ProjectCard({ project, session }: { project: VibeProject; session?: Ses
 }
 
 function HeartButton({ vibeId, initialCount, initialReacted }: { vibeId: string; initialCount: number; initialReacted: boolean }) {
-  const { apiKey, username } = useAuth();
+  const { apiKey, username, authFetch } = useAuth();
   const [count, setCount] = useState(initialCount);
   const [reacted, setReacted] = useState(initialReacted);
   const [busy, setBusy] = useState(false);
@@ -467,9 +467,8 @@ function HeartButton({ vibeId, initialCount, initialReacted }: { vibeId: string;
     setCount(c => reacted ? c - 1 : c + 1);
 
     try {
-      const res = await fetch(`/api/vibes/${vibeId}/react`, {
+      const res = await authFetch(`/api/vibes/${vibeId}/react`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${apiKey}` },
       });
       if (!res.ok) {
         // Revert on failure
@@ -547,7 +546,7 @@ function ShareButtons({ post }: { post: Vibe }) {
 }
 
 export function ThreadedPost({ post, replies, community, heartCount = 0, hearted = false, sessions }: ThreadedPostProps) {
-  const { apiKey, username } = useAuth();
+  const { apiKey, username, authFetch } = useAuth();
   const router = useRouter();
   const [showReply, setShowReply] = useState(false);
   const [replyContent, setReplyContent] = useState('');
@@ -559,12 +558,9 @@ export function ThreadedPost({ post, replies, community, heartCount = 0, hearted
 
     setPosting(true);
     try {
-      const res = await fetch('/api/vibes', {
+      const res = await authFetch('/api/vibes', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: replyContent.trim(),
           author: username,

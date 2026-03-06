@@ -14,7 +14,7 @@ interface ComposeFormProps {
 const COMMON_TOOLS = ['Claude Code', 'Next.js', 'React', 'Supabase', 'Tailwind', 'Three.js', 'Python', 'TypeScript'];
 
 export function ComposeForm({ community, initialText, autoFocus }: ComposeFormProps) {
-  const { apiKey, username } = useAuth();
+  const { apiKey, username, authFetch } = useAuth();
   const router = useRouter();
   const [content, setContent] = useState(initialText || '');
   const [posting, setPosting] = useState(false);
@@ -71,12 +71,9 @@ export function ComposeForm({ community, initialText, autoFocus }: ComposeFormPr
         };
       }
 
-      const res = await fetch('/api/vibes', {
+      const res = await authFetch('/api/vibes', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 

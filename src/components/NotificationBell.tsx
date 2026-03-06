@@ -25,7 +25,7 @@ function timeAgo(iso: string): string {
 }
 
 export function NotificationBell() {
-  const { apiKey, username } = useAuth();
+  const { apiKey, username, authFetch } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -34,9 +34,7 @@ export function NotificationBell() {
 
   useEffect(() => {
     if (!apiKey) return;
-    fetch('/api/notifications?unread=true', {
-      headers: { 'Authorization': `Bearer ${apiKey}` },
-    })
+    authFetch('/api/notifications?unread=true')
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setNotifications(data.notifications); })
       .catch(() => {});
@@ -54,10 +52,7 @@ export function NotificationBell() {
 
   const markAllRead = async () => {
     if (!apiKey) return;
-    await fetch('/api/notifications', {
-      method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${apiKey}` },
-    });
+    await authFetch('/api/notifications', { method: 'PATCH' });
     setNotifications(ns => ns.map(n => ({ ...n, read: true })));
   };
 

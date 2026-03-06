@@ -150,12 +150,9 @@ export default function UserPage() {
     }
     setFriendStatus('sending');
     try {
-      const res = await fetch('/api/friends', {
+      const res = await auth.authFetch('/api/friends', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${auth.apiKey}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: username })
       });
       const data = await res.json();
