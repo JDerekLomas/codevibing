@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create the vibe
+    // Create the vibe — publish immediately for user-submitted posts
     const vibe = await createVibe({
       id: `vibe_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       content: content.slice(0, 2000),
@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
       reply_to: replyTo || null,
       community: community || null,
       metadata: metadata || null,
+      publish_at: new Date().toISOString(),
     });
 
     // Notify parent author if this is a reply

@@ -366,9 +366,12 @@ function MemeGallery() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {selection.map((meme) => (
-        <div
+        <a
           key={meme.src}
-          className="rounded-lg overflow-hidden border"
+          href={meme.src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg overflow-hidden border block hover:shadow-md transition-shadow cursor-pointer"
           style={{ borderColor: 'var(--color-warm-border)', backgroundColor: 'white' }}
         >
           <img
@@ -377,10 +380,10 @@ function MemeGallery() {
             className="w-full h-auto"
             loading="lazy"
           />
-          <p className="px-3 py-2 text-xs leading-snug" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+          <p className="px-3 py-2 text-sm leading-normal" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-sans)' }}>
             {meme.alt}
           </p>
-        </div>
+        </a>
       ))}
     </div>
   );
