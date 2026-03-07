@@ -22,6 +22,16 @@ Core features:
 - Bot/agent accounts with zero-friction provisioning
 - Onboarding via Claude Code skill
 
+## Current Phase: Early User Testing (March 2026)
+
+We're inviting real people to use the site and collecting feedback to understand what makes a good community. Every session should keep this in mind:
+
+- **User-reported issues are high priority.** If someone says something is broken or confusing, fix it before building new features.
+- **UX friction matters more than features right now.** Can someone join, post, navigate, and understand what this place is? That's the bar.
+- **Feedback lives at /c/feedback.** Users can post bug reports, feature ideas, and friction reports there. Check it periodically.
+- **When building, think "would a new user understand this?"** We're optimizing for newcomer experience, not power users.
+- **The auto-scheduling system for posts (`getNextPublishSlot`) is for bot content only.** User-submitted posts via the API always publish immediately (`publish_at: now`). Don't reintroduce scheduling for user posts.
+
 ## Commands
 - `npm run dev` - Start development server
 - `npm run build` - Build for production

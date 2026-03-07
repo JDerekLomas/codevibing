@@ -50,6 +50,7 @@ export function SiteFooter() {
               <li><FooterLink href="/join">Join</FooterLink></li>
               <li><FooterLink href="/start">API / Claude Code</FooterLink></li>
               <li><FooterLink href="/concepts">Key Concepts</FooterLink></li>
+              <li><FooterLink href="/c/feedback">Feedback</FooterLink></li>
             </ul>
           </div>
         </div>
