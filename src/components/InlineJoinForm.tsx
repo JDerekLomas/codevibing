@@ -136,7 +136,7 @@ export function InlineJoinForm() {
         style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
       >
         <div className="text-sm font-medium mb-3" style={{ color: 'var(--color-text)' }}>
-          Claim your username and join
+          Pick a username — you&apos;re in
         </div>
         <div className="flex gap-2">
           <div className="flex items-center gap-1.5 flex-1">
@@ -188,7 +188,7 @@ export function InlineJoinForm() {
           <p className="text-xs mt-2" style={{ color: '#991B1B' }}>{error}</p>
         )}
         <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
-          Free forever. Takes 10 seconds.
+          No password, no credit card. Just a username.
         </p>
       </div>
     </form>

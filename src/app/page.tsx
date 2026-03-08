@@ -218,7 +218,7 @@ function extractImages(content: string): { text: string; images: string[] } {
 }
 
 async function RecentActivity() {
-  const vibes = await getVibes(10);
+  const vibes = await getVibes(15);
 
   if (vibes.length === 0) {
     return (
@@ -399,7 +399,10 @@ async function getTopCommunities(): Promise<Array<{ slug: string; name: string }
 }
 
 export default async function Home() {
-  const topics = await getTopCommunities();
+  const [topics, userCount] = await Promise.all([
+    getTopCommunities(),
+    getUserCount(),
+  ]);
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-cream)', fontFamily: 'var(--font-sans)' }}>
       <main className="max-w-3xl mx-auto px-6">
@@ -410,13 +413,13 @@ export default async function Home() {
               className="text-3xl sm:text-4xl mb-4 leading-snug"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
             >
-              A place for people building things with AI
+              You built something. Show&nbsp;us.
             </h1>
             <p className="text-base sm:text-lg leading-relaxed mb-3" style={{ color: 'var(--color-text-muted)' }}>
-              We&apos;re a small group of people learning to build software with Claude Code and other AI tools. Some of us are brand new to coding. Some are experienced devs exploring a new way to work.
+              A community for people shipping side projects with AI. Half-finished counts. Janky counts. If you made it and you&apos;re proud of it, we want to see it.
             </p>
             <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: 'var(--color-text-muted)' }}>
-              We share what we&apos;re building, help each other out, and figure it out together. Come hang out.
+              {userCount} builders sharing work-in-progress, helping each other debug, and celebrating the weird stuff nobody else gets.
             </p>
             <div className="max-w-md">
               <InlineJoinForm />
@@ -483,10 +486,66 @@ export default async function Home() {
           <FeaturedBuilds />
         </section>
 
+        {/* Recent Activity — the main attraction */}
+        <section className="pb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-medium" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+              What&apos;s happening right now
+            </h2>
+            <Link
+              href="/feed"
+              className="text-xs hover:underline"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
+            >
+              Full feed &rarr;
+            </Link>
+          </div>
+          <div
+            className="rounded-xl border overflow-hidden"
+            style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+          >
+            <div className="px-5 py-1">
+              <RecentActivity />
+            </div>
+            <div className="border-t px-5 py-4" style={{ borderColor: 'var(--color-warm-border)', backgroundColor: '#FAFAF8' }}>
+              <div className="flex items-center justify-between">
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  This is what it looks like here. Want in?
+                </p>
+                <Link
+                  href="/feed"
+                  className="text-xs px-4 py-2 rounded-lg transition-colors hover:opacity-80"
+                  style={{ fontFamily: 'var(--font-mono)', backgroundColor: 'var(--color-accent)', color: 'white' }}
+                >
+                  Browse the full feed &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Second join CTA — for people who scrolled this far */}
+        <section className="pb-10">
+          <div
+            className="rounded-xl p-6 sm:p-8 border text-center"
+            style={{ backgroundColor: 'white', borderColor: 'var(--color-warm-border)' }}
+          >
+            <h2 className="text-xl sm:text-2xl mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
+              Got something to share?
+            </h2>
+            <p className="text-sm mb-5 max-w-md mx-auto" style={{ color: 'var(--color-text-muted)' }}>
+              Side project, weekend hack, first-ever app — whatever you&apos;re building with AI, post it here.
+            </p>
+            <div className="max-w-sm mx-auto">
+              <InlineJoinForm />
+            </div>
+          </div>
+        </section>
+
         {/* Hot or Not CTA */}
         <HotOrNotTeaser />
 
-        {/* The Vibe — memes, moved up */}
+        {/* The Vibe — memes */}
         <section className="pb-10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
@@ -505,23 +564,6 @@ export default async function Home() {
 
         {/* Divider */}
         <div className="border-b border-dashed" style={{ borderColor: 'var(--color-warm-border)' }} />
-
-        {/* Recent Activity */}
-        <section className="py-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
-              Recent activity
-            </h2>
-            <Link
-              href="/feed"
-              className="text-xs hover:underline"
-              style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-accent)' }}
-            >
-              Full feed &rarr;
-            </Link>
-          </div>
-          <RecentActivity />
-        </section>
 
         {/* Learn Vibe Coding — standalone post-it */}
         <section className="py-8 flex justify-end">
