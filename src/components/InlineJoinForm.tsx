@@ -87,6 +87,10 @@ export function InlineJoinForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username.length < 3) return;
+    if (!email.trim()) {
+      setError('Email is required so you can log back in');
+      return;
+    }
 
     setLoading(true);
     setError('');
@@ -175,7 +179,8 @@ export function InlineJoinForm() {
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          placeholder="email (optional, for account recovery)"
+          placeholder="your email (so you can log back in)"
+          required
           className="w-full mt-2 px-3 py-2 rounded-lg border text-sm outline-none transition-colors focus:border-[#92400E]"
           style={{
             fontFamily: 'var(--font-mono)',
@@ -188,7 +193,7 @@ export function InlineJoinForm() {
           <p className="text-xs mt-2" style={{ color: '#991B1B' }}>{error}</p>
         )}
         <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
-          No password, no credit card. Just a username.
+          No password, no credit card. We&apos;ll email you a login link.
         </p>
       </div>
     </form>

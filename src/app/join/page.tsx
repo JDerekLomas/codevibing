@@ -528,14 +528,15 @@ export default function JoinPage() {
                 </p>
 
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text)' }}>
-                  Email <span className="font-normal" style={{ color: 'var(--color-text-muted)' }}>(optional, for login recovery)</span>
+                  Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors focus:border-[#92400E] mb-4"
+                  required
+                  className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors focus:border-[#92400E] mb-1"
                   style={{
                     fontFamily: 'var(--font-mono)',
                     borderColor: 'var(--color-warm-border)',
@@ -543,6 +544,9 @@ export default function JoinPage() {
                     backgroundColor: 'var(--color-cream)',
                   }}
                 />
+                <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                  We&apos;ll send you a login link. No password needed.
+                </p>
 
                 {result?.error && (
                   <div

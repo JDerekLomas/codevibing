@@ -25,6 +25,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!email || !email.trim()) {
+      return NextResponse.json(
+        { error: 'email is required' },
+        { status: 400 }
+      );
+    }
+
     // Validate username format
     if (!/^[a-zA-Z0-9_-]{1,30}$/.test(username)) {
       return NextResponse.json(
