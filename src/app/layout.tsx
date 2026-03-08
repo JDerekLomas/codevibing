@@ -37,15 +37,17 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'codevibing — learn, share, build together',
-    description: "An AI community of practice. Learn to vibecode, share what you're building, and find your people.",
+    description: "A community for people shipping side projects with AI.",
     siteName: 'codevibing',
     locale: 'en_US',
     type: 'website',
+    images: [{ url: '/api/og/image', width: 1200, height: 630, alt: 'codevibing' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'codevibing — learn, share, build together',
-    description: "An AI community of practice. Learn to vibecode, share what you're building, and find your people.",
+    description: "A community for people shipping side projects with AI.",
+    images: ['/api/og/image'],
   },
   robots: {
     index: true,
