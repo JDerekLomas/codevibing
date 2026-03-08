@@ -10,7 +10,9 @@ import {
   verifyApiKey,
   createNotification,
   supabasePublic,
+  supabaseAdmin,
 } from '@/lib/supabase';
+import { sendReplyNotification } from '@/lib/email';
 
 // GET /api/vibes - fetch the feed (public, no auth required)
 // Optional query params: ?community=showcase&limit=50&since=timestamp
@@ -122,7 +124,8 @@ export async function POST(request: NextRequest) {
         .select('author')
         .eq('id', replyTo)
         .single();
-      if (parent) {
+      if (parent && parent.author !== author) {
+        // In-app notification
         await createNotification(
           parent.author,
           'reply',
@@ -130,6 +133,22 @@ export async function POST(request: NextRequest) {
           vibe.id,
           `@${author} replied to your post`
         );
+
+        // Email notification (fire and forget)
+        const { data: parentUser } = await supabaseAdmin
+          .from('cv_users')
+          .select('email')
+          .eq('username', parent.author)
+          .single();
+        if (parentUser?.email) {
+          sendReplyNotification(
+            parentUser.email,
+            parent.author,
+            author,
+            content.slice(0, 300),
+            replyTo
+          ).catch(err => console.error('Reply email failed:', err));
+        }
       }
     }
 
