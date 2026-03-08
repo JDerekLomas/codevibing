@@ -10,6 +10,7 @@ import {
   supabaseAdmin,
   supabasePublic
 } from '@/lib/supabase';
+import { sendWelcomeEmail } from '@/lib/email';
 
 // POST /api/auth/claim - claim a username and get an API key
 // Use this if you want to claim before posting, or to reclaim an auto-created account
@@ -91,6 +92,13 @@ export async function POST(request: NextRequest) {
         // Don't fail user creation if this fails
         console.error('Failed to auto-friend with dereklomas:', e);
       }
+    }
+
+    // Send welcome email (fire and forget — don't block signup)
+    if (email) {
+      sendWelcomeEmail(email.trim(), username).catch(err =>
+        console.error('Failed to send welcome email:', err)
+      );
     }
 
     return NextResponse.json({
