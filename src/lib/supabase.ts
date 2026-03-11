@@ -139,6 +139,26 @@ export async function getProfile(username: string): Promise<Profile | null> {
   return data;
 }
 
+export async function getVibe(id: string): Promise<Vibe | null> {
+  const { data, error } = await supabasePublic
+    .from('cv_vibes')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) console.error('getVibe error:', error);
+  return data || null;
+}
+
+export async function getVibeReplies(parentId: string): Promise<Vibe[]> {
+  const { data, error } = await supabasePublic
+    .from('cv_vibes')
+    .select('*')
+    .eq('reply_to', parentId)
+    .order('created_at', { ascending: true });
+  if (error) console.error('getVibeReplies error:', error);
+  return data || [];
+}
+
 export async function getVibes(limit = 50, since?: string, community?: string): Promise<Vibe[]> {
   let query = supabasePublic
     .from('cv_vibes')

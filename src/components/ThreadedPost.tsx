@@ -497,7 +497,7 @@ function HeartButton({ vibeId, initialCount, initialReacted }: { vibeId: string;
 
 function ShareButtons({ post }: { post: Vibe }) {
   const [copied, setCopied] = useState(false);
-  const vibeUrl = `https://codevibing.com/feed#${post.id}`;
+  const vibeUrl = `https://codevibing.com/post/${post.id}`;
   const shareText = `@${post.author}: ${post.content.slice(0, 200)}${post.content.length > 200 ? '...' : ''}`;
   const projectUrl = post.project?.url;
 
