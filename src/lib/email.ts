@@ -50,6 +50,63 @@ export async function sendWelcomeEmail(email: string, username: string): Promise
   });
 }
 
+interface DigestPost {
+  id: string;
+  content: string;
+  author: string;
+  project: { title: string; url: string } | null;
+}
+
+export async function sendWeeklyDigest(
+  toEmail: string,
+  toUsername: string,
+  topPosts: DigestPost[],
+  newMemberCount: number
+): Promise<void> {
+  const resend = getResend();
+
+  const postsHtml = topPosts.map(post => {
+    const preview = post.content.length > 150 ? post.content.slice(0, 150) + '...' : post.content;
+    const projectLink = post.project
+      ? ` &mdash; <a href="${post.project.url}" style="color: #92400E;">${post.project.title}</a>`
+      : '';
+    return `
+      <div style="padding: 12px 0; border-bottom: 1px solid #e7e5e4;">
+        <div style="font-size: 12px; color: #78716c; margin-bottom: 4px;">
+          <a href="https://codevibing.com/u/${post.author}" style="color: #92400E; text-decoration: none; font-weight: 600;">@${post.author}</a>${projectLink}
+        </div>
+        <a href="https://codevibing.com/post/${post.id}" style="color: #1c1917; text-decoration: none; font-size: 14px; line-height: 1.5;">
+          ${preview}
+        </a>
+      </div>
+    `;
+  }).join('');
+
+  const statsLine = newMemberCount > 0
+    ? `<p style="color: #57534e; font-size: 14px;">${newMemberCount} new ${newMemberCount === 1 ? 'person' : 'people'} joined this week.</p>`
+    : '';
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: toEmail,
+    subject: 'This week on codevibing',
+    html: WRAPPER(`
+      <p style="color: #1c1917; font-size: 15px;">Hey @${toUsername},</p>
+      <p style="color: #57534e; font-size: 14px;">Here's what happened on codevibing this week:</p>
+      ${statsLine}
+      <div style="margin: 16px 0;">
+        ${postsHtml}
+      </div>
+      <a href="https://codevibing.com/feed" style="display: inline-block; padding: 12px 28px; background: #92400E; color: white; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600; margin: 8px 0;">
+        See more in the feed
+      </a>
+      <p style="color: #a8a29e; font-size: 11px; margin-top: 24px;">
+        To stop receiving these, reply to this email.
+      </p>
+    `),
+  });
+}
+
 export async function sendReplyNotification(
   toEmail: string,
   toUsername: string,
